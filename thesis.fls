@@ -1,7 +1,0 @@
-PWD /home/yannis/Thesis
-INPUT /etc/texmf/web2c/texmf.cnf
-INPUT /usr/share/texmf/web2c/texmf.cnf
-INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
-INPUT /var/lib/texmf/web2c/xetex/xelatex.fmt
-INPUT /home/yannis/Thesis/thesis.tex
-OUTPUT thesis.log

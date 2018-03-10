@@ -1,0 +1,441 @@
+\documentclass[diploma, english]{softlab-thesis}
+
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{color}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{subcaption}
+%\usepackage{refcheck}
+
+\usepackage{url}
+\usepackage[colorlinks]{hyperref}
+\hypersetup{
+  bookmarksnumbered,
+  citecolor={blue},
+  linkcolor={blue},
+  urlcolor={blue},
+  pdfpagemode={UseOutlines}
+}
+
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+
+\usepackage{listings}
+\usepackage{lstlinebgrd}
+\lstset{
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    basicstyle=\ttfamily\footnotesize,
+    basewidth=0.59em,
+    keywordstyle=[3]{},
+    commentstyle=\itshape\footnotesize,
+    tabsize=8,
+    frame=single,
+    frameround=tttt,
+    showstringspaces=false,
+    breaklines=false,
+    captionpos=b,
+    aboveskip=\bigskipamount,
+    belowskip=\bigskipamount,
+    escapechar=^
+}
+\lstdefinestyle{custom}{
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    basicstyle=\ttfamily\footnotesize,
+    basewidth=0.59em,
+    keywordstyle=[3]{},
+    commentstyle=\itshape\footnotesize,
+    tabsize=8,
+    frame=single,
+    frameround=tttt,
+    showstringspaces=false,
+    rulecolor=\color{black},
+    breaklines=false,
+    captionpos=b,
+    aboveskip=\bigskipamount,
+    belowskip=\bigskipamount,
+    escapechar=^,
+    moredelim=**[is][\color{blue}]{@}{@}
+}
+
+\lstnewenvironment{code}[2]{
+  \nopagebreak
+  \lstset{language=C, label={#1}, caption={#2}, style=custom}
+}{}
+
+\lstnewenvironment{code_appendix}{
+  \nopagebreak
+  \lstset{language=C, style=custom, numbers=none,rulecolor=\color{black}}
+}{}
+
+\lstnewenvironment{console}[2]{
+  \nopagebreak
+  \lstset{label={#1}, caption={#2}, numbers=none, style=custom}
+}{}
+ 
+\lstnewenvironment{assembly}[2]{
+  \nopagebreak
+  \lstset{language={[x86masm]Assembler}, label={#1}, caption={#2}, style=custom}
+}{}
+
+\usepackage{etoolbox}
+\expandafter\patchcmd\csname \string\lstinline\endcsname{%
+  \leavevmode
+  \bgroup
+}{%
+  \leavevmode
+  \ifmmode\hbox\fi
+  \bgroup
+}{}{%
+  \typeout{Patching of \string\lstinline\space failed!}%
+}
+\newcommand{\ccode}[1]{\lstset{language=C}\protect\lstinline!#1!}
+
+%%%
+%%%  The document
+%%%
+
+\begin{document}
+
+%%%  Title page
+
+\frontmatter
+
+\title{Systematic Concurrency Testing of Read-Copy-Update under Sequentially Consistent and Weak Memory Models}
+\author{Michalis Kokologiannakis}
+\date{October 2016}
+\datedefense{13}{10}{2016}
+
+\supervisor{Konstantinos Sagonas}
+\supervisorpos{Associate Professor NTUA}
+
+\committeeone{Konstantinos Sagonas}
+\committeeonepos{Associate Professor NTUA}
+\committeetwo{Nikolaos S. Papaspyrou}
+\committeetwopos{Associate Professor NTUA}
+\committeethree{Nectarios Koziris}
+\committeethreepos{Professor NTUA}
+
+\TRnumber{CSD-SW-TR-1-16}  % number-year, ask nickie for the number
+\department{Division of Computer Science}
+
+\maketitle
+
+
+%%%  Abstract, in Greek
+
+\iffalse
+\begin{abstractgr}%
+  
+\input{./abstract_gr.tex}
+  
+\begin{keywordsgr}
+\input{./keywords_gr.tex}
+\end{keywordsgr}
+\end{abstractgr}
+\fi
+
+%%%  Abstract, in English
+
+\begin{abstracten}%
+  
+\input{./abstract_en.tex}
+  
+\begin{keywordsen}
+\input{./keywords_en.tex}
+\end{keywordsen}
+\end{abstracten}
+
+
+%%%  Acknowledgements
+
+\iffalse
+\begin{acknowledgementsgr}
+\end{acknowledgementsgr}
+\fi
+
+\begin{acknowledgementsen}
+  First of all, I am most grateful to my advisor, Kostis Sagonas, for all his help
+  and support during this effort. With his ceaseless enthusiasm and avid interest
+  in research he managed to motivate and inspire me, while his essential advice
+  and guidance throughout this process have been invaluable. I absolutely enjoyed
+  every minute of working with him for my thesis during the last year,
+  and I am looking forward to working with him again in the future.
+
+  I am also much obliged to Paul McKenney, for dedicating a lot of his free time
+  to answer all of my questions willingly and promptly. With his 
+  profound insight into RCU-related issues he helped me in numerous occasions,
+  and his suggestions and input were extremely helpful.
+
+  Finally, I would like to extend my thanks to my parents and brother for
+  their patience, love and support throughout these years; after all, they are
+  the ones who made this endeavour possible.
+  
+\end{acknowledgementsen}
+
+%%%  Various tables
+
+\tableofcontents
+%\listoftables
+\listoffigures
+\listoflistings
+
+
+%%%  Main part of the book
+
+\mainmatter
+
+
+\input{./ch1.tex}
+\input{./ch2.tex}
+\input{./ch3.tex}
+\input{./ch4.tex}
+\input{./ch5.tex}
+\input{./ch6.tex}
+\nocite{*}
+
+%%%  Bibliography
+
+\bibliographystyle{softlab-thesis}
+\bibliography{thesis}
+
+
+%%%  Appendices
+
+\backmatter
+
+\appendix
+
+\chapter{Tree RCU Modified Functions \label{appendix_a}}
+
+Below are listed some functions from \ccode{kernel/rcu/tree.c} file
+that have been modified for the bug injection procedure (see Section
+\ref{valtree_gp}). The code relevant to the bug injections has been
+colored blue.
+
+%\lstinputlisting[linerange={187-199,1530-1572,1597-1671,1958-2011,3554-3581},nolol=true,style=custom}]{/home/michalis/Dropbox/sxolh/thesis/rcu/valtree/v3.19/tree.c}
+
+\begin{code_appendix}
+  void rcu_sched_qs(void) 
+  {@
+  #ifdef LIVENESS_CHECK_2
+	  return;
+  #endif@
+	  if (!rcu_sched_data[get_cpu()].passed_quiesce) {
+		  trace_rcu_grace_period(TPS("rcu_sched"),
+				         rcu_sched_data[get_cpu()].gpnum,
+				         TPS("cpuqs"));
+		  rcu_sched_data[get_cpu()].passed_quiesce = 1;
+	  }
+  }
+
+  static bool __note_gp_changes(struct rcu_state *rsp, struct rcu_node *rnp,
+			      struct rcu_data *rdp)
+  {
+	  bool ret;
+
+	  /* Handle the ends of any preceding grace periods first. */
+	  if (rdp->completed == rnp->completed) {
+
+		  /* No grace period end, so just accelerate recent callbacks. */
+		  ret = rcu_accelerate_cbs(rsp, rnp, rdp);
+
+	  } else {
+
+		  /* Advance callbacks. */
+		  ret = rcu_advance_cbs(rsp, rnp, rdp);
+
+		  /* Remember that we saw this grace-period completion. */
+		  rdp->completed = rnp->completed;
+		  trace_rcu_grace_period(rsp->name, rdp->gpnum, TPS("cpuend"));
+	  }
+
+	  if (rdp->gpnum != rnp->gpnum) {
+		  /*
+		   * If the current grace period is waiting for this CPU,
+		   * set up to detect a quiescent state, otherwise don't
+		   * go looking for one.
+		   */
+		  rdp->gpnum = rnp->gpnum;
+		  trace_rcu_grace_period(rsp->name, rdp->gpnum, TPS("cpustart"));
+		  rdp->passed_quiesce = 0;@
+  #ifdef LIVENESS_CHECK_1
+		  rdp->qs_pending = 0;
+  #else
+		  rdp->qs_pending = !!(rnp->qsmask & rdp->grpmask);
+  #endif
+  #ifdef FORCE_FAILURE_5
+		  rnp->qsmask &= ~rdp->grpmask;
+  #endif@
+		  zero_cpu_stall_ticks(rdp);
+	  }
+	  return ret;
+  }      
+
+  static int rcu_gp_init(struct rcu_state *rsp)
+  {
+	  struct rcu_data *rdp;
+	  struct rcu_node *rnp = rcu_get_root(rsp);
+
+	  rcu_bind_gp_kthread();
+	  raw_spin_lock_irq(&rnp->lock);
+	  smp_mb__after_unlock_lock();
+	  if (!ACCESS_ONCE(rsp->gp_flags)) {
+		  /* Spurious wakeup, tell caller to go back to sleep.  */
+		  raw_spin_unlock_irq(&rnp->lock);
+		  return 0;
+	  }
+	  ACCESS_ONCE(rsp->gp_flags) = 0; /* Clear all flags: New grace period. */
+
+	  if (WARN_ON_ONCE(rcu_gp_in_progress(rsp))) {
+		  /*
+		   * Grace period already in progress, don't start another.
+		   * Not supposed to be able to happen.
+		   */
+		  raw_spin_unlock_irq(&rnp->lock);
+		  return 0;
+	  }
+
+	  /* Advance to a new grace period and initialize state. */
+	  record_gp_stall_check_time(rsp);
+	  /* Record GP times before starting GP, hence smp_store_release(). */
+	  smp_store_release(&rsp->gpnum, rsp->gpnum + 1);
+	  trace_rcu_grace_period(rsp->name, rsp->gpnum, TPS("start"));
+	  raw_spin_unlock_irq(&rnp->lock);
+
+	  /* Exclude any concurrent CPU-hotplug operations. */
+	  mutex_lock(&rsp->onoff_mutex);
+	  smp_mb__after_unlock_lock(); /* ->gpnum increment before GP! */
+
+	  /*
+	   * Set the quiescent-state-needed bits in all the rcu_node
+	   * structures for all currently online CPUs in breadth-first order,
+	   * starting from the root rcu_node structure, relying on the layout
+	   * of the tree within the rsp->node[] array.  Note that other CPUs
+	   * will access only the leaves of the hierarchy, thus seeing that no
+	   * grace period is in progress, at least until the corresponding
+	   * leaf node has been initialized.  In addition, we have excluded
+	   * CPU-hotplug operations.
+	   *
+	   * The grace period cannot complete until the initialization
+	   * process finishes, because this kthread handles both.
+	   */
+	  rcu_for_each_node_breadth_first(rsp, rnp) {
+		  raw_spin_lock_irq(&rnp->lock);
+		  smp_mb__after_unlock_lock();
+		  rdp = &rsp->rda[get_cpu()];
+		  rcu_preempt_check_blocked_tasks(rnp);
+  @#ifdef FORCE_FAILURE_3
+		  rnp->qsmask &= ~rdp->grpmask;
+  #else
+		  rnp->qsmask = rnp->qsmaskinit;
+  #endif@
+		  ACCESS_ONCE(rnp->gpnum) = rsp->gpnum;
+		  WARN_ON_ONCE(rnp->completed != rsp->completed);
+		  ACCESS_ONCE(rnp->completed) = rsp->completed;
+		  if (rnp == rdp->mynode)
+			  (void)__note_gp_changes(rsp, rnp, rdp);
+		  rcu_preempt_boost_start_gp(rnp);
+		  trace_rcu_grace_period_init(rsp->name, rnp->gpnum,
+					      rnp->level, rnp->grplo,
+					      rnp->grphi, rnp->qsmask);
+		  raw_spin_unlock_irq(&rnp->lock);
+		  cond_resched_rcu_qs();
+	  }
+
+	  mutex_unlock(&rsp->onoff_mutex);
+	  return 1;
+  }
+
+  static void
+  rcu_report_qs_rnp(unsigned long mask, struct rcu_state *rsp,
+		    struct rcu_node *rnp, unsigned long flags)
+	  __releases(rnp->lock)
+  {
+	  struct rcu_node *rnp_c;
+
+@  #ifdef LIVENESS_CHECK_3
+	  return;
+  #endif@
+	  /* Walk up the rcu_node hierarchy. */
+	  for (;;) {
+		  if (!(rnp->qsmask & mask)) {
+
+			  /* Our bit has already been cleared, so done. */
+			  raw_spin_unlock_irqrestore(&rnp->lock, flags);
+			  return;
+		  }
+		  rnp->qsmask &= ~mask;
+		  trace_rcu_quiescent_state_report(rsp->name, rnp->gpnum,
+						   mask, rnp->qsmask, rnp->level,
+						   rnp->grplo, rnp->grphi,
+						   !!rnp->gp_tasks);
+@  #ifndef FORCE_FAILURE_6
+		  if (rnp->qsmask != 0 || rcu_preempt_blocked_readers_cgp(rnp)) {
+
+			  /* Other bits still set at this level, so done. */
+			  raw_spin_unlock_irqrestore(&rnp->lock, flags);
+			  return;
+		  }
+  #endif@
+		  mask = rnp->grpmask;
+		  if (rnp->parent == NULL) {
+
+			  /* No more levels.  Exit loop holding root lock. */
+
+			  break;
+		  }
+		  raw_spin_unlock_irqrestore(&rnp->lock, flags);
+		  rnp_c = rnp;
+		  rnp = rnp->parent;
+		  raw_spin_lock_irqsave(&rnp->lock, flags);
+		  smp_mb__after_unlock_lock();
+		  WARN_ON_ONCE(rnp_c->qsmask);
+	  }
+
+	  /*
+	   * Get here if we are the last CPU to pass through a quiescent
+	   * state for this grace period.  Invoke rcu_report_qs_rsp()
+	   * to clean up and start the next grace period if one is needed.
+	   */
+	  rcu_report_qs_rsp(rsp, flags); /* releases rnp->lock. */
+  }
+
+  static int __init rcu_spawn_gp_kthread(void)
+  {
+	  unsigned long flags;
+	  struct rcu_node *rnp;
+	  struct rcu_state *rsp;
+	  struct task_struct *t;
+
+	  rcu_scheduler_fully_active = 1;
+@  #ifdef ENABLE_RCU_BH
+	  for_each_rcu_flavor(rsp) {
+		  t = kthread_run(rcu_gp_kthread, rsp, "%s", rsp->name);
+		  BUG_ON(IS_ERR(t));
+		  rnp = rcu_get_root(rsp);
+		  raw_spin_lock_irqsave(&rnp->lock, flags);
+		  rsp->gp_kthread = t;
+		  raw_spin_unlock_irqrestore(&rnp->lock, flags);
+	  }
+  #else
+	  t = kthread_run(rcu_gp_kthread, &rcu_sched_state, "%s",rcu_sched_state.name);
+	  rnp = rcu_get_root(&rcu_sched_state);
+	  raw_spin_lock_irqsave(&rnp->lock, flags);
+	  rcu_sched_state.gp_kthread = t;
+	  raw_spin_unlock_irqrestore(&rnp->lock, flags);
+  #endif@
+	rcu_spawn_nocb_kthreads();
+	rcu_spawn_boost_kthreads();
+	return 0;
+  }
+  early_initcall(rcu_spawn_gp_kthread);
+\end{code_appendix}
+%%%  End of document
+
+\end{document}

@@ -1,0 +1,58 @@
+\chapter{Introduction}
+
+Moore's Law, named after Intel co-founder Gordon Moore, states that the number of transistors that can be placed on an integrated circuit doubles
+roughly every two years. For decades, chipmakers have succeeded in shrinking chip geometries, allowing Moore's Law to remain on track and consumers to 
+get their hands on ever more powerful laptops, tablets, and smartphones. Software developers could just lay back and wait for the Moore's Law to take effect.
+However, nowadays Moore's Law is coming to an end due to constraints such as heat, clock speeds have largely stood still, and the performance of each individual 
+processor core has increased only incrementally. In order for developers to compensate with the demand of efficient software, programming paradigms such
+as concurrent programming have become a necessity. However, new challenges arise from concurrent programming since it is harder and more
+error-prone than its sequential counterpart. When programming with multiple execution threads errors such as  memory violations, race conditions, shared-memory corruption
+are usual.
+
+More specifically, the typical problems with concurrency can be outlined as follows:
+\begin{itemize}
+\item Race condition: A strange interleaving of processes has an unintended effect.
+\item Deadlock: Two or more processes stop and wait for each other.
+\item Livelock: Two or more processes keep executing without making any progress.
+\end{itemize}
+
+These problems are usually heisenbugs \cite{Musu08} – they can alter their behaviour or completely
+disappear when one tries to isolate them – since they go hand in hand with the order of
+execution of the processes involved.
+
+\section{Testing and Verification of Concurrent Programs}
+
+Testing and verifying the correctness of a concurrent program can be proved a demanding task. 
+A technique used for the systematic exploration of a program's state space is model checking \cite{WikipediaModelChecking}.
+Model checking is a method for formally verifying concurrent systems through specifications about the system expressed as 
+temporal logic formulas and efficient algorithms that can traverse the model defined by the system and check whether
+the specifications hold. The major problem model checking tools have to face is the combinatorial explosion of the state-space since
+a vast number of global states have to be captured and stored. Many techniques have been proposed in order to tackle this problem.
+Stateless model checking, for example, avoids storing global states. This technique has been implemented in tools such as \cite{Gode05}, 
+CHESS \cite{Musu08}, Concuerror \cite{Chri13} and Nidhugg \cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015}. The observation that two 
+interleavings are equivalent if one can be obtained from the other by swapping adjacent, independent execution steps is the core of the partial
+order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR} technique used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
+capture dependencies between operations of concurrent threads while the program is running \cite{FlanaganDPOR}. The exploration begins with an arbitrary interleaving whose steps are then
+used to identify dependent operations and points where alternative interleavings need to
+be explored in order to capture all program behaviours. Another approach is the bounded model checking \cite{BoundedModelChecking} where the finite state
+machine is unrolled for a fixed number of steps and the specifications are checked within these steps. Bounded model checking can be combined with the partial
+order reduction for modeling executions \cite{PORinBMC} and was effectively implemented in tools such as CBMC \cite{CBMC}.
+Unfortunately all these techniques still have to deal with the problem of the state space explosion. In order to deal with this problem further
+bounding of the exploration is required. Many different bounding techniques have been examined \cite{Thomson} such as preemption bounding, delay
+bounding, a controlled random scheduler, and probabilistic concurrency testing (PCT).
+
+\section{Aim of this Thesis}
+
+The purpose of this thesis is the implementation of a preemption bounding technique \cite{BPOR} for Nidhugg and the combination
+of this technique with the a novel technique \cite{AbdullaAronisJohnssonSagonasDPOR2014} suggested for better coverage of the state space.
+The bounded-DPOR was used to verify the linux kernel \cite{LinuxKernel} and specifically RCU \cite{Spin}. RCU is a synchronization
+mechanism used heavily in Linux kernel, and many of the kernel’s subsystems rely on RCU’s correct operation. By using BPOR the minimum preemptive
+switches required to track failure injections were counted. As a result the empirical observation that errors occur in a small bound count was confirmed.
+Moreover, the possible application of various optimizations used for unbounded DPOR on bounded DPOR are examined. 
+
+\section{Overview}
+In Chapter \ref{Chapter 2} the theoretical background utilized in Nidhugg is given for both unbounded and bounded DPOR is given.
+In Chapter \ref{Chapter 3} the implementation of the methods for Nidhugg is discussed. In Chapter \ref{Chapter 4} the different techniques
+implemented are evaluated using both synthetic tests and RCU. In Chapter \ref{Chapter 5} further discussion on possible optimatizations
+is made. In Chapter \ref{Chapter 6} we summarize the previous chapters and the conclusions
+we drew from this thesis, and present some possible extensions to our work.

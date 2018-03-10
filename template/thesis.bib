@@ -1,0 +1,708 @@
+@unpublished{PaulEMcKenney2007WhatIsRCUFundamentally,
+    author = "Paul E. McKenney and Jonathan Walpole",
+    title = "What is {RCU}, Fundamentally?",
+    month = "December",
+    day = "17",
+    year = "2007",
+    note = "Available:
+           \url{http://lwn.net/Articles/262464/}",
+    annotation = "
+	    Lays out the three basic components of RCU: (1) publish-subscribe,
+	    (2) wait for pre-existing readers to complete, and (2) maintain
+	    multiple versions.
+    "
+}
+
+@unpublished{PaulEMcKenney2008WhatIsRCUUsage,
+    author = "Paul E. McKenney",
+    title = "What is {RCU}? Part 2: Usage",
+    month = "January",
+    day = "4",
+    year = "2008",
+    note = "Available:,
+           \url{http://lwn.net/Articles/263130/}",
+    annotation="
+	    Lays out six uses of RCU:
+	    1. RCU is a Reader-Writer Lock Replacement
+	    2. RCU is a Restricted Reference-Counting Mechanism
+            3. RCU is a Bulk Reference-Counting Mechanism
+	    4. RCU is a Poor Man's Garbage Collector
+	    5. RCU is a Way of Providing Existence Guarantees
+	    6. RCU is a Way of Waiting for Things to Finish 
+    "
+}
+
+@unpublished{PaulEMcKenney2008WhatIsRCUAPI
+,Author="Paul E. McKenney"
+,Title="{RCU} part 3: the {RCU} {API}"
+,month="January"
+,day="17"
+,year="2008"
+,note="Available:
+\url{http://lwn.net/Articles/264090/}"
+,annotation="
+	Gives an overview of the Linux-kernel RCU API and a brief annotated RCU
+	bibliography.
+"
+}
+
+@unpublished{PaulEMckenney2010TheRCUAPI
+,Author="Paul E. McKenney"
+,Title="The {RCU} {API}, 2010 Edition"
+,month="December"
+,day="8"
+,year="2010"
+,note="Available:
+\url{http://lwn.net/Articles/418853/}"
+,annotation="
+        Gives an overview of the Linux-kernel RCU API and a brief annotated RCU
+        bibliography
+"
+}
+
+@unpublished{PaulEMckenney2014TheRCUAPI
+,Author="Paul E. McKenney"
+,Title="The {RCU} {API}, 2014 Edition"
+,month="September"
+,day="4"
+,year="2014"
+,note="Available:
+\url{http://lwn.net/Articles/609904/}"
+,annotation="
+        Gives an overview of the Linux-kernel RCU API and a review of
+        some earlier-made predictions about RCU
+"
+}
+
+@misc{WikipediaRCU
+,Title="Read-copy-update"
+,note="Available:
+\url{https://en.wikipedia.org/wiki/Read-copy-update}"
+}
+
+@article{ACMQueueRCU
+,Author="Paul E. McKenney"
+,Title="Structured Deferral: Synchronization via Procrastination"
+,journal="ACM Queue"
+,month="May"
+,day="23"
+,year="2013"
+,note="Available:
+\url{https://queue.acm.org/detail.cfm?id=2488549}"
+,volume="11"
+,number="5"
+}
+
+@unpublished{PaulEMcKenney2010LockdepRCU
+,Author="Paul E. McKenney"
+,Title="Lockdep-RCU"
+,month="February"
+,year="2010"
+,day="1"
+,note="Available:
+\url{https://lwn.net/Articles/371986/}"
+,annotation="
+	CONFIG_PROVE_RCU, or at least an early version.
+"
+}
+
+@unpublished{PaulEMcKenney2009LWNBloatWatchRCU
+,Author="Paul E. McKenney"
+,Title="{RCU}: The {Bloatwatch} Edition"
+,month="March"
+,day="17"
+,year="2009"
+,note="Available:
+\url{http://lwn.net/Articles/323929/}"
+,annotation="
+	Uniprocessor assumptions allow simplified RCU implementation.
+"
+}
+
+@unpublished{PaulEMcKenney2006c
+,Author="Paul E. McKenney"
+,Title="Sleepable {RCU}"
+,month="October"
+,day="9"
+,year="2006"
+,note="Available:
+\url{http://lwn.net/Articles/202847/}
+Revised:
+\url{http://www.rdrop.com/users/paulmck/RCU/srcu.2007.01.14a.pdf}"
+,annotation="
+	LWN article introducing SRCU.
+"
+}
+
+@phdthesis{MathieuDesnoyersPhD
+, title  = "Low-Impact Operating System Tracing"
+, author = "Mathieu Desnoyers"
+, school = "Ecole Polytechnique de Montr\'{e}al"
+, month  = "December"
+, year   = 2009
+,note="Available:
+\url{http://www.lttng.org/pub/thesis/desnoyers-dissertation-2009-12.pdf}"
+,annotation={
+	Chapter 6 (page 97) covers user-level RCU.
+}
+}
+
+@unpublished{PaulEMcKenney2007QRCUspin
+,Author="Paul E. McKenney"
+,Title="Using {Promela} and {Spin} to verify parallel algorithms"
+,month="August"
+,day="1"
+,year="2007"
+,note="Available:
+\url{http://lwn.net/Articles/243851/}"
+,annotation="
+	LWN article describing Promela and spin, and also using Oleg
+	Nesterov's QRCU as an example (with Paul McKenney's fastpath).
+	Merged patch at: http://lkml.org/lkml/2007/2/25/18
+"
+}
+
+@phdthesis{PaulEdwardMcKenneyPhD
+,author="Paul E. McKenney"
+,title="Exploiting Deferred Destruction:
+An Analysis of Read-Copy-Update Techniques
+in Operating System Kernels"
+,school="OGI School of Science and Engineering at
+Oregon Health and Sciences University"
+,year="2004"
+,note="Available:
+\url{http://www.rdrop.com/users/paulmck/RCU/RCUdissertation.2004.07.14e1.pdf}"
+,annotation="
+	Describes RCU implementations and presents design patterns
+	corresponding to common uses of RCU in several operating-system
+	kernels.
+"
+}
+
+@unpublished{PaulEMcKenney2007PreemptibleRCU
+,Author="Paul E. McKenney"
+,Title="The design of preemptible read-copy-update"
+,month="October"
+,day="8"
+,year="2007"
+,note="Available:
+\url{http://lwn.net/Articles/253651/}"
+,annotation="
+	LWN article describing the design of preemptible RCU.
+"
+}
+
+@unpublished{PaulEMcKenney2008HierarchicalRCU
+,Author="Paul E. McKenney"
+,Title="Hierarchical {RCU}"
+,month="November"
+,day="3"
+,year="2008"
+,note="Available:
+\url{http://lwn.net/Articles/305782/}"
+,annotation="
+	RCU with combining-tree-based grace-period detection,
+	permitting it to handle thousands of CPUs.
+"
+}
+
+@Conference{Arcangeli03
+,Author="Andrea Arcangeli and Mingming Cao and Paul E. McKenney and
+Dipankar Sarma"
+,Title="Using Read-Copy Update Techniques for {System V IPC} in the
+{Linux} 2.5 Kernel"
+,Booktitle="Proceedings of the 2003 USENIX Annual Technical Conference
+(FREENIX Track)"
+,Publisher="USENIX Association"
+,year="2003"
+,month="June"
+,pages="297-310"
+}
+
+@book{RobertLoveLKDed3
+,Author="Robert Love"
+,Title="Linux Kernel Development"
+,Edition="3rd"
+,Publisher="Addison-Wesley"
+,year="2010"
+}
+
+@book{UnderstandingLinuxKerneled3BovetCesati
+,Author="Daniel P. Bovet and Marco Cesati"
+,Title="Understanding the Linux kernel"
+,Edition="3rd"
+,Publisher="O' Reilly"
+,year=2005
+}
+
+@unpublished{EWD:EWD35
+,Author="Edsger W. Dijkstra"
+,Title="Over de sequentialiteit van procesbeschrijvingen"
+,note="circulated privately"
+,url="\url{http://www.cs.utexas.edu/users/EWD/ewd00xx/EWD35.PDF}"
+}
+
+@unpublished{PaulEMckenneyRCUFundamentalsPart1
+,Author="Paul E. McKenney"
+,Title="Requirements for RCU part 1: the fundamentals"
+,year="2015"
+,month="July"
+,day="29"
+,note="Available:
+\url{http://lwn.net/Articles/652156/}"
+,annotation="
+	Describes fundamental RCU requirements and
+	fundamental RCU non-requirements
+"
+}
+
+@unpublished{PaulEMckenneyRCUFundamentalsPart2
+,Author="Paul E. McKenney"
+,Title="Requirements for RCU part 2 -- parallelism and software engineering"
+,year="2015"
+,month="August"
+,day="5"
+,note="Available:
+\url{http://lwn.net/Articles/652677/}"
+,annotation="
+	Describes RCU requirements driven by software-engineering
+	and parallelism concerns
+"
+}
+
+@unpublished{PaulEMckenneyRCUFundamentalsPart3
+,Author="Paul E. McKenney"
+,Title="Requirements for RCU part 3"
+,year="2015"
+,month="August"
+,day="12"
+,note="Available:
+\url{http://lwn.net/Articles/652677/}"
+,annotation="
+        Describes more RCU-specific requirements
+"
+}
+
+@inproceedings{McKenneyAhmedGroceJensenMutationASE2015
+,Title="How Verified is My Code? Falsification-Driven Verification"
+,Author="Iftekhar Ahmed and Alex Groce and Carlos Jensen and Paul E. McKenney"
+,booktitle="30th IEEE/ACM International Conference on Automated Software Engineering (ASE)"
+,year="2015"
+,month="November"
+,pages="737-748"
+,url="\url{https://www.cs.cmu.edu/~agroce/ase15.pdf}"
+}
+
+@inproceedings{AbdullaAronisJohnssonSagonasDPOR2014,
+author = {Abdulla, Parosh and Aronis, Stavros and Jonsson, Bengt and Sagonas, Konstantinos},
+ title = {Optimal Dynamic Partial Order Reduction},
+ booktitle = {Proceedings of the 41st ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+ series = {POPL '14},
+ year = {2014},
+ isbn = {978-1-4503-2544-8},
+ location = {San Diego, California, USA},
+ pages = {373--384},
+ numpages = {12},
+ url = {http://doi.acm.org/10.1145/2535838.2535845},
+ doi = {10.1145/2535838.2535845},
+ acmid = {2535845},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {concurrency, dynamic partial oder reduction, software model checking, source sets, systematic testing, wakeup trees},
+} 
+
+@inproceedings{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015,
+ author = {Abdulla, Parosh Aziz and Aronis, Stavros and Atig, Mohamed Faouzi and Jonsson, Bengt and Leonardsson, Carl and Sagonas, Konstantinos},
+ title = {Stateless Model Checking for TSO and PSO},
+ booktitle = {Proceedings of the 21st International Conference on Tools and Algorithms for the Construction and Analysis of Systems - Volume 9035},
+ year = {2015},
+ isbn = {978-3-662-46680-3},
+ pages = {353--367},
+ numpages = {15},
+ url = {http://dx.doi.org/10.1007/978-3-662-46681-0_28},
+ doi = {10.1007/978-3-662-46681-0_28},
+ acmid = {2945622},
+ publisher = {Springer-Verlag New York, Inc.},
+ address = {New York, NY, USA},
+} 
+
+@misc{WikipediaMemoryOrdering
+,Title="Memory ordering"
+,note="Available:
+\url{https://en.wikipedia.org/wiki/Memory_ordering}"
+}
+
+@misc{RelaxedMemoryConcurrency
+,Title="Relaxed-Memory Concurrency"
+,note="Available:
+\url{http://www.cl.cam.ac.uk/~pes20/weakmemory/}"
+}
+
+@misc{WikipediaModelChecking
+,Title="Model checking"
+,note="Available:
+\url{https://en.wikipedia.org/wiki/Model_checking}"
+}
+
+@article{BoundedModelChecking
+,Title="Bounded Model Checking"
+,Author="Armin Biere and Alessandro Cimatti and Edmund M. Clarke and Ofer Strichman and Yunshan Zhu"
+,journal="Advances in Computers"
+,volume="58"
+,year="2003"
+}
+
+@inproceedings{PORinBMC
+,Title="Partial Orders for Efficient Bounded Model Checking of Concurrent Software"
+,Author="Jade Alglave and Daniel Kroening and Michael Tautschnig"
+,booktitle="Proceedings of the 25th International Conference on Computer Aided Verification"
+,pages="141-157"
+,url="\url{http://www.kroening.com/papers/cav2013-wpo.pdf}"
+,year="2013"
+}
+
+@inproceedings{CBMC,
+    author = {Edmund Clarke and Daniel Kroening and Flavio Lerda},
+    title = {A tool for checking ANSI-C programs},
+    booktitle = {Tools and Algorithms for the Construction and Analysis of Systems},
+    year = {2004},
+    pages = {168--176},
+    publisher = {Springer}
+}
+
+@article{POR,
+    author = "Edmund M. Clarke and Orna Grumberg and Marius Minea and Doron A. Peled",
+    title = "State Space Reduction Using Partial Order Techniques",
+    journal = "International Journal on Software Tools for Technology Transfer",
+    volume = "2",
+    number = "3",
+    pages = "279-287",
+    year = "1999"
+}
+
+@inproceedings{SMC,
+    author = "Patrice Godefroid",
+    title = "Model checking for programming languages using VeriSoft",
+    booktitle = "Proceedings of the 24th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages",
+    pages = "147-186",
+    year = "1997"
+}
+
+@article{Gode05,
+author = "Patrice Godefroid",
+title = "Software Model Checking: The VeriSoft Approach",
+journal = "Formal Methods in System Design",
+volume = "26",
+number = "2",
+pages = "77-101",
+year = "2005"
+}
+
+@inproceedings{Musu08,
+author = "Mandanlal Musuvathi and Shaz Qadeer and Thomas Ball and Gerald Basler and Piramanayagam Arumuga Nainar and Iulian Neamtiu",
+title = "Finding and Reproducing Heisenbugs in Concurrent Programs",
+booktitle = "Proceedings of the 8th USENIX Symposium on Operating Systems Design and Implementation (OSDI '08)",
+pages = "267-280",
+publisher = {USENIX Association},
+year = "2008",
+address = {Berkeley, CA, USA}
+}
+
+@inproceedings{Chri13,
+author = "Maria Christakis and Alkis Gotovos and Konstantinos Sagonas",
+title = "Systematic Testing for Detecting Concurrency Errors in Erlang Programs",
+booktitle = "Sixth IEEE International Conference on Software Testing, Verification and Validation (ICST 2013)",
+pages = "154-163",
+publisher = "IEEE Computer Society",
+address = "Los Angeles, CA, USA",
+year = "2013"
+}
+
+@inproceedings{FlanaganDPOR,
+ author = {Flanagan, Cormac and Godefroid, Patrice},
+ title = {Dynamic Partial-order Reduction for Model Checking Software},
+ booktitle = {Proceedings of the 32nd ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+ series = {POPL '05},
+ year = {2005},
+ isbn = {1-58113-830-X},
+ location = {Long Beach, California, USA},
+ pages = {110--121},
+ numpages = {12},
+ url = "\url{http://doi.acm.org/10.1145/1040305.1040315}",
+ doi = {10.1145/1040305.1040315},
+ acmid = {1040315},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {partial-order reduction, software model checking},
+}
+
+@misc{LinuxKernel,
+  title = {The Linux kernel},
+  note = "\url{https://www.kernel.org/}"
+}
+
+@inproceedings{Gotsman2013,
+ author = {Gotsman, Alexey and Rinetzky, Noam and Yang, Hongseok},
+ title = {Verifying Concurrent Memory Reclamation Algorithms with Grace},
+ booktitle = {Proceedings of the 22nd European Conference on Programming Languages and Systems},
+ series = {ESOP'13},
+ year = {2013},
+ isbn = {978-3-642-37035-9},
+ location = {Rome, Italy},
+ pages = {249--269},
+ numpages = {21},
+ url = "\url{http://dx.doi.org/10.1007/978-3-642-37036-6_15}",
+ doi = {10.1007/978-3-642-37036-6_15},
+ acmid = {2450289},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+} 
+
+@inproceedings{Tassarotti2015,
+ author = {Tassarotti, Joseph and Dreyer, Derek and Vafeiadis, Viktor},
+ title = {Verifying Read-copy-update in a Logic for Weak Memory},
+ booktitle = {Proceedings of the 36th ACM SIGPLAN Conference on Programming Language Design and Implementation},
+ series = {PLDI '15},
+ year = {2015},
+ isbn = {978-1-4503-3468-6},
+ location = {Portland, OR, USA},
+ pages = {110--120},
+ numpages = {11},
+ url = "\url{http://doi.acm.org/10.1145/2737924.2737992}",
+ doi = {10.1145/2737924.2737992},
+ acmid = {2737992},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {C/C++, Concurrency, Program logic, RCU, Separation logic, Weak memory models},
+}
+
+@phdthesis{Seyster2012,
+author = "Justin Seyster",
+title = "Runtime Verification of Kernel-Level Concurrency Using Compiler-Based Instrumentation",
+school = "Stony Brook University",
+year = "2012"
+}
+
+@phdthesis{Duggal2010,
+author = "Abhinav Duggal",
+title = "Stopping Data Races Using Redflag",
+school = "Stony Brook University",
+year = "2010"
+}
+
+@article{Desnoyers2013,
+ author = {Desnoyers, Mathieu and McKenney, Paul E. and Dagenais, Michel R.},
+ title = {Multi-core Systems Modeling for Formal Verification of Parallel Algorithms},
+ journal = {SIGOPS Oper. Syst. Rev.},
+ issue_date = {July 2013},
+ volume = {47},
+ number = {2},
+ month = jul,
+ year = {2013},
+ issn = {0163-5980},
+ pages = {51--65},
+ numpages = {15},
+ url = "\url{http://doi.acm.org/10.1145/2506164.2506174}",
+ doi = {10.1145/2506164.2506174},
+ acmid = {2506174},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Promela, instruction reordering, model checking, multiprocessor, read copy update, shared memory, weak memory model},
+}
+
+@article{Desnoyers2012,
+ author = {Desnoyers, Mathieu and McKenney, Paul E. and Stern, Alan S. and Dagenais, Michel R. and Walpole, Jonathan},
+ title = {User-Level Implementations of Read-Copy Update},
+ journal = {IEEE Trans. Parallel Distrib. Syst.},
+ issue_date = {February 2012},
+ volume = {23},
+ number = {2},
+ month = feb,
+ year = {2012},
+ issn = {1045-9219},
+ pages = {375--382},
+ numpages = {8},
+ url = "\url{http://dx.doi.org/10.1109/TPDS.2011.159}",
+ doi = {10.1109/TPDS.2011.159},
+ acmid = {2122521},
+ publisher = {IEEE Press},
+ address = {Piscataway, NJ, USA},
+ keywords = {Synchronization, process management, operating systems, software/software engineering, threads, concurrency.},
+} 
+
+@unpublished{McKenney2015,
+title = "Verification Challenge 4: Tiny RCU",
+author = "Paul E. McKenney",
+year = "2015",
+month = "3",
+day = "9",
+note = "Available: \url{http://paulmck.livejournal.com/39343.html}"
+}
+
+@misc{LKMLBugForcingInitialization,
+title = "rcu: fix long-grace-period race between forcing and initialization",
+note = "\url{https://lkml.org/lkml/2009/10/28/196}"
+}
+
+@misc{LKMLBugCompletedCounter,
+title = "rcu: Fix synchronization for \ccode{rcu_process_gp_end()} uses of \ccode{->completed} counter",
+note = "\url{https://lkml.org/lkml/2009/11/4/69}"
+}
+
+@misc{LKMLAdditionalPatches,
+title = "rcu: clean up locking for \ccode{->completed} and \ccode{->gpnum} fields",
+note = "\url{https://lkml.org/lkml/2009/10/30/212}"
+}
+
+@unpublished{McKenneyHeisenbugs2009,
+title = "Hunting Heisenbugs",
+author = "Paul E. McKenney",
+year = "2009",
+month = "11",
+day = "1",
+note = "Available: \url{http://paulmck.livejournal.com/14639.html}"
+}
+
+@unpublished{AndroidPhonesKernel,
+title = "Google says there are now 1.4 billion active Android devices worldwide",
+author = "John Callaham",
+year = "2015",
+month = "September",
+day = "29",
+note = "Available: \url{http://www.androidcentral.com/google-says-there-are-now-14-billion-active-android-devices-worldwide}"
+}
+
+@misc{KernelNOHZ,
+title = "NO\_HZ: Reducing Scheduling-Clock Ticks",
+note = "Available: \url{https://www.kernel.org/doc/Documentation/timers/NO_HZ.txt}"
+}
+
+@misc{KernelDoc,
+title = "Linux Kernel Documentation",
+note = "Available: \url{https://www.kernel.org/doc/}"
+}
+
+@misc{KernelLockdep,
+title = "Runtime locking correctness validator",
+author = "Ingo Molnar and Arjan van de Ven",
+note = "Available: \url{https://www.kernel.org/doc/Documentation/locking/lockdep-design.txt}"
+}
+
+@misc{KernelRCU,
+title = "RCU Concepts",
+note = "Available: \url{https://www.kernel.org/doc/Documentation/RCU/rcu.txt}"
+}
+
+@misc{KernelRCURequirements,
+title = "RCU Requirements",
+note = "Available: \url{https://www.kernel.org/doc/Documentation/RCU/Design/Requirements/}"
+}
+
+@unpublished{RelativisticProgrammingWiki
+,Author="Josh Triplett and Paul E. McKenney and Jonathan Walpole"
+,Title="Relativistic Programming"
+,month="September"
+,year="2009"
+,note="Available:
+\url{http://wiki.cs.pdx.edu/rp/}"
+,annotation="
+	Main Relativistic Programming Wiki.
+"
+}
+
+@misc{RCULinuxUsage,
+title = "RCU Linux Usage",
+author = "Paul E. McKenney",
+note = "Available: \url{http://www.rdrop.com/users/paulmck/RCU/linuxusage.html}"
+}
+
+@Conference{McKenney98
+,Author="Paul E. McKenney and John D. Slingwine"
+,Title="Read-Copy Update: Using Execution History to Solve Concurrency
+Problems"
+,Booktitle="{Parallel and Distributed Computing and Systems}"
+,Month="October"
+,Year="1998"
+,pages="509-518"
+,Address="Las Vegas, NV"
+}
+
+@misc{KernelMemoryBarriers,
+title = "Linux Kernel Memory Barriers",
+author = "David Howells and Paul E. McKenney and Will Deacon and Peter Zijlstra",
+note = "Available: \url{https://www.kernel.org/doc/Documentation/memory-barriers.txt}"
+}
+
+@misc{Sparse,
+title = "Sparse - a Semantic Parser for C",
+note = "Available: \url{https://sparse.wiki.kernel.org/index.php/Main_Page}"
+}
+
+@misc{IntelCStates,
+title = "Power Management States: P-States, C-States, and Package C-States",
+note = "Available: \url{https://software.intel.com/en-us/articles/power-management-states-p-states-c-states-and-package-c-states}"
+}
+
+@misc{AMDCNQ,
+title = "Cool'n'Quiet",
+note = "Available: \url{https://en.wikipedia.org/wiki/Cool%27n%27Quiet}"
+}
+
+@misc{GCCAtomics,
+title = "Built-in Functions for Memory Model Aware Atomic Operations",
+note = "Available: \url{https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html}"
+}
+
+@misc{ClangAtomics,
+title = "LLVM Atomic Instructions and Concurrency Guide",
+note = "Available: \url{http://llvm.org/docs/Atomics.html#libcalls-atomic}"
+}
+
+@conference{TACAS2015,
+title = "Rules for 4th Intl. Competition on Software Verification",
+booktitle = "21st International Conference on Tools and Algorithms for the Construction and Analysis of Systems (TACAS)",
+author = "Dirk Beyer",
+year = "2015",
+month = "4",
+day = "16",
+note = "Available: \url{https://sv-comp.sosy-lab.org/2015/rules.php}"
+}
+
+@inproceedings{Peled1993,
+ author = {Peled, Doron},
+ title = {All from One, One for All: On Model Checking Using Representatives},
+ booktitle = {Proceedings of the 5th International Conference on Computer Aided Verification},
+ series = {CAV '93},
+ year = {1993},
+ isbn = {3-540-56922-7},
+ pages = {409--423},
+ numpages = {15},
+ url = {http://dl.acm.org/citation.cfm?id=647762.735490},
+ acmid = {735490},
+ publisher = {Springer-Verlag},
+ address = {London, UK, UK},
+}
+
+@inproceedings{Valmari1991,
+ author = {Valmari, Antti},
+ title = {Stubborn Sets for Reduced State Space Generation},
+ booktitle = {Proceedings of the 10th International Conference on Applications and Theory of Petri Nets: Advances in Petri Nets 1990},
+ year = {1991},
+ isbn = {3-540-53863-1},
+ pages = {491--515},
+ numpages = {25},
+ url = {http://dl.acm.org/citation.cfm?id=647736.735461},
+ acmid = {735461},
+ publisher = {Springer-Verlag},
+ address = {London, UK, UK},
+} 
+
+@book{Godefroid1996,
+ author = {Godefroid, Patrice},
+ editor = {Leeuwen, J. van and Hartmanis, J. and Goos, G.},
+ title = {Partial-Order Methods for the Verification of Concurrent Systems: An Approach to the State-Explosion Problem},
+ year = {1996},
+ isbn = {3540607617},
+ publisher = {Springer-Verlag New York, Inc.},
+ address = {Secaucus, NJ, USA},
+} 

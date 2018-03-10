@@ -1,0 +1,460 @@
+\chapter{Background Knowledge}
+\label{Chapter 2}
+
+\section{Cuncurrent programming}
+
+Concurrent computing, which is implemented by concurrent programming paradigm, is a form of computing in which several 
+computations are executed during overlapping time 
+periods—concurrently—instead of sequentially (one completing before the next starts). 
+This is a property of a system—this may be an individual program, a computer, or a network—and there is a separate execution point 
+or "thread of control" for each computation ("process"). A concurrent system is one where a computation can advance without waiting for 
+all other computations to complete.
+The main challenge in designing concurrent programs is concurrency control: ensuring the correct sequencing of the 
+interactions or communications between different computational executions, and coordinating access to resources that are shared among executions.
+Potential problems include race conditions, deadlocks, and resource starvation. 
+The scheduler is usually responsible for running a thread. Due to this scheduling indeterminism the programmer can not always be aware of which thread
+will be scheduled next and thus concurrent programs may seem to run randomly. 
+
+An important aspect of a concurrent program is the notion of the set of interleavings. 
+If we imagine a process as a (possibly infinite) sequence/trace of statements (e.g. obtained by loop unfolding),
+then the set of possible interleavings of several processes consists of all possible sequences of statements of any of those process.
+
+As it can be inferred, debugging this kind of programs can be proved extremely challenging. The challenge mainly emerges from the fact that it is 
+not always clear which thread command will be executed. Moreover the error may not always occur or cannot be traced during debugging. There may be only a limited
+number of interleavings that produce an error. 
+
+
+\section{Stateless model checking and partial order reduction}
+
+In order to find an error of a concurrent algorithm, one must examine every possible interleaving this algorithm can produce. Usually the error 
+would occur only under some unexpected interleaving, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
+the program along all these possible interleavings. However, this approach suffers from state explosion, i.e. the number of all possible interleavings grows 
+exponentially with the size of the program and the number of threads. Several approaches to this problem have been proposed in order to deal with this challenge: 
+partial order reduction and bounded search. Partial order reduction is aiming to reduce the number of interleavings explored by eliminating equivalent interleavings.
+These equivalent traces are produced by the inversion of independent events which do not affect the results of the program. For example, the scheduling of two threads that read a local
+variable can be inverted since the result of the operation is affected by the order under which each operation occurs. 
+There are two ways that a partial order reduction algorithm can be implemented. The first is a
+static partial order reduction algorithm where the dependencies between two threads are tracked before the execution of the concurrent program. 
+The second is the Dynamic partial order reduction (DPOR) which observes the program's dependencies on runtime. It is important to notice that the size of
+the state space still grows exponentially even if it is reduced by the DPOR. 
+
+For larger programs DPOR often runs longer than developers are willing to wait. In these cases, bounded search can be proved useful. Bounded search,
+in contrast to the DPOR, alleviates state-space explosion by pruning the executions that exceed a bound \cite{Thomson}. There have been proposed many bounded techniques
+such as preemption bounded search or delay bounded search. All bounded search techniques are based on the notion that many of the concurrency bugs can be
+tracked even when the bound limit is set to be small, thus the time required for a bug to be found is significantly smaller.
+
+\section{Vector Clocks}
+
+A vector clock is an algorithm for generating a partial ordering of events in a distributed or concurrent system and detecting causality violations. 
+Just as in Lamport timestamps \cite{Lamp}, interprocess messages contain the state of the sending process's logical clock. 
+A vector clock of a system of N processes is an array/vector of N logical clocks, one clock per process; 
+a local "smallest possible values" copy of the global clock-array is kept in each process, with the following rules for clock updates:
+
+The algorithm consists of the following steps:
+
+\begin{enumerate}
+    \item Each process experiencing an internal event, it increments its own logical clock in the vector by one.
+    \item Each time a process receives a message or performs an action on a shared variable, it increments its own logical clock in the vector by one and updates each element in its vector 
+    by taking the maximum of the value in its own vector clock and the value in the vector in the received message or the maximum value of all processes that share
+    the same shared variable. (for every element).
+\end{enumerate}
+
+An example execution of the algorithm is in Figure \ref{Clock example} where both the source code and an explored trace are given.
+As we can easily notice for each command the clock of the main thread increases. The thread <0.0> starts to run its clock for the thread <0> is 8 since 
+that is the moment when the thread was spawned. When the value of y is read the clock for <0> increases again so it corresponds with the y=1 event. When the first thread is
+scheduled again then its clock for the <0.0> is 7 since \verb|pthread_join()| command takes place.
+
+
+\Side{./code/clocks.c}{Vector Clock example}{./code/clocks.out}{Vector Clock output}{Clock example}
+
+Every algorithm that is presented in this thesis is based on vector clocks algorithm.
+
+\section{Event Dependencies}
+
+One of the most important concepts when we have to deal with an algorithm that searches the whole state space of the different schedulings is the 
+happen-before relation in an execution sequence. Usually this relation is denoted with $\rightarrow$ symbol. For example, if the relation $\rightarrow$ 
+for two events $e,e'$ in $dom(E)$ holds true then the event $e$ happens-before $e'$. This relation usually appears in the message exchange, when $e$ is the message
+transmission and $e'$ is the event when the message is received. For the context of Nidhugg $e \rightarrow e'$ would hold true when at least one of the two events
+is a write operation on the same shared variable. It is fathomable that any DPOR algorithm should be able to assign this happen-before relations. In practice,
+the happens-before assignment is implemented with the use of vector clocks that demonstrate the relating accesses to the same variable.
+
+\begin{definition}{(happen-before assignment)}
+    A happens-before assignment, which assigns a
+    unique happens-before relation $\rightarrow$ E to any execution sequence
+    $E$, is valid if it satisfies the following properties for all execution
+    sequences $E$.
+    \begin{enumerate}
+        \item $\rightarrow_{E}$ is a partial order on $dom(E)$, which is included in $<_E$. In other words every scheduling is part of the set of all possible
+        partial order of the program.
+        \item The execution steps of each process are totally ordered, i.e. 
+        $\langle p,i \rangle \rightarrow_E \langle p,i+1 \rangle$ whenever $\langle p, i+1 \rangle \in dom(E)$.
+        \item If $E'$ is a prefix of $E$ then $\rightarrow_E$ and $\rightarrow_{E'}$ are the same on $dom(E')$.
+        \item Any linearization $E'$ of $\rightarrow_E$ on $dom(E)$ is an execution sequence which has exactly the same “happens-before” relation
+$\rightarrow_{E'}$ as $\rightarrow_E$. This means that the relation $\rightarrow_E$ induces a set
+of equivalent execution sequences, all with the same “happens-
+before” relation. We use $E \simeq E'$ to denote that $E$ and $E'$ are
+linearizations of the same “happens-before” relation, and $[E] \simeq$ 
+to denote the equivalence class of E.
+    \item If $E \simeq E'$ then $s_{[E]} = s_{[E']}$ (i.e. two equivalent traces will lead to the same state).
+    \item For any sequences $E, E'$ and $w$, such that $E.w$ is an execution
+sequence, we have $E \simeq E'$  if and only if $E.w \simeq' E'.w$.
+    \end{enumerate}
+\end{definition}
+
+The first six properties should be obvious for any reasonable
+happens-before relation. The only non-obvious one would be the
+last. Intuitively, if the next step of p happens before the next step
+of $r$ after the sequence $E$, then the step of $p$ still happens before
+the step of $r$ even when some step of another process, which is not
+dependent with $p$, is inserted between $p$ and $r$. This property holds
+in any reasonable computation model that we could think of. As
+examples, one situation is when $p$ and $q$ read a shared variable that
+is written by $r$. Another situation is that $p$ sends a message that is
+received by $r$. If an intervening process $q$ is independent with $p$, it
+cannot affect this message, and so $r$ still receives the same message.
+Properties 4 and 5 together imply, as a special case, that if $e$
+and $e'$ are two consecutive events in E with $e \not \rightarrow_{E} e'$, then they can
+be swapped and the (global) state after the two events remains the
+same.
+
+\section{Indipendence and races}
+We now define independence between events of a computation. If
+$E.p$ and $E.w$ are both execution sequences, then $E \models p\diamondsuit w$ denotes
+that $E.p.w$ is an execution sequence such that $next_{[E]}(p) \not \rightarrow_{E.p.w} e$
+for any $e \in dom([E.p])(w)$. In other words, $E \models p \diamondsuit w$ states that
+the next event of $p$ would not “happen before” any event in $w$
+in the execution sequence $E.p.w$. Intuitively, it means that $p$ is
+independent with $w$ after $E$. In the special case when $w$ contains
+only one process $q$, then $E \models p \diamondsuit q$ denotes that the next steps of
+$p$ and $q$ are independent after $E$. We use $E'| =p \diamondsuit w$ to denote that
+$E \not \models p \diamondsuit w$ does not hold.
+
+For a sequence $w$ and $p \in w$, let $w \\ p$ denote the sequence
+$w$ with its first occurrence of $p$ removed, and let $w \uparrow p$ denote the
+prefix of w up to but not including the first occurrence of $p$. For
+an execution sequence $E$ and an event $e \in  dom(E)$, let $pre(E, e)$
+denote the prefix of $E$ up to, but not including, the event $e$. For an
+execution sequence $E$ and an event $e \in E$, let $notdep(e, E)$ be the
+sub-sequence of $E$ consisting of the events that occur after $e$ but do
+not “happen after” $e$ (i.e. the events $e'$ that occur after $e$ such that
+$e \not \rightarrow_E e'$.
+
+
+A central concept in most DPOR algorithms is that of a race.
+Intuitively, two events, $e$ and $e'$ in an execution sequence $E$, where
+$e$ occurs before $e'$ in $E$, are in a race if
+\begin{itemize}
+\item $e$ happens-before $e'$ in $E$, and
+\item $e$ and $e'$ are “concurrent”, i.e. there is an equivalent execution
+sequence $E' \simeq E$ in which $e$ and $e'$ are adjacent.
+\end{itemize}
+Formally, let $e \l_E e'$ denote that $proc(e) \not = proc(e')$, that $e \rightarrow_E e'$,
+and that there is no event $e'' \in dom(E)$, different from $e'$ and $e$,
+such that $e \rightarrow_E e'' \rightarrow_E e'$.
+
+Whenever a DPOR algorithm detects a race, then it will check
+whether the events in the race can be executed in the reverse order.
+Since the events are related by the happens-before relation, this may
+lead to a different global state: therefore the algorithm must try to
+explore a corresponding execution sequence. Let $e \lesssim_E e'$ denote
+that $e \lessdot_E e'$ , and that the race can be reversed. Formally, if E 0 ' E
+and $e$ occurs immediately before $e'$ in $E'$ , then $proc(e')$ was not
+blocked before the occurrence of $e$.
+
+
+\section{Unbounded dynamic partial order reduction}
+
+Before explaining the DPOR algorithm it is important to define sufficient sets.
+
+\begin{definition}{Sufficient Sets}
+A set of transitions is sufficient in a state $s$ if any relevant
+state reachable via an enabled transition from s is also reach able from $s$ via at least one of the transitions in the sufficient
+set. A search can thus explore only the transitions in the
+sufficient set from s because all relevant states still remain
+reachable. The set containing all enabled threads is trivially
+sufficient in $s$, but smaller sufficient sets enable more state
+space reduction.
+\end{definition}
+
+Many techniques have been proposed in order to implement a DPOR algorithm. What all most of these techniques share in common is the following basic structure:
+\SetKwProg{Fn}{Function}{}{}
+
+\SetKwHangingKw{Let}{let}
+\begin{algorithm}[H]
+    \caption{General form of DPOR}
+    Explore($\emptyset$)\;
+    \Fn{Explore($S$)}{
+     \Let{T = Sufficient\_set($final(S)$)}
+     \For{all $t \in T$}{
+        Explore($S.t$) \;
+    }
+    }
+\end{algorithm}
+
+where $final(S)$ represents the state that will be reached when the scheduling $S$ is executed.
+
+The algorithm above describes a DFS search in the state space of all possible interleavings.
+As it can be inferred from the algorithm the most important step is that of the calculation of the set T.
+
+An obvious property that the sufficient sets must hold is that Sufficient\_set$(final(S)) \subseteq enabled(S)$.
+
+\begin{definition}{$enabled(s)$}
+    Given a state $s$, $enabled(s)$ represents the set of all the threads that can be scheduled immediately after $s$.
+\end{definition}
+
+Intuitively $enabled(s)$ represents the threads that are not blocked or have already finished their execution.
+
+In bibliography many types of sets can be found \cite{Godefroid1996}. In this thesis we mainly focus on persistent sets and on source sets.
+
+
+\section{Persistent Sets}
+
+\begin{definition}{(Persistent Sets)}
+A persistent set in a state $s$ is a sufficient set of transitions to
+explore from s while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
+sets explores a persistent set of transitions from each state s where $enabled(s) \neq $ and prunes enabled transitions that
+are not persistent in s.
+In a more formal way:\\
+
+Let $s$ be a state, and let $W \subseteq E(s)$ be a set
+of execution sequences from $s$. A set $T$ of transitions is a persistent set for $W$
+after $s$ if for each prefix $w$ of some sequence in $W$, which contains no occurrence
+of a transition in $T$ , we have $E \vdash t \diamondsuit w$ for each $t \in T$.
+\end{definition}
+
+The above definition can be described as followed: If a $t \in T$ and there is another thread $t'$ that can be executed until a command which
+is in a race with the $t$ then $t'$ belongs in the persistent set.
+
+Notice that the definition of persistent sets suggests a way to construct them.
+
+Let a concurrent program contain 3 threads. The first thread changes the value of the variable (writer) and and the other just read this variable (readers).
+Let w.r1.r2 be an interleaving. According to the definition of the persistent sets r1 and r2 are in a race with w, thus, r1 and r2 must also be on the persistent set
+of the first command of the interleaving. In Figure \ref{Construction of persistent set} we notice that both r and q threads are added to the persistent set of the first
+command of the trace since both conflict with the write operation. At the second example, again both r and q are added. However, there is no conflict between p and r. The reason
+why the thread r is added is the conflict that will be produced by the q's write operation.
+
+\trace{persistent.pdf}{Construction of persistent set}
+
+\section{Source sets}
+
+Before defining source sets, it is crucial to give some other useful definitions.
+
+\begin{definition}{($dom(E)$)}
+    The set of events-transitions happening in during the scheduling of $E$.
+\end{definition}
+
+\begin{definition}{(Initials after an execution sequence $E.w$, $I_{[E]}(w)$)}
+For an execution sequence $E.w$, let $I_{[E]}(w)$ denote the set of
+processes that perform events $e$ in $dom_{[E]}(w)$ that have no
+“happens-before” predecessors in dom[E](w). More formally,
+$p \in I_{[E]}(w)$ if $p \in w$ and there is no other event $e \in dom_{[E]}(w)$ with
+$e \rightarrow_{E.w} next_{[E]}(p)$.
+\end{definition}
+
+\begin{definition}{(Source Sets)}
+Let $S$ be an execution sequence,
+and let $W$ be a set of sequences, such that $E.w$ is an execution
+sequence for each $w \in W$. A set $T$ of processes is a source set for
+$W$ after $E$ if for each $w \in W$ we have $WI [E] (w) \cap P  = \emptyset$.
+\end{definition}
+
+A source set is a set of threads that guarantee that the whole state space will be explored. Notice that their is no requirement related to the races
+of the events.
+What the above definition implies is that source can be considered every set of threads that contains these threads that are able to cover the whole state-space.
+It actually suggests a property for the sufficient sets to hold.
+
+\section{Sleep sets}
+
+Another technique complementary to the persistent or source sets aiming to reduce the number of interleavings is the sleep set technique.
+Sleep sets prohibit visited transitions from executing again
+until the search explores a dependent transition. Assume that
+the search explores transition $t$ from state $s$, backtracks $t$,
+then explores $t_0$ from $s$ instead. Unless the search explores
+a transition that is dependent with $t$, no states are reachable
+via $t_0$ that were not already reachable via t from s. Thus, t
+“sleeps” unless a dependent transition is explored.
+
+A short example on sleep sets is the following:
+Let us the concurrent program of one writer and two readers.
+let w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) and r2 <0.2>: (local operations), r(x).
+
+The resulted traces are demonstrated in the \ref{Sleep set example}.
+
+\Output{./code/sleep_sets.out}{Sleep set example}
+
+As we can see from the execution of the DPOR algorithm the interleaving which started from r2 was blocked since it would lead to an interleaving which
+has already been explored. Notice that this is due to the fact that r1 cannot wakeup since its first transition (local operations) does not conflict with any other transition
+in the program. 
+It can be proved \cite{Godefroid1996} that sleeps will eventually block all the redundant interleavings and thus the only interleavings that will be explored till their end (where all threads that could be executed, have been executed).
+As a result an optimal algorithm should be able to not consider these interleavings whatsoever.
+
+\section{Comparing Persistent sets with Source Sets}
+
+It is transparent that the definition of source sets is much more relaxed than the definition of the persistent sets. 
+This relaxation enables the source sets to be much more efficient than the persistent sets. In Figure \ref{Non-minimal persistent sets}
+an example is given were sleep sets and persistent sets differentiate.
+
+\begin{figure*}
+    \begin{lstlisting}[frame=none,numbers=none]
+        Initially: x = y = z = 0 
+    \end{lstlisting}
+    \begin{minipage}{0.3\textwidth}
+      \begin{lstlisting}[frame=none, numbers=none]
+        p:
+        m := x; (p1)
+        if (m = 0) then
+        z := 1; (p2)
+      \end{lstlisting}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+        \begin{lstlisting}[frame=none, numbers=none]
+            q:
+            n := y; (q1)
+            if (n = 0) then
+            x := 1; (q2)
+        \end{lstlisting}
+      \end{minipage}
+      \begin{minipage}{0.3\textwidth}
+        \begin{lstlisting}[frame=none, numbers=none]
+            r:
+            o := z; (r1)
+            if (o = 0) then
+            y := 1; (r2)
+        \end{lstlisting}
+      \end{minipage}
+      \caption{Program with non-minimal persistent sets}
+      \label{Non-minimal persistent sets}
+  \end{figure*}
+
+From the example, it is clear the reason why source sets are an improvement over persistent sets is the fact that minimum source sets can eliminate
+sleep set blocked traces i.e. traces that would eventually be blocked by the sleep sets. An algorithm that would only calculate minimal source sets would be optimal \cite{AbdullaAronisJohnssonSagonasDPOR2014}, hence
+would never explore two equivalent interleavings.
+
+It is obvious that a single transition cannot be a source set. For
+instance, the set {p1} does not contain the initials of execution q1.q2.p1.r1.r2,
+since q2 and p1 perform conflicting accesses. On the other hand, any subset
+containing two enabled transitions is a source set. To see this, let us choose
+{p1, q1} as the source set. Obviously, {p1, q1} contains an initial of any execution
+that starts with either p1 or q1. Any execution sequence which starts with r1 is
+equivalent to an execution obtained by moving the first step of either p1 or q1 to
+the beginning:
+\begin{itemize}
+\item If q1 occurs before r2, then q1 is an initial, since it does not conflict with
+any other transition.
+\item If q1 occurs after r2, then p1 is independent of all steps, so p1 is an initial.
+We claim that {p1, q1} cannot be a persistent set. The reason is that the execution
+sequence r1.r2 does not contain any transition in the persistent set, but its second
+step is dependent with q1. By symmetry, it follows that no other two-transition
+set can be a persistent set.
+\end{itemize}
+
+In other words, persistent sets have the unpleasant property that adding a process
+may disturb the persistent set so that even more process may have to be added.
+This property is relevant in the context of DPOR, where the first member of the
+persistent set is often chosen rather arbitrarily (it is the next process in the first
+exploration after $E$), and where the persistent set is expanded by need.
+
+Continuing the comparison between source sets and persistent sets, we first
+note some rather direct properties, including the following.
+
+\begin{itemize}
+\item Any persistent set is a source set.
+\item Any one-process source set is a persistent set.
+\end{itemize}
+
+An interesting question is then whether there are situations where any persistent
+set contains a strictly smaller source set. We note that the program in Fig. 1
+does not illustrate such a situation, since the smallest persistent sets and the
+smallest source sets coincide: they are either {q} or {r}. Nevertheless, the answer
+to this question is yes, and we formulate this as a theorem.
+
+
+\section{Bounded search - preemption bounded search}
+Bounded search explores only executions that do not exceed
+a bound \cite{BPOR,Thomson}. The bound may be any property of a
+sequence of transitions. A bound evaluation function $Bv(S)$
+computes the bounded value for a sequence of transitions S.
+A bound evaluation function Bv and bound c are inputs to
+bounded search. Bounded search may not visit all relevant
+reachable states; it visits only those that are reachable within
+the bound. If a search explores all relevant states reachable
+within the bound, then it provides bounded coverage.
+
+An algorithm that could describe a bounded search would be the following:
+
+\begin{algorithm}[H]
+    \caption{Bounded-DPOR}
+    \KwResult{Explore the whole statespace}
+    Explore($\emptyset$)\;
+    \Fn{Explore($S$)}{
+        T = Sufficient\_set($final(S)$)
+     \For{all $t \in T$}{
+         \If{$Bv(S.t) \leq c$}{
+            Explore($S.t$)
+         }
+        }
+    }
+\end{algorithm}
+
+\noindent The only difference between the unbounded and the bounded version of the algorithm is the if statement which allows for an interleaving to be explored
+only if the bound has not been exceeded.
+
+What is needed next is an appropriate definition of the function $B_v$ that calculates a value, the bounded-DPOR tries to keep bounded, 
+and the sufficient set. 
+
+In this thesis we mainly focus on preemption-bounded search. 
+
+Preemption-bounded search limits the number of preemptive context switches that occur in an execution \cite{Musu07}. The 
+preemption bound is defined recursively as follows.
+
+\begin{definition}{Preemption bound}
+$P_b(t) = 0$ \\
+$P_b(S.t) = 
+ \begin{cases} 
+    P_b(S) + 1 & \text{ if } t.tid = last(S).tid \text{ and } last(S).tid \in enabled(final(S)) \\
+    P_b(S) & \text{ otherwise }
+ \end{cases}
+$\\
+\end{definition}
+
+The previous definition describes what a preemptive context switch is. A preemptive context switch happens when the previously running thread could execute
+its next step but it does not due to the scheduling of an other thread. Hence, a preemptive switch will increase the preemption bound.
+
+\section{Preemption-bound persistent sets}
+
+A set that has been proposed as a sufficient for preemption bounded search is the preemption bounded persistent set \cite{BPOR}.
+
+An important observation is that the execution of a thread until it gets blocked or terminates will not increase
+the bound count.
+\begin{definition}{(ext(s,t))}
+    Given a state $s = final(S)$ and a transition $t \in enabled(s)$,
+    $ext(s,t)$ returns the unique sequence of transitions $\beta$ from $s$
+    such that
+    \begin{enumerate}
+        \item $\forall i \in dom(\beta): \beta_i.tid = t.tid$
+        \item $t.tid \notin enabled(final(S.\beta))$
+    \end{enumerate}
+\end{definition}
+
+\begin{definition}{(Preemption bounded persistent set)}
+
+A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(S)$
+is preemption-bound persistent in $s$ iff for all nonempty
+sequences $a$ of transitions from $s$ in $A_G(P_b,c)$ such that
+$\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
+
+\begin{enumerate}
+\item $Pb(S.t) \leq Pb(S.a_1)$
+\item if $Pb(S.t) < Pb(S.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(S.a), last(a).tid)$
+\item if $Pb(S.t) = Pb(S.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(S.a), last(a).tid)$
+\end{enumerate}
+
+\end{definition}
+where $A_G(P_b,c)$ is a generic bounded state space with bound function $P_b$ and bound c.
+
+Let us assume that $P$ is a persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
+threads that would be added in a block that would be created when a $p$ was scheduled. These threads are called conservative threads threads and their 
+goal is to allow the coverage of interleavings that would not exceed the bound. Notice that an interleaving can be both conservative and non-conservative.
+Preemption bounded persistent set extends a persistent set by adding all the threads that will create a new block
+after the block that will be created by the persistent set.
+

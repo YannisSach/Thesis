@@ -1,0 +1,617 @@
+\documentclass[diploma, english]{softlab-thesis}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usepackage{color}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{subcaption}
+%\usepackage{refcheck}
+
+\usepackage{url}
+\usepackage[colorlinks]{hyperref}
+\hypersetup{
+  bookmarksnumbered,
+  citecolor={blue},
+  linkcolor={blue},
+  urlcolor={blue},
+  pdfpagemode={UseOutlines}
+}
+
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[chapter]
+
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+
+\usepackage{listings}
+\usepackage{lstlinebgrd}
+\lstset{
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    basicstyle=\ttfamily\footnotesize,
+    basewidth=0.59em,
+    keywordstyle=[3]{},
+    commentstyle=\itshape\footnotesize,
+    tabsize=8,
+    frame=single,
+    frameround=tttt,
+    showstringspaces=false,
+    breaklines=false,
+    captionpos=b,
+    aboveskip=\bigskipamount,
+    belowskip=\bigskipamount,
+    escapechar=^
+}
+\lstdefinestyle{custom}{
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    basicstyle=\ttfamily\footnotesize,
+    basewidth=0.59em,
+    keywordstyle=[3]{},
+    commentstyle=\itshape\footnotesize,
+    tabsize=8,
+    frame=single,
+    frameround=tttt,
+    showstringspaces=false,
+    rulecolor=\color{black},
+    breaklines=false,
+    captionpos=b,
+    aboveskip=\bigskipamount,
+    belowskip=\bigskipamount,
+    escapechar=^,
+    moredelim=**[is][\color{blue}]{@}{@}
+}
+
+\lstnewenvironment{code}[2]{
+  \nopagebreak
+  \lstset{language=C, label={#1}, caption={#2}, style=custom}
+}{}
+
+\lstnewenvironment{code_appendix}{
+  \nopagebreak
+  \lstset{language=C, style=custom, numbers=none,rulecolor=\color{black}}
+}{}
+
+\lstnewenvironment{console}[2]{
+  \nopagebreak
+  \lstset{label={#1}, caption={#2}, numbers=none, style=custom}
+}{}
+ 
+\lstnewenvironment{assembly}[2]{
+  \nopagebreak
+  \lstset{language={[x86masm]Assembler}, label={#1}, caption={#2}, style=custom}
+}{}
+
+\usepackage{etoolbox}
+\expandafter\patchcmd\csname \string\lstinline\endcsname{%
+  \leavevmode
+  \bgroup
+}{%
+  \leavevmode
+  \ifmmode\hbox\fi
+  \bgroup
+}{}{%
+  \typeout{Patching of \string\lstinline\space failed!}%
+}
+\newcommand{\ccode}[1]{\lstset{language=C}\protect\lstinline!#1!}
+
+%% My commands
+\newcommand{\EndAlg}{\BlankLine 
+\BlankLine 
+\BlankLine 
+\BlankLine}
+
+\graphicspath{ {img/} }
+\newcommand{\trace}[2]{
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{#1}
+\caption{#2}
+\label{#2}
+\end{figure}
+}
+
+\newcommand{\tracelong}[2]{
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{#1}
+\caption{#2}
+\end{figure}
+}
+
+\newcommand{\graph}[2]{
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{#1}
+\caption{#2}
+\label{#2}
+\end{figure}
+}
+
+\newcommand{\mediumGraph}[2]{
+  \begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{#1}
+    \caption{#2}
+    \label{#2}
+    \end{figure}
+    }
+
+\newcommand{\Code}[2]{
+  \begin{minipage}{\linewidth}
+  \lstinputlisting[caption=#2]{#1}
+  \label{#2}
+  \end{minipage}
+ }
+
+\newcommand{\Output}[2]{
+  %%\BVerbatimInput[fontsize=\tiny]{#1}
+  \begin{minipage}{\textwidth}
+  \lstinputlisting[label={#2},numbers=none,frame=none,caption=#2]{#1}
+  \end{minipage}
+  %%\caption{#2}
+ }
+
+\newcommand{\Side}[5]{
+  %\begin{figure}
+    \begin{minipage}{0.5\textwidth}
+      \lstinputlisting[frame=none, numbers=none,caption={[#2]}]{#1}
+    \end{minipage}
+    %%\begin{minipage}{0.1\textwidth}
+    %%  \includegraphics[scale=0.1]{arrow.pdf}
+    %%\end{minipage}
+    \begin{minipage}{0.5\textwidth}
+      %%\VerbatimInput{#2}
+      \lstinputlisting[frame=none, numbers=none,caption={[#4]}]{#3}
+    \end{minipage}
+    \captionof{figure}{#5}
+    \label{#5}
+    
+     % \caption{#5}
+     % \label{#5}
+  %\end{figure}
+} 
+
+\newcommand{\bigtabular}[2]{
+ \begin{table} 
+   \resizebox{\linewidth}{!}{
+      \input{#1}
+    }
+    \caption{#2}
+    \label{#2}
+ \end{table}
+}
+
+\newcommand{\smalltabular}[2]{
+  \begin{table} 
+     \input{#1}
+     \caption{#2}
+     \label{#2}
+  \end{table} 
+}
+
+%%%
+%%%  The document
+%%%
+
+\begin{document}
+
+%%%  Title page
+
+\frontmatter
+
+\title{Bounding Techniques For Dynamic Partial Order Reduction}
+\author{Ioannis-Petros Sachinoglou}
+\date{November 2017}
+\datedefense{00}{00}{0000}
+
+\supervisor{Konstantinos Sagonas}
+\supervisorpos{Associate Professor NTUA}
+
+\committeeone{Konstantinos Sagonas}
+\committeeonepos{Associate Professor NTUA}
+\committeetwo{Nikolaos S. Papaspyrou}
+\committeetwopos{Associate Professor NTUA}
+\committeethree{Nectarios Koziris}
+\committeethreepos{Professor NTUA}
+
+\TRnumber{CSD-SW-TR-1-16}  % number-year, ask nickie for the number
+\department{Division of Computer Science}
+
+\maketitle
+
+
+%%%  Abstract, in Greek
+
+\iffalse
+\begin{abstractgr}%
+  
+\input{./abstract_gr.tex}
+  
+\begin{keywordsgr}
+\input{./keywords_gr.tex}
+\end{keywordsgr}
+\end{abstractgr}
+\fi
+
+%%%  Abstract, in English
+%%\iffalse
+\begin{abstracten}%
+  
+\input{./abstract_en.tex}
+  
+\begin{keywordsen}
+\input{./keywords_en.tex}
+\end{keywordsen}
+\end{abstracten}
+%%\fi
+
+%%%  Acknowledgements
+
+\iffalse
+\begin{acknowledgementsgr}
+\end{acknowledgementsgr}
+\fi
+
+\begin{acknowledgementsen}
+
+  First of all, I would like to thank my advisor, Kostis Sagonas, for his help and support during the preparation of this diploma thesis.
+  Not only did he encourage me and support me all this time, but he also inspired me by his ceaseless enthusiasm and his avid interest in my
+  work. I would also like to thank all members of Kostis Sagonas' team both in NTUA and Upsalla University and particulary Stavros Aronis for 
+  their vivid support. 
+
+  Finally, I would like to extend my thanks to my family for encouraging me and supporting me all these years. Without them I would not
+  be able to accomplish my goals.
+  
+\end{acknowledgementsen}
+
+%%%  Various tables
+
+\tableofcontents
+\listoftables
+\listoffigures
+\listoflistings
+\listofalgorithms
+\addcontentsline{toc}{chapter}{List of Algorithms}
+%%%  Main part of the book
+
+\mainmatter
+
+
+\input{./ch1.tex}
+\input{./ch2.tex}
+\input{./ch3.tex}
+\input{./ch4.tex}
+\input{./ch5.tex}
+\input{./ch6.tex}
+\nocite{*}
+
+%%%  Bibliography
+
+\bibliographystyle{softlab-thesis}
+\bibliography{thesis}
+
+
+%%%  Appendices
+
+\backmatter
+
+\appendix
+
+\chapter{ \label{appendix_a}}
+
+Below are listed some testcases examined throughout.
+
+%\lstinputlisting[linerange={187-199,1530-1572,1597-1671,1958-2011,3554-3581},nolol=true,style=custom}]{/home/michalis/Dropbox/sxolh/thesis/rcu/valtree/v3.19/tree.c}
+
+\begin{code_appendix}
+  // 1writer-2readers.c
+  #include <pthread.h>
+  #include <assert.h>
+  
+  volatile int c = 0;
+  void *writer(){
+    c = 2;
+    return NULL;
+  }
+  
+  void *reader(void * arg){
+    int local;
+    local = c;
+    return NULL;
+  }
+  
+  int main(int argc, char *argv[]){
+    pthread_t t,t2,t3;
+    pthread_create(&t,NULL, writer,NULL);
+    pthread_create(&t2, NULL, reader, NULL);
+    pthread_create(&t3, NULL, reader, NULL);
+    return 0;
+  }
+
+  //acount.c
+  #include <pthread.h>
+  #include <stdio.h>
+  #include <assert.h>
+  
+  pthread_mutex_t m;
+  //int nondet_int();
+  int x, y, z, balance;
+  _Bool deposit_done=0, withdraw_done=0;
+  
+  void *deposit(void *arg) 
+  {
+    pthread_mutex_lock(&m);
+    balance = balance + y;
+    deposit_done=1;
+    pthread_mutex_unlock(&m);
+  }
+  
+  void *withdraw(void *arg) 
+  {
+    pthread_mutex_lock(&m);
+    balance = balance - z;
+    withdraw_done=1;
+    pthread_mutex_unlock(&m);
+  }
+  
+  void *check_result(void *arg) 
+  {
+    pthread_mutex_lock(&m);
+    if (deposit_done && withdraw_done)
+      assert(balance == (x + y) - z);
+    pthread_mutex_unlock(&m);
+  }
+  
+  int main() 
+  {
+    pthread_t t1, t2, t3;
+  
+    pthread_mutex_init(&m, 0);
+  
+    x = 1;
+    y = 2;
+    z = 4;
+    balance = x;
+  
+    pthread_create(&t3, 0, check_result, 0);
+    pthread_create(&t1, 0, deposit, 0);
+    pthread_create(&t2, 0, withdraw, 0);
+  
+    return 0;
+  }
+
+  //indexer0.c
+  #include <assert.h>
+  #include <stdlib.h>
+  #include <pthread.h>
+  #include <stdbool.h>
+  #include  <stdatomic.h>
+  #include <stdio.h>
+  
+  #define SIZE 128
+  #define MAX  4
+  
+  atomic_int table[SIZE];
+  
+  void *thread_n(void *arg)
+  {
+    int tid = *((int *) arg);
+    int zero = 0;
+    int w, h;
+  
+    for (int i = 0; i < MAX; i++) {
+      w = i * 11 + tid;
+  
+      h = (w * 7) % SIZE;
+  
+      if (h < 0)
+        assert(0);
+  
+      while (!atomic_compare_exchange_strong_explicit(&table[h], &zero, w,
+                  memory_order_relaxed,
+                  memory_order_relaxed)) {
+  //		printf("%d: %d\n",tid,h);
+        h = (h+1) % SIZE;
+        zero = 0;
+      }
+    }
+    return NULL;
+  }
+  
+  int idx[N];
+  
+  int main()
+  {
+    pthread_t t[N];
+  
+    for (int i = 0; i < N; i++) {
+      idx[i] = i;
+      pthread_create(&t[i], NULL, thread_n, &idx[i]);
+    }
+    for(int i = 0; i<N; i++){
+      pthread_join(t[i],NULL);
+    }
+    return 0;
+  }
+
+  #include <assert.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include  <stdatomic.h>
+
+#define SIZE 128
+#define MAX  1
+
+atomic_int table[SIZE];
+
+void *thread_n()
+{
+    int h = 0, zero = 0;
+    while (!atomic_compare_exchange_strong_explicit(&table[h], &zero, 1,
+                                                    memory_order_relaxed,
+                                                    memory_order_relaxed))
+    {
+        h = (h + 1) % SIZE;
+        zero = 0;
+    }
+    return NULL;
+}
+
+int idx[N];
+
+int main()
+{
+	pthread_t t[N];
+
+	for (int i = 0; i < N; i++) {
+		pthread_create(&t[i], NULL, thread_n, NULL);
+	}
+
+	return 0;
+}
+
+//lastzero.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include "stdatomic.h"
+
+int array[N+1];
+int idx[N+1];
+
+void *thread_reader(void *unused)
+{
+	for (int i = N; array[i] != 0; i--);
+
+	return NULL;
+}
+
+void *thread_writer(void *arg)
+{
+	int j = *((int *) arg);
+
+	array[j] = array[j - 1] + 1;
+	return NULL;
+}
+
+int main()
+{
+	pthread_t t[N+1];
+
+	for (int i = 0; i <= N; i++) {
+		idx[i] = i;
+		if (i == 0) {
+			if (pthread_create(&t[i], NULL, thread_reader, &idx[i]))
+				abort();
+		} else {
+			if (pthread_create(&t[i], NULL, thread_writer, &idx[i]))
+				abort();
+		}
+	}	
+
+	return 0;
+}
+
+//lazy.c
+
+#include <pthread.h>
+#include <assert.h>
+
+pthread_mutex_t  mutex;
+int data = 0;
+
+void *thread1(void *arg)
+{
+  pthread_mutex_lock(&mutex);
+  data++;
+  pthread_mutex_unlock(&mutex);
+  return NULL;
+}
+
+
+void *thread2(void *arg)
+{
+  pthread_mutex_lock(&mutex);
+  data+=2;
+  pthread_mutex_unlock(&mutex);
+}
+
+
+void *thread3(void *arg)
+{
+  pthread_mutex_lock(&mutex);
+  if (data >= 3){
+    //assert(0);
+  }
+  pthread_mutex_unlock(&mutex);    
+}
+
+
+int main()
+{
+  pthread_mutex_init(&mutex, 0);
+
+  pthread_t t1, t2, t3;
+
+  pthread_create(&t3, 0, thread3, 0);
+  pthread_create(&t1, 0, thread1, 0);
+  pthread_create(&t2, 0, thread2, 0);
+
+  pthread_join(t1, 0);
+  pthread_join(t2, 0);
+  pthread_join(t3, 0);
+  
+  return 0;
+}
+
+//micro.c
+
+#include <assert.h>
+#include <pthread.h>
+
+int x=0;
+
+void* t1(void* arg)
+{
+  x++;
+  x++;
+  assert(0<x);
+}
+
+void* t2(void* arg)
+{
+  x++;
+  x++;
+  assert(0<x);
+}
+
+void* t3(void* arg)
+{
+  x++;
+  x++;
+  assert(0<x);
+}
+
+int main(void)
+{
+  pthread_t id[3];
+
+  pthread_create(&id[0], NULL, &t1, NULL);
+  pthread_create(&id[1], NULL, &t2, NULL);
+  pthread_create(&id[2], NULL, &t3, NULL);
+
+  return 0;
+}
+
+\end{code_appendix}
+%%%  End of document
+
+\end{document}

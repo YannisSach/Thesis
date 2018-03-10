@@ -1,0 +1,295 @@
+\chapter{Evaluation of Bounding Techniques}
+\label{Chapter 4}
+
+In this chapter the performance of each implemented technique will be discussed. Firstly the performance of persistent sets is demonstrated in order to prove
+that is indeed differentiated from source sets. The evaluation happens in two parts. In the first part, short synthetic programs are used, while in the second part
+real world software is tested. All the programs tested will be Added in the appendix section. One area where Nidhugg is tested is the verification of the Read Copy Update
+technique of the Linux kernel.
+
+
+\section{Synthetic Tests}
+There are many tests provided from various sources. Most of these testcases are not complicated at all since their purpose is to demonstrate the optimization
+of the Source-DPOR compared to the DPOR.
+
+\begin{itemize}
+\item The writer-Nreaders test: In this test N threads read (reader) the same global variable and one threads (writer) writes that variable. It is important 
+to notice that in this case there are some other local operations taking place before the read of the variable. As a result we must expect different results between 
+source-sets and persistent sets.
+
+\item Account: This test is a small bank account simulation which uses mutex locks to prevent simultaneous operations on the account.
+There are three possible operations: The deposit operation increases the balance by an amount. The withdraw operation decreases the balance by a certain amount. The check\_result operation confirms 
+$\text{final\_balance} == \text{initial\_balance} + \text{deposit} - \text{withdraw}$ and can only happen after both deposit and withdraw were completed.
+
+\item Micro: In this test three threads are spawned that perform the \verb|x++| operation twice. The \verb|x++| operation
+consists of two operations a read operation and a write operation.
+
+\item Last-zero test: program whose pseudo code is shown in Figure 4. Its N+1 threads operate on an array of
+N+1 elements which are all initially zero. In this program, thread 0
+searches the array for the zero element with the highest index, while
+the other N threads read one of the array elements and update the
+next one. The final state of the program is uniquely defined by the
+values of i and array[1..N]. Last-zero does not produce more traces when DPOR is used for reasons
+that will be explained later. However a modification of the .ll file can expose the difference.
+
+\item Indexer.c: This benchmark uses a compare-and-swap(CAS) primitive instruction to check
+whether a specific entry in a matrix is 0 and set it to a new
+value. 
+
+\item Indexermod.c: In this benchmark all the threads traverse and try to write the table at the same
+order and as a result many conflicts emerge.
+
+\end{itemize}
+
+\section{RCU}
+Read-Copy-Update is a synchronization mechanism invented by
+McKenney and Slingwine \cite{McKenney98} that is a part of the Linux kernel
+since 2002. The key feature of RCU is the good scalability it provides
+by allowing concurrent reads and updates. While this may seem
+counter-intuitive or impossible at first, RCU allows this in a very
+simple yet extremely efficient way: by maintaining multiple data
+versions. RCU is carefully orchestrated in a way that not only
+ensures that reads are coherent and no data will be deleted until
+it is certain that no one holds references to them, but also uses
+efficient and scalable mechanisms which make read paths extremely
+fast. Most notably, in non-preemptible kernels, RCU imposes zero
+overhead to readers.
+
+The basic idea behind RCU is to split updates in two phases: the
+removal phase and the reclamation phase. During the removal phase,
+an updater removes references to data either by destroying them
+(i.e., setting them to NULL ), or by replacing them with references to
+newer versions of these data. This phase can run concurrently with
+reads due to the fact that modern microprocessors guarantee that a
+reader will see either the old or the new reference to an object, and
+not a weird mash-up of these two or a partially updated reference.
+During the reclamation phase, the updater frees the items removed
+in the removal phase, i.e., these items are reclaimed. Of course, since
+RCU allows concurrent reads and updates, the reclamation phase
+must begin after the removal phase and, more specifically, when it
+is certain that there are no readers accessing or holding references
+to the data being reclaimed.
+
+The typical update procedure using RCU looks as follows \cite{McKenney98}.
+
+\begin{enumerate}
+\item Ensure that all readers accessing RCU-protected data structures
+carry out their references from within an RCU read-side critical
+section.
+\item Remove pointers to a data structure, so that subsequent readers
+cannot gain a reference to it (removal phase).
+\item Wait until all pre-existing readers complete their RCU read-side
+critical section, so that there no one holding a reference to the
+item being removed.
+\item At this point, there cannot be any readers still holding references to the data structure, which may now be safely freed.
+\end{enumerate}
+
+\begin{itemize}
+    
+
+\item
+    
+-DASSERT\_0 : An \verb|assert(0)| statement is inserted after \verb|synchronize_rcu()|.
+ Obviously, this results in a test failure. What this assertion does, however, is that it shows that the
+grace period can end, and that there are some explored executions in which it does; i.e., it provides
+liveness guarantees. We will use this injection in conjunction with some of
+the next bug injections in order to determine whether the grace period can end or not.
+\item
+-DFORCE\_FAILURE\_1 : This injection forces the reader to pass through and report a quiescent state
+during its read-side critical section. Of course, this is not permitted and, as
+expected, results in a failure.
+\item
+-DFORCE\_FAILURE\_2 : A return statement is placed at the beginning of \verb|synchronize_rcu()|. 
+Of course, this results in a test failure since the updater does not wait for pre-existing
+readers to complete their RCU read-side critical sections, and such critical sections are not 
+permitted to span a grace period.
+\item
+-DFORCE\_FAILURE\_3 : This injection makes \verb|rcu_gp_init()| clear the node mask \verb|(->qsmask)| variables instead of setting them 
+appropriately. The \verb|rcu_gp_init()| function is
+invoked from the RCU grace-period kthread at the beginning of each grace period in order to initialize it. Obviously, since the \verb|->qsmask| variables are cleared from the start of
+the grace period, the grace period can end immediately. In other words, the grace-period kthread does not wait for pre-existing readers to complete. (This can be considered a
+more complex variant of injection \#2.) As expected, this injection results in a test failure.
+\item
+-DFORCE\_FAILURE\_4 : In this injection the \verb|rcu_gp_fqs()| function is made to clear the \verb|->qsmask| variables
+instead of waiting for the CPUs to clear their respective bits. Of course,
+in order for \verb|rcu_gp_fqs()| to clear the \verb|->qsmask| variables, the respective CPUs (in our case, the reader) 
+have to be in dynticks-idle mode (or the CPU must have passed
+through a quiescent state at some point, since the respective dynticks counters are sampled). Consequently, 
+in our code, CPU0 calls the \verb|rcu_gp_fqs()| function, and CPU1
+enters and exits dynticks-idle mode within its RCU read-side critical section, which enables CPU0 to 
+prematurely end the grace period. This can be considered an even more
+complex variant of injection \#2, and results in a test failure, as expected.
+\item
+-DFORCE\_FAILURE\_5 : This injection makes the function \verb|__note_gp_changes()| clear the bit of the respective node’s mask for this CPU \verb|( rnp->qsmask &= ∼ rdp->grpmask )|.
+This function is called when a CPU enters RCU core in order to record the beginnings and ends of grace periods. However, instead of just recording a grace period beginning,
+\verb|__note_gp_changes()| is now made to also clear the \verb|->qsmask| bit, which implies that this CPU reported a quiescent state for the new grace period. This results in test failure.
+\item
+-DFORCE\_FAILURE\_6 : Essentially, what this injection does is delete the if statement checking whether a 
+node’s mask is zero and calling \verb|rcu_preempt_blocked_readers_cgp()|,
+in the \verb|rcu_report_qs_rnp()| function. This if statement just checks whether the bitmask for this node is 
+cleared in order for a node to acquire its parent’s lock. In a real
+kernel, this should result in too short grace periods, since a signal that will prematurely awake the 
+grace-period kthread is sent, if there are multiple CPUs. In our case,
+however, it does not lead to too-short grace periods since, in our modeling, \verb|wake_up()| boils down to a no-op – there is no 
+need to wake up someone who is just spinning.
+However, if we were dealing with a two-level tree, the caller of \verb|rcu_report_qs_rnp()| would move up one level and trigger a 
+\verb|WARN_ON_ONCE()| statement that checks
+whether the child node’s bits are cleared. Hence, this test automatically sets the number of CPUs to \verb|CONFIG_RCU_FANOUT_LEAF + 1| 
+(i.e., to 17, since the default value of \verb|CONFIG_RCU_FANOUT_LEAF| is 16 in these kernels). 
+Also, this test requires the use of a higher unroll value because there are some loops that need to be 
+unrolled at least as many times as the number of CPUs used plus one. So, we used an unroll value of 19 for this case.
+\item
+-DLIVENESS\_CHECK\_1 : This eliminates the need for a CPU to pass through a quiescent state by setting 
+rdp->qs\_pending to zero in \_\_note\_gp\_changes() . This function updates
+the per-CPU rcu\_data structure and, since rdp->qs\_pending is set to zero, there is no need for a CPU to report a quiescent 
+state to RCU, which prevents grace periods from completing. When the injection is used in conjunction with -DASSERT\_0 , no execution triggers the assert(0) 
+statement after synchronize\_rcu() .
+\item
+-DLIVENESS\_CHECK\_2 : A return statement is placed at the beginning of the rcu\_sched\_qs() function. In effect, this means 
+that CPUs cannot record their passing through a
+quiescent state in the respective rc\_data structures, something that also prevents grace periods from 
+completing. Used in conjunction with -DASSERT\_0 this bug injection
+also results in no executions triggering the assertion, thus signifying a liveness violation.
+\item
+-DLIVENESS\_CHECK\_3 : A return statement is placed at the beginning of rcu\_report\_qs\_rnp(). 
+This means that CPUs cannot report their passing through a quiescent state to
+RCU, which in turn means that grace periods cannot complete. This injection also needs to be used together 
+with -DASSERT\_0 to discover the liveness violation.
+
+\end{itemize}
+
+\section{Evaluation of Persistent sets}
+As it was established in the previous chapter the implementation of the persistent sets
+is crucial since they are utilized in every bounding technique. As a result it is vital to
+able to verify that source-DPOR is indeed an optimization over the DPOR. The comparison of the results is demonstrated below.
+
+
+\subsection{Evaluation of Persistent sets on Synthetic tests}
+It is clear from these testcases that there are indeed some different results. As it was expected source-DPOR explores less traces than the DPOR. It is important
+to notice that this difference is caused by the sleep set blocked traces that are produced by the DPOR algorithm that are omitted by the source DPOR. The implication
+of the Source-DPOR is not the same for all test cases. It varies due to the different approaches as well as the size of the state space. The results are presented with two different ways. 
+The writer-Nreaders example is given with a graph in order to demonstrate the escalation of the state space as well as the greater impact the source-DPOR has. The rest of the
+results are given in a table so their can be an easily comparison.
+
+\graph{/home/yannis/nidhugg/tests/mytests/wNr.png}{writer-N-readers}
+
+\smalltabular{"/home/yannis/nidhugg/tests/mytests/unbounded.tex"}{Source-DPOR vs DPOR for synthetic tests}
+
+\subsection{Evaluation of Persistent sets on RCU}
+We noticed that there is no difference between Source sets and persistent sets thus no results are presented since they coincide with \cite{Spin}. 
+The reason why the results of DPOR and Source-DPOR may be due to the operations that take place which not allow for the optimization of the Source-DPOR 
+to be effective. There is another reason based on the LLVM code the Nidhugg produces which is explained in the next section.
+
+\section{Comparison with Concuerror results - Why DPOR may be enough for LLVM}
+There are many cases where Concuerror results do not seem to be verified. We have found out that both DPOR and Source-DPOR produce the same results. However, taking a look on the code that Nidhugg tests this behavior seems rational.
+LLVM produces much more code than the code in the source file. Due to this padding of the dependent events, the number of conflicting events is less than the 
+number of conflicting events in an Erlang program.
+
+At Figure \ref{Padding impact on persistent sets} the reason is visualized. As shown in the figure we would expect that both p and r would be added in the persistent set. However when the p thread is added the write event is no longer visible, 
+according to the persistent set definition. As a the r thread is not added. We can compare the LLVM code with the relative Erlang code.
+
+\trace{rwrpersistent.pdf}{Padding impact on persistent sets}
+
+\Code{./code/readers_rwr.erl}{Erlang code for rwr}
+%%\Code{"./code/rwr.c"}{C code for rwr}
+%%\Code{"./code/rwr.ll"}{Produced LLVM code for rwr}
+\Side{./code/rwr.c}{C code for writer and reader}{./code/rwr.ll}{LLVM code for writer and reader}{Comparison between C and LLVM}
+
+
+\section{Evaluation of Bounding Techniques}
+The evaluation of the techniques takes into account two aspects. The number of traces explored and the soundness. The former is closely related with the amount
+of time required for a bug to be found or the whole state space to be explored. The second is important because it demonstrates the tradeoff between time and accuracy
+of the results. It is intelligible that a faster algorithm may compromise the soundness of the state space.
+\subsection{Evaluation of Bounding Techniques on Synthetic tests}
+
+The results for the testcases are demonstrated below. Again they are presented in two different ways.
+
+%%\begin{center}
+%%    \begin{tabular}{ |c|c|c|c|c|c|c|}
+%%    \hline
+%%    \multicolumn{1}{|c|}{Technique:} & \multicolumn{2}{c|}{Vanilla-BPOR} & \multicolumn{2}{c|}{BPOR} & \multicolumn{2}{c|}{Source-BPOR} \\
+%%    \hline
+%%    Bound: & 0 & 1 & 0 & 1 & 0 & 1 \\
+%%    \hline \hline
+%%    account.c & 1 & 6 & 6 & 1 & 27 & 27 \\
+%%    \hline
+%%    lazy.c & 1 & 6 & 6 & 1 & 27 & 27 \\
+%%    \hline
+%%    \end{tabular}
+%%\end{center}
+\graph{/home/yannis/nidhugg/tests/mytests/wNrB.png}{writer-N-readers bounded}
+\smalltabular{"/home/yannis/nidhugg/tests/mytests/bounded.tex"}{Traces for various bound limits}
+
+As it was expected the Vanilla-BPOR explores significantly less traces than the BPOR and the source-DPOR. However, as it was previously discussed, the whole
+state space is not explored. The number of traces explored by the sound algorithms is significantly greater and it caused by the many conservative branches that are
+added in order to achieve soundness. Surprisingly, there is no difference between the other two bounding techniques. An explanation is given later.
+
+\subsection{Evalution of Bounding Techniques on RCU}
+The results are demonstrated below. Notice that since the Source-DPOR did not resulted less traces than the DPOR we could not expect from the Source-BPOR and BPOR
+to differentiate. Moreover tests did not show any difference. For these reasons only the performance of Vanilla-BPOR and BPOR is examined. In each table
+the results with a given bound are demonstrated. Specifically the exploration time and the number of traces are shown. 
+Moreover there is a cell indicating whether the assertion was found (We note F for found and NF for not found).
+
+
+\bigtabular{"/home/yannis/rcu/valtree/nobound.tex"}{RCU results without bound}
+\bigtabular{"/home/yannis/rcu/valtree/bound_0.tex"}{RCU results for bound $b=0$}
+\bigtabular{"/home/yannis/rcu/valtree/bound_1.tex"}{RCU results for bound $b=1$}
+\bigtabular{"/home/yannis/rcu/valtree/bound_2.tex"}{RCU results for bound $b=2$}
+\bigtabular{"/home/yannis/rcu/valtree/bound_3.tex"}{RCU results for bound $b=3$}
+\bigtabular{"/home/yannis/rcu/valtree/bound_4.tex"}{RCU results for bound $b=4$}
+\bigtabular{"/home/yannis/rcu/valtree/comp_traces.tex"}{Comparison between DPOR and BPOR}
+
+
+We notice that some assertions are found significantly faster. The most spectacular result is the \verb|-DFORCE_FAILURE_3| which is found in only 6 seconds for bound b=3 whereas it requires 464.77 seconds in the unbounded version. Moreover we notice for bound b=4 all the errors that are found in the unbounded version are
+found. As a result the empirical observation that errors occur in low bound count seems to be confirmed. However, we have to underline that these are contrived
+errors aiming to verify the correctness of the rcu and as a result they cannot be regarded as substantial evidences. As it is expected for larger bounds (b=4) the number of traces
+grows exponentially. An other impressive result is that when the bound grows larger the errors takes longer to be found. If we take a look at \verb|-DFORCE_FAILURE_3| again we notice that the error
+takes significantly longer to be tracked even through it exposed for the first time at bound b=2. For b=4 the exploration will was stopped since it exceeded 100,000 traces.
+On the other hand many assertions are found faster with source-DPOR.
+
+\subsection{A known bug}
+As it was discussed in previous section, the scheduling priorities of Nidhugg should be changed in order for the running thread to be prioritize since it does not
+increase the bound count. However this alternation in the priority causes Nidhugg to explore many more traces in unbounded search for an unknown reason. In order to deal with
+this problem alternation in priority occurs only when bound is applied. As a result the comparison between DPOR and BPOR is not fair. Looking at table \ref{Comparison between DPOR and BPOR with the bug}
+we can clearly see that the minimum traces required for BPOR to track the bug for the first time are always less than DPOR
+
+\bigtabular{"/home/yannis/rcu/valtree/comp_trace_priority.tex"}{Comparison between DPOR and BPOR with the bug}
+
+\section{Equivalence between BPOR and Source-BPOR (Correctness of Source-BPOR)}
+Surprisingly the results of BPOR and Source-BPOR always coincide. However, further investigation of this behavior can reveal that these two techniques
+are actually equivalent. 
+
+It can be proved that a branch which was rejected by the Source-DPOR but accepted by the BPOR algorithm as a non-conservative one will be added as 
+conservative by the source-bpor algorithm.
+
+Let us assume a branch of the thread $b$ that is added as a non-conservative by the BPOR algorithm.
+
+By the definition of persistent-sets this means that there is a $t \in T$ which
+conflicts with an execution step of b. 
+
+This non-conservative branch is rejected by the Source-BPOR. We know that there must be
+ a trace such that thread b occurs before t. Since b was rejected there must be another branch s which shares the same initials
+  with b, 
+  
+When s is scheduled another block will be created.
+ 
+\begin{itemize}
+\item Case 1: s is an execution step which conflicts with b. Hence, there must be a trace where b happens before s. As a result b belongs to the source set.
+As shown in the Figure \ref{Source-BPOR and BPOR equivalence Case 1}, the branch which seems to be initially rejected, will finally be added by the Source-DPOR and as a result belongs to the source-set.
+\trace{equivalence_case1.pdf}{Source-BPOR and BPOR equivalence Case 1}
+   
+\item Case 2: 
+   s doesn’t conflict with b (both b and s are read operations). There must b an trace s.b.t (where s,b,t is the execution
+   of all the steps of s,b,t). 
+   Since t conflicts with an execution step of s the ﬁrst step of b is an initial for t and it will be added both as non-conservative branch and 
+   as conservative at the beginning of the block where it was rejected by the source-dpor. For Figure \ref{Source-BPOR and BPOR equivalence Case 2}, both q and r belong to the persistent set. However,
+   the r thread will be rejected since it shares the same initials with the q thread. However it will be added as a conservative set. Notice that it would be added as a
+   non-conservative as well but we have already shown that when both conservative and non-conservative branches of the same thread are added we must keep the conservative one.
+
+   \trace{equivalence_case2.pdf}{Source-BPOR and BPOR equivalence Case 2}
+\end{itemize}
+   
+A more intuitive explanation of the equivalence of the two techniques would be this: Persistent sets add threads in points higher in the trace. As a result, an equivalent trace
+may have already been explored when these branches are scheduled, leading to sleep set blocked sets. However, it obvious that these branches would lead to equivalent traces of
+lower bound count and thus, they would be add as conservative branches by the BPOR algorithm.
+
+We have proved that Source-Bpor is sound since the traces explored by the bpor are subset of the traces explored by the Source-BPOR.

@@ -49,7 +49,7 @@ The purpose of this thesis was to:
    \item Examine whether the techniques introduced in \cite{AbdullaAronisJohnssonSagonasDPOR2014} for optimal unbounded dynamic partial order reduction can
    be used for the implementation of bounded partial order reduction.
    \item Confirm or disapprove the capability of bounded dynamic partial order reduction to track errors faster than unbounded partial order reduction.
-   \item Examine whether the empirical observation that most concurrency errors can manifest themselves in a small number of preemptions is correct.
+   \item Examine whether the empirical observation that most concurrency errors can manifest themselves in a small number of preemptions is correct \cite{Musu07}.
    \item Explore alternative algorithms that can perform bounded partial order reduction.
 \end{itemize}
 
@@ -63,7 +63,7 @@ Moreover, the possible application of various optimizations used for unbounded D
 \fi
 
 \section{Overview}
-In Chapter \ref{Chapter 2} the theoretical background utilized in Nidhugg is given for both unbounded and bounded DPOR is given.
+In Chapter \ref{Chapter 2} the theoretical background utilized in Nidhugg for both unbounded and bounded DPOR is given.
 In Chapter \ref{Chapter 3} the implementation of the methods for Nidhugg is discussed. In Chapter \ref{Chapter 4} the different techniques
 implemented are evaluated using both synthetic tests and RCU. In Chapter \ref{Chapter 5} further discussion on possible optimatizations
 is made. In Chapter \ref{Chapter 6} we summarize the previous chapters and the conclusions

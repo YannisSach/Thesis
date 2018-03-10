@@ -14,6 +14,7 @@ More specifically, the typical problems with concurrency can be outlined as foll
 \item Race condition: A strange interleaving of processes has an unintended effect.
 \item Deadlock: Two or more processes stop and wait for each other.
 \item Livelock: Two or more processes keep executing without making any progress.
+\item Resource starvation: Two or more processes are stuck in circular waiting for the resources
 \end{itemize}
 
 These problems are usually Heisenbugs \cite{Musu08} – they can alter their behavior or completely

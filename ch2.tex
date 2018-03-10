@@ -1,7 +1,7 @@
-\chapter{Background Knowledge}
+\chapter{Background}
 \label{Chapter 2}
 
-\section{Cuncurrent programming}
+\section{Concurrent programming}
 
 Concurrent computing, which is implemented by concurrent programming paradigm, is a form of computing in which several 
 computations are executed during overlapping time 
@@ -11,37 +11,45 @@ or "thread of control" for each computation ("process"). A concurrent system is 
 all other computations to complete.
 The main challenge in designing concurrent programs is concurrency control: ensuring the correct sequencing of the 
 interactions or communications between different computational executions, and coordinating access to resources that are shared among executions.
-Potential problems include race conditions, deadlocks, and resource starvation. 
-The scheduler is usually responsible for running a thread. Due to this scheduling indeterminism the programmer can not always be aware of which thread
-will be scheduled next and thus concurrent programs may seem to run randomly. 
+Potential problems include race conditions, deadlocks, livelocks and resource starvation. 
+The scheduler is usually responsible for running a thread. Due to this scheduling non-determinism the programmer cannot always be aware of which thread
+will be scheduled next.
 
-An important aspect of a concurrent program is the notion of the set of interleavings. 
-If we imagine a process as a (possibly infinite) sequence/trace of statements (e.g. obtained by loop unfolding),
-then the set of possible interleavings of several processes consists of all possible sequences of statements of any of those process.
+An important aspect of a concurrent program is the notion of the set of interleavings which is the set of all the execution paths a program can follow.
+Intuitively, if we imagine a process as a (possibly infinite) sequence/trace of statements (e.g. obtained by loop unfolding),
+then the set of possible interleavings of several processes consists of all possible sequences of statements of any of these processes.
 
 As it can be inferred, debugging this kind of programs can be proved extremely challenging. The challenge mainly emerges from the fact that it is 
-not always clear which thread command will be executed. Moreover the error may not always occur or cannot be traced during debugging. There may be only a limited
+not always clear which thread command will be executed. Moreover the error may not always occur during debugging since there may be only a limited
 number of interleavings that produce an error. 
 
+\section{Testing, Model Checking and Verification}
+
+Dynamic software model checking consists of adapting model check-ing into a form of systematic testing that is applicable to industrial-size software. 
+Over the last two decades, dozens of tools following this paradigm have been de-veloped for checking concurrent and data-driven software. Compared to 
+traditionalsoftware testing, dynamic software model checking provides better coverage, butis more computationally expensive. Compared to more general 
+forms of programverification like interactive theorem proving, this approach provides more limitedverification guarantees, but is cheaper due to its higher
+level of automation. Dynamic software model checking thus offers an attractive practical trade-off between testing and formal verification. 
 
 \section{Stateless model checking and partial order reduction}
 
-In order to find an error of a concurrent algorithm, one must examine every possible interleaving this algorithm can produce. Usually the error 
-would occur only under some unexpected interleaving, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
-the program along all these possible interleavings. However, this approach suffers from state explosion, i.e. the number of all possible interleavings grows 
+In order to find an error of a concurrent program, one must examine every possible interleaving this program can produce. Usually the error 
+would occur only under some interleaving the programmer did not take into consideration, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
+the program along all these possible interleavings. However, this approach suffers from state explosion, i.e., the number of all possible interleavings grows 
 exponentially with the size of the program and the number of threads. Several approaches to this problem have been proposed in order to deal with this challenge: 
-partial order reduction and bounded search. Partial order reduction is aiming to reduce the number of interleavings explored by eliminating equivalent interleavings.
+partial order reduction \cite{Godefroid1996} and bounded search \cite{BPOR}. Partial order reduction is aiming to reduce the number of interleavings explored by eliminating equivalent interleavings.
 These equivalent traces are produced by the inversion of independent events which do not affect the results of the program. For example, the scheduling of two threads that read a local
 variable can be inverted since the result of the operation is affected by the order under which each operation occurs. 
 There are two ways that a partial order reduction algorithm can be implemented. The first is a
-static partial order reduction algorithm where the dependencies between two threads are tracked before the execution of the concurrent program. 
-The second is the Dynamic partial order reduction (DPOR) which observes the program's dependencies on runtime. It is important to notice that the size of
-the state space still grows exponentially even if it is reduced by the DPOR. 
+static partial order reduction algorithm \cite{Static1997} where the dependencies between two threads are tracked before the execution of the concurrent program. 
+The second is the Dynamic partial order reduction (DPOR) which observes the program's dependencies of runtime. It is important to notice that the size of
+the state space still grows exponentially. 
 
 For larger programs DPOR often runs longer than developers are willing to wait. In these cases, bounded search can be proved useful. Bounded search,
-in contrast to the DPOR, alleviates state-space explosion by pruning the executions that exceed a bound \cite{Thomson}. There have been proposed many bounded techniques
-such as preemption bounded search or delay bounded search. All bounded search techniques are based on the notion that many of the concurrency bugs can be
+in contrast to DPOR, alleviates state-space explosion by pruning the executions that exceed a bound \cite{Thomson}. There have been proposed many bounded techniques
+such as preemption bounded search \cite{BPOR} or delay bounded search \cite{Delay11}. All bounded search techniques are based on the notion that many of the concurrency bugs can be
 tracked even when the bound limit is set to be small, thus the time required for a bug to be found is significantly smaller.
+
 
 \section{Vector Clocks}
 
@@ -50,16 +58,14 @@ Just as in Lamport timestamps \cite{Lamp}, interprocess messages contain the sta
 A vector clock of a system of N processes is an array/vector of N logical clocks, one clock per process; 
 a local "smallest possible values" copy of the global clock-array is kept in each process, with the following rules for clock updates:
 
-The algorithm consists of the following steps:
-
 \begin{enumerate}
     \item Each process experiencing an internal event, it increments its own logical clock in the vector by one.
     \item Each time a process receives a message or performs an action on a shared variable, it increments its own logical clock in the vector by one and updates each element in its vector 
     by taking the maximum of the value in its own vector clock and the value in the vector in the received message or the maximum value of all processes that share
-    the same shared variable. (for every element).
+    the same shared variable.
 \end{enumerate}
 
-An example execution of the algorithm is in Figure \ref{Clock example} where both the source code and an explored trace are given.
+An example execution of the algorithm is shown in Figure \ref{Clock example} where both the source code and an explored trace are given.
 As we can easily notice for each command the clock of the main thread increases. The thread <0.0> starts to run its clock for the thread <0> is 8 since 
 that is the moment when the thread was spawned. When the value of y is read the clock for <0> increases again so it corresponds with the y=1 event. When the first thread is
 scheduled again then its clock for the <0.0> is 7 since \verb|pthread_join()| command takes place.
@@ -67,12 +73,43 @@ scheduled again then its clock for the <0.0> is 7 since \verb|pthread_join()| co
 
 \Side{./code/clocks.c}{Vector Clock example}{./code/clocks.out}{Vector Clock output}{Clock example}
 
-Every algorithm that is presented in this thesis is based on vector clocks algorithm.
+Every algorithm that is presented in this thesis is based on vector clocks.
+
+
+\section{Notation}
+
+Before examining delving in the problem of dynamic partial order reduction it is crucial to explain the notation that will be used.
+An execution sequence $E$ of a system is a finite sequence of
+execution steps of its processes that is performed from the initial
+state which we denote as $s_0$. Since each execution step is deterministic, an execution
+sequence $E$ is uniquely characterized by the sequence of processes
+that perform steps in $E$. For instance, $p.p.q$ denotes the execution
+sequence where first $p$ performs two steps, followed by a step of $q$.
+The sequence of processes that perform steps in $E$ also uniquely
+determine the (global) state of the system after $E$, which is denoted
+$s_{[E]}$. For a state $s$, let $enabled(s)$ denote the set of processes $p$ that
+are enabled in $s$ (i.e., for which execute $p(s)$ is defined). We use $.$ to
+denote concatenation of sequences of processes. Thus, if $p$ is not
+blocked after $E$, then $E.p$ is an execution sequence.
+An event of $E$ is a particular occurrence of a process in $E$.
+We use $\langle p,i \rangle$ to denote the ith event of process $p$ in the execution
+sequence $E$. In other words, the event $\langle p,i \rangle$ is the ith execution step
+of process $p$ in the execution sequence $E$. We use $dom(E)$ to denote
+the set of events $\langle p,i \rangle$ which are in $E$, i.e., $\langle p,i \rangle \in dom(E)$ iff $E$
+contains at least $i$ steps of $p$. We will use $e,e',...$ , to range over
+events. We use $proc(e)$ to denote the process $p$ of an event $e = \langle p, i \rangle$.
+If $E.w$ is an execution sequence, obtained by concatenating $E$ and
+$w$, then $dom_{[E]}(w)$ denotes $dom(E.w) \ dom(E)$, i.e. the events in
+$E.w$ which are in $w$. As a special case, we use $next_{[E]}(p)$ to denote
+$dom_{[E]}(p)$.
+We use $<_E$ to denote the total order between events in $E$, i.e.
+$e <_E e'$  denotes that $e$ occurs before $e'$  in $E$. We use $E'\leq E$ to
+denote that the sequence $E'$ is a prefix of the sequence $E$.
 
 \section{Event Dependencies}
 
 One of the most important concepts when we have to deal with an algorithm that searches the whole state space of the different schedulings is the 
-happen-before relation in an execution sequence. Usually this relation is denoted with $\rightarrow$ symbol. For example, if the relation $\rightarrow$ 
+happens-before relation in an execution sequence. Usually this relation is denoted with $\rightarrow$ symbol. For example, if the relation $\rightarrow$ 
 for two events $e,e'$ in $dom(E)$ holds true then the event $e$ happens-before $e'$. This relation usually appears in the message exchange, when $e$ is the message
 transmission and $e'$ is the event when the message is received. For the context of Nidhugg $e \rightarrow e'$ would hold true when at least one of the two events
 is a write operation on the same shared variable. It is fathomable that any DPOR algorithm should be able to assign this happen-before relations. In practice,

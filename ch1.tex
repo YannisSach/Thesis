@@ -31,7 +31,7 @@ a vast number of global states have to be captured and stored. Many techniques h
 Stateless model checking, for example, avoids storing global states. This technique has been implemented in tools such as Verisoft \cite{SMC,Gode05}, 
 CHESS \cite{Musu08}, Concuerror \cite{Chri13}, Nidhugg \cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015} and \cite{RCMC}. The observation that two 
 interleavings are equivalent if one can be obtained from the other by swapping adjacent, independent execution steps is the core of the partial
-order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR,JACM} technique used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
+order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR,JACM} techniques used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
 capture dependencies between operations of concurrent threads while the program is running \cite{FlanaganDPOR}. The exploration begins with an arbitrary interleaving whose steps are then
 used to identify dependent operations and points where alternative interleavings need to
 be explored in order to capture all program behaviours. Another approach is the bounded model checking \cite{BoundedModelChecking} where the finite state

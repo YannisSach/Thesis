@@ -32,23 +32,35 @@ Stateless model checking, for example, avoids storing global states. This techni
 CHESS \cite{Musu08}, Concuerror \cite{Chri13}, Nidhugg \cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015} and \cite{RCMC}. The observation that two 
 interleavings are equivalent if one can be obtained from the other by swapping adjacent, independent execution steps is the core of the partial
 order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR,JACM} techniques used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
-capture dependencies between operations of concurrent threads while the program is running \cite{FlanaganDPOR}. The exploration begins with an arbitrary interleaving whose steps are then
-used to identify dependent operations and points where alternative interleavings need to
-be explored in order to capture all program behaviours. Another approach is the bounded model checking \cite{BoundedModelChecking} where the finite state
+capture dependencies between operations of concurrent threads while the program is running \cite{FlanaganDPOR,JACM}. The exploration begins with an arbitrary interleaving whose steps are then
+used to identify operations and points where alternative interleavings need to
+be explored in order to capture all program behaviors. Another approach is the bounded model checking \cite{BoundedModelChecking} where the finite state
 machine is unrolled for a fixed number of steps and the specifications are checked within these steps. Bounded model checking can be combined with the partial
-order reduction for modeling executions \cite{PORinBMC} and was effectively implemented in tools such as CBMC \cite{CBMC}.
+order reduction for modeling executions \cite{PORinBMC} and was effectively implemented in tools such as CBMC \cite{CBMC},Nidhugg \cite{AbdullaAronisJohnssonSagonasDPOR2014, RCMC}.
 Unfortunately all these techniques still have to deal with the problem of the state space explosion. In order to deal with this problem further
 bounding of the exploration is required. Many different bounding techniques have been examined \cite{Thomson} such as preemption bounding, delay
 bounding, a controlled random scheduler, and probabilistic concurrency testing (PCT).
 
 \section{Aim of this Thesis}
 
+The purpose of this thesis was to: 
+\begin{itemize}
+   \item Implement a preemption bounding technique \cite{BPOR} for Nidhugg. 
+   \item Examine whether the techniques introduced in \cite{AbdullaAronisJohnssonSagonasDPOR2014} for optimal unbounded dynamic partial order reduction can
+   be used for the implementation of bounded partial order reduction.
+   \item Confirm or disapprove the capability of bounded dynamic partial order reduction to track errors faster than unbounded partial order reduction.
+   \item Examine whether the empirical observation that most concurrency errors can manifest themselves in a small number of preemptions is correct.
+   \item Explore alternative algorithms that can perform bounded partial order reduction.
+\end{itemize}
+
+\iffalse
 The purpose of this thesis is the implementation of a preemption bounding technique \cite{BPOR} for Nidhugg and the combination
 of this technique with the a novel technique \cite{AbdullaAronisJohnssonSagonasDPOR2014} suggested for better coverage of the state space.
 The bounded-DPOR was used to verify the linux kernel \cite{LinuxKernel} and specifically RCU \cite{Spin}. RCU is a synchronization
 mechanism used heavily in Linux kernel, and many of the kernel’s subsystems rely on RCU’s correct operation. By using BPOR the minimum preemptive
 switches required to track failure injections were counted. As a result the empirical observation that errors occur in a small bound count was confirmed.
 Moreover, the possible application of various optimizations used for unbounded DPOR on bounded DPOR are examined. 
+\fi
 
 \section{Overview}
 In Chapter \ref{Chapter 2} the theoretical background utilized in Nidhugg is given for both unbounded and bounded DPOR is given.

@@ -1,13 +1,13 @@
 \chapter{Introduction}
 
-Moore's Law, named after Intel co-founder Gordon Moore, states that the number of transistors that can be placed on an integrated circuit doubles
+Moore's Law, named after Intel's co-founder Gordon Moore, states that the number of transistors that can be placed on an integrated circuit doubles
 roughly every two years. For decades, chipmakers have succeeded in shrinking chip geometries, allowing Moore's Law to remain on track and consumers to 
 get their hands on ever more powerful laptops, tablets, and smartphones. Software developers could just lay back and wait for the Moore's Law to take effect.
-However, nowadays Moore's Law is coming to an end due to constraints such as heat, clock speeds have largely stood still, and the performance of each individual 
-processor core has increased only incrementally. In order for developers to compensate with the demand of efficient software, programming paradigms such
+However, constraints such as heat, clock speeds have largely stood still, and the incremental increase of the performance of each individual 
+processor core impede the further acceleration of software execution. In order for developers to compensate with the demand of efficient software, programming paradigms such
 as concurrent programming have become a necessity. However, new challenges arise from concurrent programming since it is harder and more
-error-prone than its sequential counterpart. When programming with multiple execution threads errors such as  memory violations, race conditions, shared-memory corruption
-are usual.
+error-prone than its sequential counterpart. When programming with multiple execution threads many errors may occur due to the fact the many execution threads 
+may access and edit the shared memory or require to execute lines of code excluding other threads.
 
 More specifically, the typical problems with concurrency can be outlined as follows:
 \begin{itemize}
@@ -16,7 +16,7 @@ More specifically, the typical problems with concurrency can be outlined as foll
 \item Livelock: Two or more processes keep executing without making any progress.
 \end{itemize}
 
-These problems are usually heisenbugs \cite{Musu08} – they can alter their behaviour or completely
+These problems are usually Heisenbugs \cite{Musu08} – they can alter their behavior or completely
 disappear when one tries to isolate them – since they go hand in hand with the order of
 execution of the processes involved.
 
@@ -26,12 +26,12 @@ Testing and verifying the correctness of a concurrent program can be proved a de
 A technique used for the systematic exploration of a program's state space is model checking \cite{WikipediaModelChecking}.
 Model checking is a method for formally verifying concurrent systems through specifications about the system expressed as 
 temporal logic formulas and efficient algorithms that can traverse the model defined by the system and check whether
-the specifications hold. The major problem model checking tools have to face is the combinatorial explosion of the state-space since
+the specifications hold. The major problem model checking tools have to face is the combinatorial explosion of the state space since
 a vast number of global states have to be captured and stored. Many techniques have been proposed in order to tackle this problem.
-Stateless model checking, for example, avoids storing global states. This technique has been implemented in tools such as \cite{Gode05}, 
-CHESS \cite{Musu08}, Concuerror \cite{Chri13} and Nidhugg \cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015}. The observation that two 
+Stateless model checking, for example, avoids storing global states. This technique has been implemented in tools such as Verisoft \cite{SMC,Gode05}, 
+CHESS \cite{Musu08}, Concuerror \cite{Chri13}, Nidhugg \cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015} and \cite{RCMC}. The observation that two 
 interleavings are equivalent if one can be obtained from the other by swapping adjacent, independent execution steps is the core of the partial
-order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR} technique used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
+order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR,JACM} technique used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
 capture dependencies between operations of concurrent threads while the program is running \cite{FlanaganDPOR}. The exploration begins with an arbitrary interleaving whose steps are then
 used to identify dependent operations and points where alternative interleavings need to
 be explored in order to capture all program behaviours. Another approach is the bounded model checking \cite{BoundedModelChecking} where the finite state

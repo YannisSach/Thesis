@@ -31,6 +31,11 @@ traditionalsoftware testing, dynamic software model checking provides better cov
 forms of programverification like interactive theorem proving, this approach provides more limitedverification guarantees, but is cheaper due to its higher
 level of automation. Dynamic software model checking thus offers an attractive practical trade-off between testing and formal verification. 
 
+A graph that greatly demonstrates the differences between these terms is show in 
+
+\trace{testmodver.png}{Comparing Testing, Model Checking and Verification}
+
+
 \section{Stateless model checking and partial order reduction}
 
 In order to find an error of a concurrent program, one must examine every possible interleaving this program can produce. Usually the error 
@@ -112,12 +117,12 @@ One of the most important concepts when we have to deal with an algorithm that s
 happens-before relation in an execution sequence. Usually this relation is denoted with $\rightarrow$ symbol. For example, if the relation $\rightarrow$ 
 for two events $e,e'$ in $dom(E)$ holds true then the event $e$ happens-before $e'$. This relation usually appears in the message exchange, when $e$ is the message
 transmission and $e'$ is the event when the message is received. For the context of Nidhugg $e \rightarrow e'$ would hold true when at least one of the two events
-is a write operation on the same shared variable. It is fathomable that any DPOR algorithm should be able to assign this happen-before relations. In practice,
-the happens-before assignment is implemented with the use of vector clocks that demonstrate the relating accesses to the same variable.
+is a write operation on the same shared variable. It is fathomable that any DPOR algorithm should be able to assign this happens-before relations. 
+In practice, the happens-before assignment is implemented with the use of vector clocks.
 
-\begin{definition}{(happen-before assignment)}
+\begin{definition}{(happens-before assignment)}
     A happens-before assignment, which assigns a
-    unique happens-before relation $\rightarrow$ E to any execution sequence
+    unique happens-before relation $\rightarrow E$ to any execution sequence
     $E$, is valid if it satisfies the following properties for all execution
     sequences $E$.
     \begin{enumerate}
@@ -128,8 +133,8 @@ the happens-before assignment is implemented with the use of vector clocks that 
         \item If $E'$ is a prefix of $E$ then $\rightarrow_E$ and $\rightarrow_{E'}$ are the same on $dom(E')$.
         \item Any linearization $E'$ of $\rightarrow_E$ on $dom(E)$ is an execution sequence which has exactly the same “happens-before” relation
 $\rightarrow_{E'}$ as $\rightarrow_E$. This means that the relation $\rightarrow_E$ induces a set
-of equivalent execution sequences, all with the same “happens-
-before” relation. We use $E \simeq E'$ to denote that $E$ and $E'$ are
+of equivalent execution sequences, all with the same “happens-before” relation. 
+We use $E \simeq E'$ to denote that $E$ and $E'$ are
 linearizations of the same “happens-before” relation, and $[E] \simeq$ 
 to denote the equivalence class of E.
     \item If $E \simeq E'$ then $s_{[E]} = s_{[E']}$ (i.e. two equivalent traces will lead to the same state).
@@ -139,12 +144,12 @@ sequence, we have $E \simeq E'$  if and only if $E.w \simeq' E'.w$.
 \end{definition}
 
 The first six properties should be obvious for any reasonable
-happens-before relation. The only non-obvious one would be the
+happens-before relation. The only non-obvious is the
 last. Intuitively, if the next step of p happens before the next step
 of $r$ after the sequence $E$, then the step of $p$ still happens before
 the step of $r$ even when some step of another process, which is not
 dependent with $p$, is inserted between $p$ and $r$. This property holds
-in any reasonable computation model that we could think of. As
+in any reasonable computation model that we can think of. As
 examples, one situation is when $p$ and $q$ read a shared variable that
 is written by $r$. Another situation is that $p$ sends a message that is
 received by $r$. If an intervening process $q$ is independent with $p$, it
@@ -154,7 +159,8 @@ and $e'$ are two consecutive events in E with $e \not \rightarrow_{E} e'$, then 
 be swapped and the (global) state after the two events remains the
 same.
 
-\section{Indipendence and races}
+\section{Independence and races}
+
 We now define independence between events of a computation. If
 $E.p$ and $E.w$ are both execution sequences, then $E \models p\diamondsuit w$ denotes
 that $E.p.w$ is an execution sequence such that $next_{[E]}(p) \not \rightarrow_{E.p.w} e$
@@ -163,7 +169,7 @@ the next event of $p$ would not “happen before” any event in $w$
 in the execution sequence $E.p.w$. Intuitively, it means that $p$ is
 independent with $w$ after $E$. In the special case when $w$ contains
 only one process $q$, then $E \models p \diamondsuit q$ denotes that the next steps of
-$p$ and $q$ are independent after $E$. We use $E'| =p \diamondsuit w$ to denote that
+$p$ and $q$ are independent after $E$. We use $E'\models p \diamondsuit w$ to denote that
 $E \not \models p \diamondsuit w$ does not hold.
 
 For a sequence $w$ and $p \in w$, let $w \\ p$ denote the sequence
@@ -185,7 +191,7 @@ $e$ occurs before $e'$ in $E$, are in a race if
 \item $e$ and $e'$ are “concurrent”, i.e. there is an equivalent execution
 sequence $E' \simeq E$ in which $e$ and $e'$ are adjacent.
 \end{itemize}
-Formally, let $e \l_E e'$ denote that $proc(e) \not = proc(e')$, that $e \rightarrow_E e'$,
+Formally, let $e \lessdot_E e'$ denote that $proc(e) \not = proc(e')$, that $e \rightarrow_E e'$,
 and that there is no event $e'' \in dom(E)$, different from $e'$ and $e$,
 such that $e \rightarrow_E e'' \rightarrow_E e'$.
 
@@ -194,8 +200,8 @@ whether the events in the race can be executed in the reverse order.
 Since the events are related by the happens-before relation, this may
 lead to a different global state: therefore the algorithm must try to
 explore a corresponding execution sequence. Let $e \lesssim_E e'$ denote
-that $e \lessdot_E e'$ , and that the race can be reversed. Formally, if E 0 ' E
-and $e$ occurs immediately before $e'$ in $E'$ , then $proc(e')$ was not
+that $e \lessdot_E e'$, and that the race can be reversed. Formally, if $E' \lesssim E$
+and $e$ occurs immediately before $e'$ in $E'$, then $proc(e')$ was not
 blocked before the occurrence of $e$.
 
 
@@ -203,9 +209,9 @@ blocked before the occurrence of $e$.
 
 Before explaining the DPOR algorithm it is important to define sufficient sets.
 
-\begin{definition}{Sufficient Sets}
+\begin{definition}{(Sufficient Sets)}
 A set of transitions is sufficient in a state $s$ if any relevant
-state reachable via an enabled transition from s is also reach able from $s$ via at least one of the transitions in the sufficient
+state reachable via an enabled transition from s is also reachable from $s$ via at least one of the transitions in the sufficient
 set. A search can thus explore only the transitions in the
 sufficient set from s because all relevant states still remain
 reachable. The set containing all enabled threads is trivially
@@ -213,40 +219,42 @@ sufficient in $s$, but smaller sufficient sets enable more state
 space reduction.
 \end{definition}
 
-Many techniques have been proposed in order to implement a DPOR algorithm. What all most of these techniques share in common is the following basic structure:
+Many techniques have been proposed in order to implement a DPOR algorithm. What most of these techniques share in common is the following basic structure:
 \SetKwProg{Fn}{Function}{}{}
 
 \SetKwHangingKw{Let}{let}
 \begin{algorithm}[H]
     \caption{General form of DPOR}
     Explore($\emptyset$)\;
-    \Fn{Explore($S$)}{
-     \Let{T = Sufficient\_set($final(S)$)}
+    \Fn{Explore($E$)}{
+     \Let{T = Sufficient\_set($final(E)$)}
      \For{all $t \in T$}{
-        Explore($S.t$) \;
+        Explore($E.t$) \;
     }
     }
 \end{algorithm}
 
-where $final(S)$ represents the state that will be reached when the scheduling $S$ is executed.
+where $final(E)$ represents the state that will be reached when the execution sequence $E$ is executed.
 
 The algorithm above describes a DFS search in the state space of all possible interleavings.
-As it can be inferred from the algorithm the most important step is that of the calculation of the set T.
+As it can be inferred from the algorithm the most important step is that of the calculation of the set $T$.
 
-An obvious property that the sufficient sets must hold is that Sufficient\_set$(final(S)) \subseteq enabled(S)$.
+An obvious property that the sufficient sets must hold is that Sufficient\_set$(final(E)) \subseteq enabled(E)$.
 
-\begin{definition}{$enabled(s)$}
+\begin{definition}{(enabled sets, $enabled(s)$)}
     Given a state $s$, $enabled(s)$ represents the set of all the threads that can be scheduled immediately after $s$.
 \end{definition}
 
 Intuitively $enabled(s)$ represents the threads that are not blocked or have already finished their execution.
 
-In bibliography many types of sets can be found \cite{Godefroid1996}. In this thesis we mainly focus on persistent sets and on source sets.
+In bibliography many types of sufficient sets can be found \cite{Godefroid1996}. 
+In this thesis we mainly focus on persistent sets and on source sets.
 
 
 \section{Persistent Sets}
 
 \begin{definition}{(Persistent Sets)}
+
 A persistent set in a state $s$ is a sufficient set of transitions to
 explore from s while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
 sets explores a persistent set of transitions from each state s where $enabled(s) \neq $ and prunes enabled transitions that

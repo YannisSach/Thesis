@@ -277,9 +277,10 @@ check all the other threads and add them to the branch if they contain a command
 completely contradicts with the whole philosophy of Nidhugg which stems from the nature of source sets and, thus, would not be feasible. 
 The option that was finally chosen was an implementation based on the DPOR using Vector Clocks.
 
-\subsection{Description of DPOR using persistent sets}
+\subsection{classic-DPOR}
 
-Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors variation will be used which is shown in Algorithm \ref{DPORV}
+Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors variation will be used which is shown in Algorithm \ref{DPORV}.
+
 
 \begin{algorithm}
     \caption{DPOR using Clock Vectors}
@@ -304,7 +305,7 @@ Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors va
                add $p$ to $done$ \;
                \Let{$t = next(s,p)$} 
                 \Let{$S' = S.t$} 
-                \Let{$cu = max \{ C(i) \mid i \in 1.. | S |$ and $S_i$ dependent with $t \}$ 
+                \Let{$cu = max \{ C(i) \mid i \in 1.. | S |$ and $S_i$ dependent with $t \}$} 
                 \Let{$cu2 = cu [ p := | S' | ] $} 
                \Let{$C' = C [p:= cu2, |S'| := cu2 ]$} 
                 $Explore(S',C')$ \;
@@ -383,7 +384,7 @@ To calculate the $CI$ set we just need to prevent the \verb|add\_branch()| funct
 An example of the modification is presented at Algorithm \ref{addbranch routine for persistent sets}.
 
 \begin{algorithm}
-    \caption{add\_branch() routine for persistent sets}
+    \caption{add\_branch() for persistent sets}
     \label{addbranch routine for persistent sets}
     \Fn{add\_branch($b$)}{
         $candidates = \emptyset$ \;
@@ -495,7 +496,7 @@ in the implementation section.
 
 \subsection{Implementation of BPOR}
 As it was made clear in previous sections for any algorithm to be implemented, the main modifications should take place in the see\_events and add\_branch procedures. 
-The pseudo code for the see\_events procedure is demonstrated at Algorithm \ref{seeevents routine for BPOR}.
+The pseudo code for the see\_events procedure is show in Algorithm \ref{seeevents routine for BPOR}.
 
 During see\_events procedure we add another branch at the beginning of the block if that is possible. In order to do that we have to check whether the added thread
 is available or not in that place. We use the available thread field for this purpose.
@@ -505,12 +506,11 @@ is available or not in that place. We use the available thread field for this pu
     \label{seeevents routine for BPOR}
     Explore($\langle \rangle$,$\emptyset$)\;
     \Fn{see\_events($seen\_access$)}{
-        $vector branches = \emptyset$ \;
         $branches := seen\_access - \{ a \in seen\_access \mid a$ happens before $last(E) or \exists a' \in seen\_access$ which happens after $a \}$ \;
         $update\_clocks()$ \;
         \ForEach{$b \in branches$}{
             $add\_branch(b)$ \;
-            \If{$b \in enabled(last(E))$}{
+            \If{$last(E).id \in enabled($ at the beggining of block $b)$}{
                 $add\_branch($ at the beginning of block $b)$ \;
             }
         }
@@ -518,10 +518,22 @@ is available or not in that place. We use the available thread field for this pu
 \end{algorithm}
 
 In case the \verb|add_branch()| invokes directly then the \verb|add_conservative_branch()| is called which works as the "conservative"
-part of the \verb|see_events()|. The pseudo code for this procedure is given here:
+part of the \verb|see_events()|. The pseudo code for this procedure is shown in Algorithm \ref{try to add conservative branch}.
+The \verb|add_branch()| has already been described in Algorithm \ref{addbranch routine for persistent sets}.
+
+\begin{algorithm}[H]
+    \caption{try\_to\_add\_conservative\_branches()}
+    \label{seeevents routine for BPOR}
+    Explore($\langle \rangle$,$\emptyset$)\;
+    \Fn{try\_to\_add\_conservative\_branches($b$)}{
+        \If{$last(E).id \in enabled($ at the beggining of block $b)$}{
+            $add\_branch($ at the beginning of block $b)$ \;
+        }
+    }
+\end{algorithm}
 
 During \verb|add_branch()| procedure we add branches at the appropriate places using the algorithm for the persistent sets suggested in the previous section.
-It was made clear that two different types of branches are used. However, the Nidhugg's infrastructure takes into account only the non-conservative ones when it comes
+As mentioned before two different types of branches are used. However, the Nidhugg's infrastructure takes into account only the non-conservative ones when it comes
 to searching for threads in set of threads such as sleep sets. As a result, at some points of the code we have to look for both the conservative and the non conservative
 branches in the set. 
 Another important problem arises when both conservative and non conservative branches are added at the same point. In that case the conservative branch prevails.
@@ -538,17 +550,55 @@ The results are shown at Figure \ref{Following source sets for conservative bran
 It is clear that some traces are not explored. Specifically, the trace which start with r has been rejected. The reason is that it shares the same initials with r1 even at the
 beginning of that block. As a result the algorithm must create to persistent sets when conservative threads are added. 
 
-Having made the preceding observations the algorithm used for Source-BPOR is the following:
+Having made the preceding observations the algorithm used for Source-BPOR is shown in Algorithm \ref{SBPOR}.
 
 \subsection{Description of Source-BPOR}
 
-We can notice that the algorithm is equivalent to the source-DPOR for non-conservative traces and equivalent to BPOR for conservative traces.
+\begin{algorithm}
+    \caption{Source-BPOR}
+    \label{SBPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
+                        add some $q' \in I_{[E']}(u) \text{ to } backtrack(E') $ \;
+                    }
+                    \Let{$E''= pre\_block(e,E)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E''}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                            add some $c(q') \in I_{[E'']}(u)$ to $backtrack(E'') $ \;
+                        }
+                    } 
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
+                }
+            }
+        }
+    }
+\end{algorithm}
+
+We can notice that the Algorithm \ref{SBPOR} works as Source-DPOR (Alg. \ref{Source}) for non-conservative traces and as BPOR (Alg. \ref{Nidhugg BPOR}) for conservative traces.
 
 \subsection{Implementation of Source-BPOR}
 The implementation is again based on modifications on the procedure \verb|add_branch()| since every change in the \verb|see_events()| procedure is still necessary for this algorithm.
 We can infer from the algorithm that will choose the same candidate with the Source-DPOR when we are dealing with a non-conservative branch and the same candidate as in BPOR
 in case the branch is conservative. In order to differentiate for the two cases we add a second parameter at the routine so we can be aware of the nature of the
-branch (conservative or non-conservative). The pseudo code for \verb|add_branch()| is given at Algorithm \ref{addbranch routine for Source-BPOR}.
+branch (conservative or non-conservative). The pseudo code for \verb|add_branch()| is shown in Algorithm \ref{addbranch routine for Source-BPOR}.
 
 \begin{algorithm}[H]
     \caption{add\_branch() routine for Source-BPOR}

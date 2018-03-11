@@ -208,7 +208,7 @@ limit. The algorithm is presented at Algorithm \ref{Vanilla}.
     \SetKwInOut{Input}{input}
     Explore($\langle \rangle$,$\emptyset$,$b$)\;
     \Fn{Explore($E$,$Sleep$,$b$)}{
-        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b$ }{
+        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b)$ }{
             $backtrack(E) :={p}$ \;
             \While{$\exists p \in (backtrack(E) \backslash Sleep$ and $B_v(E.p) \leq b$}{
                 \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p) $}{
@@ -271,24 +271,26 @@ been explored and as a result more interleavings would have been explored.
 \section{The DPOR using persistent sets}
 
 The implementation of persistent sets proved to be one of the most challenging tasks in Nidhugg. As it will become clear later, such an implementation
-of persistent sets is a prerequisite for BPOR's soundness. Many options were considered. The definition of persistent sets implies one way to implement them i.e. for every execution step we should
+of persistent sets is a prerequisite for BPOR's soundness. Many options were considered. The definition of persistent sets implies one 
+way to implement them i.e., for every execution step we should
 check all the other threads and add them to the branch if they contain a command which conflicts with the execution step. This kind of approach
 completely contradicts with the whole philosophy of Nidhugg which stems from the nature of source sets and, thus, would not be feasible. 
 The option that was finally chosen was an implementation based on the DPOR using Vector Clocks.
 
 \subsection{Description of DPOR using persistent sets}
 
-Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors variation will be used.
+Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors variation will be used which is shown in Algorithm \ref{DPORV}
 
 \begin{algorithm}
     \caption{DPOR using Clock Vectors}
+    \label{DPORV}
     \SetKwInOut{Input}{input}
     \SetKwInput{Initialization}{Explore($\emptyset, \lambda x. \bot$)}
     \SetKwHangingKw{Let}{let}
     \Fn{Explore($E$,$C$)}{
-        \Let{s := last(S)}
+        \Let{$s := last(S)$}
         \For{all process $p$}{
-            \If{$\exists i = max(\{ i \in dom(S) \mid S_i  \text{is dependent and may be co-enabled with } next(s,p) and i \not \leq  C(p)(proc(S_i)) \} $}{
+            \If{$\exists i = max(\{ i \in dom(S) \mid S_i$ is dependent and may be co-enabled with $next(s,p)$ and $i \not \leq  C(p)(proc(S_i)) \} $}{
                 \uIf{$p \in enabled(pre(S,i)))$}{
                     add $p$ to $backtrack(pre(S,i))$ \;
                 }
@@ -302,21 +304,23 @@ Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors va
                add $p$ to $done$ \;
                \Let{$t = next(s,p)$} 
                 \Let{$S' = S.t$} 
-                \Let{$cu = max \{ C(i) \mid i \in 1.. | S |$ and $S_i$ dependent with $t$} 
+                \Let{$cu = max \{ C(i) \mid i \in 1.. | S |$ and $S_i$ dependent with $t \}$ 
                 \Let{$cu2 = cu [ p := | S' | ] $} 
                \Let{$C' = C [p:= cu2, |S'| := cu2 ]$} 
-                Explore($S',C'$) \;
+                $Explore(S',C')$ \;
             }
         }
     }
 \end{algorithm}
 
-A subtle variation of the algorithm is used. As a result there is no need to add all available threads when $p$ is not enabled. If no sufficient candidate was found
-a candidate suggested by the Source-DPOR algorithm will be added. This way of calculating persistent sets is considered to be more complex and it is usually
-rejected. However, source sets algorithm is closer to this approach.
+In order to take advantage of Nidhugg's infrastructure Algorithm \ref{NBPOR} will be used. As a result there is no need to add all
+available threads when $p$ is not enabled. If no sufficient candidate is found
+a candidate suggested by the Source-DPOR algorithm is added. This way of calculating persistent sets is considered to be more 
+complex and thus a bad option \cite{Gode05}. However, source sets algorithm is closer to this approach.
 
 \begin{algorithm}
-    \caption{Nidhugg BPOR}
+    \caption{Nidhugg DPOR}
+    \label{NDPOR}
     \SetKwInOut{Input}{input}
     \SetKwHangingKw{Let}{let}
     Explore($\langle \rangle$,$\emptyset$)\;
@@ -343,13 +347,16 @@ rejected. However, source sets algorithm is closer to this approach.
     }
 \end{algorithm}
 
+The implemented Algorithm \ref{NDPOR} differs from Source-DPOR (Alg. \ref{Source}) in the calculation of the initials.
 It is clear that persistent algorithm implemented differentiates from Source-DPOR in the calculation of the initials. 
 Specifically a subset of the initials that happen before $p$ is used. 
-Intuitively in the case of a writer and 2 readers both readers will be added to the branch since the first read does not happen before the second read.
-To generalize this idea: since Nidhugg does not enable us to create branches for $last(E)$ when it is scheduled we add the branches later as in DPOR. When
-a race is considered usually only the thread that causes the race will be added since $CI$ contains this thread only.
+Intuitively in the case of a writer and two readers, both readers will be added to the branch since the first read does not
+happen before the second one.
+To generalize this idea: since Nidhugg does not enable us to create branches for $last(E)$ when it is scheduled we add the 
+branches later as in Source-DPOR (Alg. \ref{Source}). When a race is considered usually only the thread that causes the race will be added since 
+$CI$ contains this thread only.
 
-We will prove that Nidhugg's DPOR calculates a persistent set or that when the algorithm finishes a persistent set will have been calculated in each step.
+We will prove that DPOR calculates a persistent set or that when the algorithm finishes a persistent set will have been calculated in each step.
 
 Let us assume two processes that are in race with $last(S)$.
 \begin{itemize}
@@ -365,12 +372,12 @@ Since we do not calculate $I$ but $CI$ the first read operation will not be cons
 both processes will be added to $backtrack$. 
 
 \end{itemize}
-It is clear that any process no process that does not belong to the backtrack(S) has race with a process that belongs to backtrack(S).
+It is clear that no process that does not belong to the backtrack(S) has race with a process that belongs to backtrack(S).
 
 \subsection{Implementation of DPOR using persistent-sets}
 
 The implementation of the persistent sets is based on the already implemented infrastructure of vector clocks. Specifically the \verb|include()| function of vector clocks
-lets as determine whether the $i \rightarrow p$ holds true.
+lets as determine whether $i \rightarrow p$.
 
 To calculate the $CI$ set we just need to prevent the \verb|add\_branch()| function from rejecting branches due to threads that belong to $I$ but not to $CI$.
 An example of the modification is presented at Algorithm \ref{addbranch routine for persistent sets}.
@@ -423,7 +430,7 @@ branch been added at the beginning of the block the preemption count would not h
 
 \subsection{Description of BPOR}
 The algorithm implemented is presented here \cite{BPOR} in detail. A modification of this algorithm is used in order to take advantage of the Nidhugg's infrastructure.
-The algorithm is presented at Algorithm \ref{Nidhugg BPOR}.
+The algorithm is presented in Algorithm \ref{Nidhugg BPOR}.
 
 
 \begin{algorithm}
@@ -433,33 +440,33 @@ The algorithm is presented at Algorithm \ref{Nidhugg BPOR}.
     \SetKwHangingKw{Let}{let}
     Explore($\langle \rangle$,$\emptyset$,$b$)\;
     \Fn{Explore($E$,$Sleep$,$b$)}{
-        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep) \text{ and } B_v(E.p) <=b$}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
             backtrack(E) $:={p}$ \;
-            \While{$\exists p \in (backtrack(E) \backslash Sleep \text { and } B_v(E.p) <=b$}{
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
                 \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
                     \Let{$E' = pre(E,e)$}
                     \Let{$u = notdep(e,E).p$}
                     \Let{$CI = \{ i \in I_{E'}(u) \mid i \rightarrow p \}$}
                     \If{$CI \cap backtrack(E') = \emptyset$}{
                         \If{$CI \neq \emptyset$}{
-                            add some $q' \in CI \text{ to } backtrack(E') $ \;
+                            add some $q' \in CI$ to $backtrack(E') $ \;
                         }
                         \Else{
-                             add some $q' \in I_{[E']}(u) \text{ to } backtrack(E') $ \;}
+                             add some $q' \in I_{[E']}(u)$ to $backtrack(E') $ \;}
                         }
                     \Let{$E''= pre\_block(e,E)$}
                     \Let{$u = notdep(e,E).p$}
                     \Let{$CI = \{ i \in I_{E''}(u) \mid i \rightarrow p \}$}
                     \If{$CI \cap backtrack(E') = \emptyset$}{
                         \If{$CI \neq \emptyset$}{
-                            add some $q' \in CI \text{ to } backtrack(E') $ \;
+                            add some $q' \in CI$ to $backtrack(E') $ \;
                         }
                         \Else{
-                            add some $c(q') \in I_{[E'']}(u) \text{ to } backtrack(E'') $ \;
+                            add some $c(q') \in I_{[E'']}(u)$ to $backtrack(E'') $ \;
                         }
                     } 
                 }
-                \Let{ $Sleep' := {q \in Sleep \mid E \models p \diamondsuit q } $ } 
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
                 $Explore(E.p, Sleep)$ \;
                 \If{$p$ is not conservative}{
                     add $p$ to $Sleep$ \;
@@ -472,7 +479,7 @@ The algorithm is presented at Algorithm \ref{Nidhugg BPOR}.
 A critical challenge arises when a DPOR algorithm is used in tandem with sleep sets. This stems from the fact that conservative branches are not added due to a
 concurrent event. By observing the sleep set algorithm we notice that if we follow the same strategy as with non-conservative branches many traces will end up being blocked.
 
-Let us take the writer-2readers example:
+Let us take the writer-2readers example as shown in Figure \ref{Usage of non-conservative branches}.
 
 \trace{w2rpersistent.pdf}{Usage of non-conservative branches}
 
@@ -484,7 +491,7 @@ so no thread is added twice. The solution is based on the notion of the conserva
 Intuitively the algorithm is the same with the Source-DPOR with the addition of the conservative branches. The solution is based on the notion of the conservative sets where every thread that was added to the branch is recorded.  However many challenges araise which are discussed 
 in the implementation section.
 
-\tracelong{w2rbpor.pdf}{BPOR}
+\tracelong{w2rbpor.pdf}{Example of BPOR execution}
 
 \subsection{Implementation of BPOR}
 As it was made clear in previous sections for any algorithm to be implemented, the main modifications should take place in the see\_events and add\_branch procedures. 
@@ -494,26 +501,26 @@ During see\_events procedure we add another branch at the beginning of the block
 is available or not in that place. We use the available thread field for this purpose.
 
 \begin{algorithm}[H]
-    \caption{see\_events() routine for BPOR}
+    \caption{see\_events() for BPOR}
     \label{seeevents routine for BPOR}
     Explore($\langle \rangle$,$\emptyset$)\;
     \Fn{see\_events($seen\_access$)}{
-        vector branches = $\emptyset$ \;
-        branches := seen\_access $ - \{ a \in seen\_access \mid a  \text{happens before} last(E) or \exists a' \in seen\_access \text{ which happens after a } \}$ \;
-        update\_clocks() \;
+        $vector branches = \emptyset$ \;
+        $branches := seen\_access - \{ a \in seen\_access \mid a$ happens before $last(E) or \exists a' \in seen\_access$ which happens after $a \}$ \;
+        $update\_clocks()$ \;
         \ForEach{$b \in branches$}{
-            add\_branch($b$) \;
+            $add\_branch(b)$ \;
             \If{$b \in enabled(last(E))$}{
-                add\_branch(at the beginning of block $b$) \;
+                $add\_branch($ at the beginning of block $b)$ \;
             }
         }
      }
 \end{algorithm}
 
-In case the add\_branch() invokes directly then the add\_conservative\_branch() is called which works as the "conservative" part of the see\_events().
-The pseudo code for this procedure is given here:
+In case the \verb|add_branch()| invokes directly then the \verb|add_conservative_branch()| is called which works as the "conservative"
+part of the \verb|see_events()|. The pseudo code for this procedure is given here:
 
-During add\_branch procedure we add branches at the appropriate places using the algorithm for the persistent sets suggested in the previous section.
+During \verb|add_branch()| procedure we add branches at the appropriate places using the algorithm for the persistent sets suggested in the previous section.
 It was made clear that two different types of branches are used. However, the Nidhugg's infrastructure takes into account only the non-conservative ones when it comes
 to searching for threads in set of threads such as sleep sets. As a result, at some points of the code we have to look for both the conservative and the non conservative
 branches in the set. 
@@ -538,10 +545,10 @@ Having made the preceding observations the algorithm used for Source-BPOR is the
 We can notice that the algorithm is equivalent to the source-DPOR for non-conservative traces and equivalent to BPOR for conservative traces.
 
 \subsection{Implementation of Source-BPOR}
-The implementation is again based on modifications on the procedure add\_branch since every change in the see\_events procedure is still necessary for this algorithm.
+The implementation is again based on modifications on the procedure \verb|add_branch()| since every change in the \verb|see_events()| procedure is still necessary for this algorithm.
 We can infer from the algorithm that will choose the same candidate with the Source-DPOR when we are dealing with a non-conservative branch and the same candidate as in BPOR
 in case the branch is conservative. In order to differentiate for the two cases we add a second parameter at the routine so we can be aware of the nature of the
-branch (conservative or non-conservative). The pseudo code for add\_branch is given at Algorithm \ref{addbranch routine for Source-BPOR}.
+branch (conservative or non-conservative). The pseudo code for \verb|add_branch()| is given at Algorithm \ref{addbranch routine for Source-BPOR}.
 
 \begin{algorithm}[H]
     \caption{add\_branch() routine for Source-BPOR}
@@ -550,9 +557,9 @@ branch (conservative or non-conservative). The pseudo code for add\_branch is gi
         $candidates = \emptyset$ \;
         $lc = null$ \;
         $lpc = null$ \;
-        $E'$ := $E \text{ starting from } next_{E}(b)$ \; 
+        $E'$ := $E$ starting from $next_{E}(b)$ \; 
         \ForEach{$e \in dom(E')$}{
-            \If{$b \rightarrow e \text{ or } \exists c \in candidates \mid c \rightarrow e $}{
+            \If{$b \rightarrow e$ or $\exists c \in candidates \mid c \rightarrow e $}{
                 continue \;
             }
 
@@ -562,13 +569,13 @@ branch (conservative or non-conservative). The pseudo code for add\_branch is gi
 
             $lc := e.pid$\;
 
-            \If{$e.pid \in backtrack(b) \text{ or } e.pid \in sleep\_set(b)$}{
-                \If{$\text{not is\_conservative or} lc \rightarrow last(E)$}{
+            \If{$e.pid \in backtrack(b)$ or $e.pid \in sleep\_set(b)$}{
+                \If{not is\_conservative or $ lc \rightarrow last(E)$}{
                     return \;
                 }
             }
         }
-        \If{$lpc \text{ and is\_conservative}$}{
+        \If{$lpc$ and $is\_conservative$}{
             $backtrack(b) := backtrack(b) \cup lpc $
         }
         \Else{$backtrack(b) := backtrack(b) \cup lc $}

@@ -7,6 +7,7 @@ Testing vs Verification
 Vanilla-BPOR bad name
 Unsoundness of Vanilla-BPOR bad?
 bad formatting page22.
+Factored out page23.
 
 See overview because chapter 3 will be split.
 A slash is wrong somewhere

@@ -271,7 +271,7 @@ is in a race with $t$, then $t'$ belongs in the persistent set.
 
 Notice that the definition of persistent sets suggests a way to construct them.
 
-In \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
+In Figure \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
 In the first, let a concurrent program contain 3 threads $p$, $q$, and $r$. Thread $p$ changes the value of the variable (writer) and the other ($q$ and $r$) just read this variable (readers).
 Let $p.q.r$ be an interleaving. According to the definition of the persistent sets $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
 of the first command of the interleaving. In Figure \ref{Construction of persistent set} we notice that both $r$ and $q$ threads are added to the persistent set of the first
@@ -283,16 +283,16 @@ just read the variable $x$. The reason why the thread $r$ is added is the confli
 
 \section{Source sets}
 
-Before defining source sets, it is crucial to give some other useful definitions.
+Before defining source sets, we give some other useful definitions.
 
 \begin{definition}{($dom(E)$)}
-    The set of events-transitions happening in during the scheduling of $E$.
+    The set of events-transitions happening during the scheduling of $E$.
 \end{definition}
 
 \begin{definition}{(Initials after an execution sequence $E.w$, $I_{[E]}(w)$)}
 For an execution sequence $E.w$, let $I_{[E]}(w)$ denote the set of
 processes that perform events $e$ in $dom_{[E]}(w)$ that have no
-“happens-before” predecessors in dom[E](w). More formally,
+“happens-before” predecessors in $dom_{[E]}(w)$. More formally,
 $p \in I_{[E]}(w)$ if $p \in w$ and there is no other event $e \in dom_{[E]}(w)$ with
 $e \rightarrow_{E.w} next_{[E]}(p)$.
 \end{definition}
@@ -301,7 +301,7 @@ $e \rightarrow_{E.w} next_{[E]}(p)$.
 Let $S$ be an execution sequence,
 and let $W$ be a set of sequences, such that $E.w$ is an execution
 sequence for each $w \in W$. A set $T$ of processes is a source set for
-$W$ after $E$ if for each $w \in W$ we have $WI [E] (w) \cap P  = \emptyset$.
+$W$ after $E$ if for each $w \in W$ we have $WI_{[E]}(w) \cap P  = \emptyset$.
 \end{definition}
 
 A source set is a set of threads that guarantee that the whole state space will be explored. Notice that their is no requirement related to the races
@@ -324,7 +324,7 @@ A short example on sleep sets is the following:
 Let us the concurrent program of one writer and two readers.
 let w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) and r2 <0.2>: (local operations), r(x).
 
-The resulted traces are demonstrated in the \ref{Sleep set example}.
+The resulted traces are demonstrated in the Listing \ref{Sleep set example}.
 
 \Output{./code/sleep_sets.out}{Sleep set example}
 
@@ -336,9 +336,9 @@ As a result an optimal algorithm should be able to not consider these interleavi
 
 \section{Comparing Persistent sets with Source Sets}
 
-It is transparent that the definition of source sets is much more relaxed than the definition of the persistent sets. 
+Note that the definition of source sets is much more relaxed than the definition of the persistent sets. 
 This relaxation enables the source sets to be much more efficient than the persistent sets. In Figure \ref{Non-minimal persistent sets}
-an example is given were sleep sets and persistent sets differentiate.
+an example is given were source sets and persistent sets differ.
 
 \begin{figure*}
     \begin{lstlisting}[frame=none,numbers=none]
@@ -349,7 +349,7 @@ an example is given were sleep sets and persistent sets differentiate.
         p:
         m := x; (p1)
         if (m = 0) then
-        z := 1; (p2)
+            z := 1; (p2)
       \end{lstlisting}
     \end{minipage}
     \begin{minipage}{0.3\textwidth}
@@ -357,7 +357,7 @@ an example is given were sleep sets and persistent sets differentiate.
             q:
             n := y; (q1)
             if (n = 0) then
-            x := 1; (q2)
+                x := 1; (q2)
         \end{lstlisting}
       \end{minipage}
       \begin{minipage}{0.3\textwidth}
@@ -365,32 +365,32 @@ an example is given were sleep sets and persistent sets differentiate.
             r:
             o := z; (r1)
             if (o = 0) then
-            y := 1; (r2)
+                y := 1; (r2)
         \end{lstlisting}
       \end{minipage}
       \caption{Program with non-minimal persistent sets}
       \label{Non-minimal persistent sets}
   \end{figure*}
 
-From the example, it is clear the reason why source sets are an improvement over persistent sets is the fact that minimum source sets can eliminate
+From the example, it is clear that the reason why source sets are an improvement over persistent sets is the fact that minimum source sets can eliminate
 sleep set blocked traces i.e. traces that would eventually be blocked by the sleep sets. An algorithm that would only calculate minimal source sets would be optimal \cite{AbdullaAronisJohnssonSagonasDPOR2014}, hence
 would never explore two equivalent interleavings.
 
 It is obvious that a single transition cannot be a source set. For
-instance, the set {p1} does not contain the initials of execution q1.q2.p1.r1.r2,
+instance, the set $\{ p_1 \}$ does not contain the initials of execution $q_1.q_2.p_1.r_1.r_2$,
 since q2 and p1 perform conflicting accesses. On the other hand, any subset
 containing two enabled transitions is a source set. To see this, let us choose
-{p1, q1} as the source set. Obviously, {p1, q1} contains an initial of any execution
-that starts with either p1 or q1. Any execution sequence which starts with r1 is
-equivalent to an execution obtained by moving the first step of either p1 or q1 to
+$\{p_1, q_1 \}$ as the source set. Obviously, $\{p1, q1 \}$ contains an initial of any execution
+that starts with either $p_1$ or $q_1$. Any execution sequence which starts with $r_1$ is
+equivalent to an execution obtained by moving the first step of either $p_1$ or $q_1$ to
 the beginning:
 \begin{itemize}
-\item If q1 occurs before r2, then q1 is an initial, since it does not conflict with
+\item If $q_1$ occurs before $r_2$, then $q_1$ is an initial, since it does not conflict with
 any other transition.
-\item If q1 occurs after r2, then p1 is independent of all steps, so p1 is an initial.
-We claim that {p1, q1} cannot be a persistent set. The reason is that the execution
-sequence r1.r2 does not contain any transition in the persistent set, but its second
-step is dependent with q1. By symmetry, it follows that no other two-transition
+\item If $q_1$ occurs after $r_2$, then $p_1$ is independent of all steps, so $p_1$ is an initial.
+We claim that $\{p_1, q_1 \}$ cannot be a persistent set. The reason is that the execution
+sequence $\{r_1.r_2 \}$ does not contain any transition in the persistent set, but its second
+step is dependent with $q_1$. By symmetry, it follows that no other two-transition
 set can be a persistent set.
 \end{itemize}
 
@@ -408,19 +408,13 @@ note some rather direct properties, including the following.
 \item Any one-process source set is a persistent set.
 \end{itemize}
 
-An interesting question is then whether there are situations where any persistent
-set contains a strictly smaller source set. We note that the program in Fig. 1
-does not illustrate such a situation, since the smallest persistent sets and the
-smallest source sets coincide: they are either {q} or {r}. Nevertheless, the answer
-to this question is yes, and we formulate this as a theorem.
-
 
 \section{Bounded search - preemption bounded search}
 Bounded search explores only executions that do not exceed
 a bound \cite{BPOR,Thomson}. The bound may be any property of a
 sequence of transitions. A bound evaluation function $Bv(S)$
 computes the bounded value for a sequence of transitions S.
-A bound evaluation function Bv and bound c are inputs to
+A bound evaluation function $B_v$ and bound $c$ are inputs to
 bounded search. Bounded search may not visit all relevant
 reachable states; it visits only those that are reachable within
 the bound. If a search explores all relevant states reachable
@@ -442,13 +436,13 @@ An algorithm that could describe a bounded search would be the following:
     }
 \end{algorithm}
 
-\noindent The only difference between the unbounded and the bounded version of the algorithm is the if statement which allows for an interleaving to be explored
+\noindent The only difference between the unbounded and the bounded version of the algorithm is the if statement on line 4 which allows for an interleaving to be explored
 only if the bound has not been exceeded.
 
-What is needed next is an appropriate definition of the function $B_v$ that calculates a value, the bounded-DPOR tries to keep bounded, 
+What is needed next is an appropriate definition of the function $B_v$ that calculates a value that the bounded-DPOR tries to keep bounded, 
 and the sufficient set. 
 
-In this thesis we mainly focus on preemption-bounded search. 
+In this thesis, we mainly focus on preemption-bounded search. 
 
 Preemption-bounded search limits the number of preemptive context switches that occur in an execution \cite{Musu07}. The 
 preemption bound is defined recursively as follows.
@@ -464,7 +458,7 @@ $\\
 \end{definition}
 
 The previous definition describes what a preemptive context switch is. A preemptive context switch happens when the previously running thread could execute
-its next step but it does not due to the scheduling of an other thread. Hence, a preemptive switch will increase the preemption bound.
+its next step but it does not due to the scheduling of another thread. Hence, a preemptive switch will increase the preemption bound.
 
 \section{Preemption-bound persistent sets}
 
@@ -472,7 +466,7 @@ A set that has been proposed as a sufficient for preemption bounded search is th
 
 An important observation is that the execution of a thread until it gets blocked or terminates will not increase
 the bound count.
-\begin{definition}{(ext(s,t))}
+\begin{definition}{($ext(s,t)$)}
     Given a state $s = final(S)$ and a transition $t \in enabled(s)$,
     $ext(s,t)$ returns the unique sequence of transitions $\beta$ from $s$
     such that
@@ -481,6 +475,10 @@ the bound count.
         \item $t.tid \notin enabled(final(S.\beta))$
     \end{enumerate}
 \end{definition}
+
+Next, we need to define preemption bounded persistent sets. We denote with $A_G(P_b,c)$ the generic 
+bounded state space with bound function $P_b$ and bound $c$. $last(a)$ denotes the last execution step of
+an execution sequence $a$
 
 \begin{definition}{(Preemption bounded persistent set)}
 
@@ -491,16 +489,23 @@ $\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
 
 \begin{enumerate}
 \item $Pb(S.t) \leq Pb(S.a_1)$
-\item if $Pb(S.t) < Pb(S.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(S.a), last(a).tid)$
-\item if $Pb(S.t) = Pb(S.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(S.a), last(a).tid)$
+\item if $Pb(S.t)<Pb(S.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(S.a), last(a).tid)$
+\item if $Pb(S.t)=Pb(S.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(S.a), last(a).tid)$
 \end{enumerate}
 
 \end{definition}
-where $A_G(P_b,c)$ is a generic bounded state space with bound function $P_b$ and bound c.
+
+When dealing with preemption bounded DPOR it is useful to introduce the idea of blocks in an execution sequence.
+
+\begin{definition}{(Block of execution sequence}
+    Block in an execution sequence is the maximal subsequence of execution steps that consists of execution steps of the same thread.
+\end{definition}
+
+In the following example there are three blocks. The first block is coloured with blue, the second with green and the third with yellow.
 
 Let us assume that $P$ is a persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
-threads that would be added in a block that would be created when a $p$ was scheduled. These threads are called conservative threads threads and their 
+threads that would be added in a block that would be created when $p$ was scheduled. These threads are called conservative threads and their 
 goal is to allow the coverage of interleavings that would not exceed the bound. Notice that an interleaving can be both conservative and non-conservative.
-Preemption bounded persistent set extends a persistent set by adding all the threads that will create a new block
+Preemption bounded persistent sets extend a persistent set by adding all the threads that will create a new block
 after the block that will be created by the persistent set.
 

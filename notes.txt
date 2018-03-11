@@ -6,3 +6,7 @@ p3 Example inverted
 Testing vs Verification
 
 See overview because chapter 3 will be split.
+A slash is wrong somewhere
+Change Testing vs modelchecking vs Verification
+vdash may be redundant
+Definition of persistent sets

@@ -172,15 +172,15 @@ only one process $q$, then $E \models p \diamondsuit q$ denotes that the next st
 $p$ and $q$ are independent after $E$. We use $E'\models p \diamondsuit w$ to denote that
 $E \not \models p \diamondsuit w$ does not hold.
 
-For a sequence $w$ and $p \in w$, let $w \\ p$ denote the sequence
+For a sequence $w$ and $p \in w$, let $w \backslash p$ denote the sequence
 $w$ with its first occurrence of $p$ removed, and let $w \uparrow p$ denote the
 prefix of w up to but not including the first occurrence of $p$. For
-an execution sequence $E$ and an event $e \in  dom(E)$, let $pre(E, e)$
+an execution sequence $E$ and an event $e \in  dom(E)$, let $pre(E,e)$
 denote the prefix of $E$ up to, but not including, the event $e$. For an
 execution sequence $E$ and an event $e \in E$, let $notdep(e, E)$ be the
 sub-sequence of $E$ consisting of the events that occur after $e$ but do
-not “happen after” $e$ (i.e. the events $e'$ that occur after $e$ such that
-$e \not \rightarrow_E e'$.
+not “happen after” $e$ (i.e., the events $e'$ that occur after $e$ such that
+$e \not \rightarrow_E e'$).
 
 
 A central concept in most DPOR algorithms is that of a race.
@@ -205,7 +205,7 @@ and $e$ occurs immediately before $e'$ in $E'$, then $proc(e')$ was not
 blocked before the occurrence of $e$.
 
 
-\section{Unbounded dynamic partial order reduction}
+\section{Dynamic partial order reduction}
 
 Before explaining the DPOR algorithm it is important to define sufficient sets.
 
@@ -239,11 +239,11 @@ where $final(E)$ represents the state that will be reached when the execution se
 The algorithm above describes a DFS search in the state space of all possible interleavings.
 As it can be inferred from the algorithm the most important step is that of the calculation of the set $T$.
 
-An obvious property that the sufficient sets must hold is that Sufficient\_set$(final(E)) \subseteq enabled(E)$.
-
-\begin{definition}{(enabled sets, $enabled(s)$)}
+\begin{definition}{(Enabled sets, $enabled(s)$)}
     Given a state $s$, $enabled(s)$ represents the set of all the threads that can be scheduled immediately after $s$.
 \end{definition}
+
+An obvious property that the sufficient sets must hold is that Sufficient\_set$(final(E)) \subseteq enabled(E)$.
 
 Intuitively $enabled(s)$ represents the threads that are not blocked or have already finished their execution.
 
@@ -253,30 +253,31 @@ In this thesis we mainly focus on persistent sets and on source sets.
 
 \section{Persistent Sets}
 
-\begin{definition}{(Persistent Sets)}
-
 A persistent set in a state $s$ is a sufficient set of transitions to
-explore from s while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
-sets explores a persistent set of transitions from each state s where $enabled(s) \neq $ and prunes enabled transitions that
+explore from $s$ while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
+sets explores a persistent set of transitions from each state s where $enabled(s) \neq \emptyset$ and prunes enabled transitions that
 are not persistent in s.
 In a more formal way:\\
 
+\begin{definition}{(Persistent Sets)}
 Let $s$ be a state, and let $W \subseteq E(s)$ be a set
 of execution sequences from $s$. A set $T$ of transitions is a persistent set for $W$
 after $s$ if for each prefix $w$ of some sequence in $W$, which contains no occurrence
-of a transition in $T$ , we have $E \vdash t \diamondsuit w$ for each $t \in T$.
+of a transition in $T$,  we have $E \vdash t \diamondsuit w$ for each $t \in T$.
 \end{definition}
 
-The above definition can be described as followed: If a $t \in T$ and there is another thread $t'$ that can be executed until a command which
-is in a race with the $t$ then $t'$ belongs in the persistent set.
+The above definition can be described as follows: If $t \in T$ and there is another thread $t'$ that can be executed until a command which
+is in a race with $t$, then $t'$ belongs in the persistent set.
 
 Notice that the definition of persistent sets suggests a way to construct them.
 
-Let a concurrent program contain 3 threads. The first thread changes the value of the variable (writer) and and the other just read this variable (readers).
-Let w.r1.r2 be an interleaving. According to the definition of the persistent sets r1 and r2 are in a race with w, thus, r1 and r2 must also be on the persistent set
-of the first command of the interleaving. In Figure \ref{Construction of persistent set} we notice that both r and q threads are added to the persistent set of the first
-command of the trace since both conflict with the write operation. At the second example, again both r and q are added. However, there is no conflict between p and r. The reason
-why the thread r is added is the conflict that will be produced by the q's write operation.
+In \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
+In the first, let a concurrent program contain 3 threads $p$, $q$, and $r$. Thread $p$ changes the value of the variable (writer) and the other ($q$ and $r$) just read this variable (readers).
+Let $p.q.r$ be an interleaving. According to the definition of the persistent sets $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
+of the first command of the interleaving. In Figure \ref{Construction of persistent set} we notice that both $r$ and $q$ threads are added to the persistent set of the first
+command of the trace since both conflict with the write operation. 
+In the second example, let $p$ and $r$  be a readers and $q$ be a writer. We notice that both $r$ and $q$ are added. However, there is no conflict between $p$ and $r$ since both $p$ and $r$
+just read the variable $x$. The reason why the thread $r$ is added is the conflict that will be produced by the $q$'s write operation.
 
 \trace{persistent.pdf}{Construction of persistent set}
 

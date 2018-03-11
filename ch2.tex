@@ -501,7 +501,9 @@ When dealing with preemption bounded DPOR it is useful to introduce the idea of 
     Block in an execution sequence is the maximal subsequence of execution steps that consists of execution steps of the same thread.
 \end{definition}
 
-In the following example there are three blocks. The first block is coloured with blue, the second with green and the third with yellow.
+In the Figure \ref{Example of blocks} there are three blocks. The first block is coloured with yellow, the second with green and the third with blue.
+
+\trace{blocks.pdf}{Example of blocks}
 
 Let us assume that $P$ is a persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
 threads that would be added in a block that would be created when $p$ was scheduled. These threads are called conservative threads and their 

@@ -11,4 +11,5 @@ Change Testing vs modelchecking vs Verification
 vdash may be redundant
 Definition of persistent sets
 -- Make an example of source sets
-Comparison 
+Comparison
+WI not defined

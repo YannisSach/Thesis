@@ -297,6 +297,14 @@ $p \in I_{[E]}(w)$ if $p \in w$ and there is no other event $e \in dom_{[E]}(w)$
 $e \rightarrow_{E.w} next_{[E]}(p)$.
 \end{definition}
 
+By relaxing the definition of Initials we can get the definition of Weak Initials $WI$.
+
+
+\begin{definition}{(Weak Initials after an execution sequence $E.w$, $WI_{[E]}(w)$)}
+For an execution sequence $E.w$, let $WI_{[E]}(w)$ denote the union of $I_{[E]}(w)$ and the set of
+processes that perform events $p$ such that $p \in enabled(s_{[E]}) $.
+\end{definition}
+
 \begin{definition}{(Source Sets)}
 Let $S$ be an execution sequence,
 and let $W$ be a set of sequences, such that $E.w$ is an execution
@@ -304,9 +312,11 @@ sequence for each $w \in W$. A set $T$ of processes is a source set for
 $W$ after $E$ if for each $w \in W$ we have $WI_{[E]}(w) \cap P  = \emptyset$.
 \end{definition}
 
-A source set is a set of threads that guarantee that the whole state space will be explored. Notice that their is no requirement related to the races
+A source set is a set of threads that guarantee that the whole state space will be explored. 
+Notice that their is no requirement related to the races
 of the events.
-What the above definition implies is that source can be considered every set of threads that contains these threads that are able to cover the whole state-space.
+What the above definition implies is that source can be considered every set of threads that contains these threads 
+that are able to cover the whole state-space.
 It actually suggests a property for the sufficient sets to hold.
 
 \section{Sleep sets}

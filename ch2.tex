@@ -23,18 +23,31 @@ As it can be inferred, debugging this kind of programs can be proved extremely c
 not always clear which thread command will be executed. Moreover the error may not always occur during debugging since there may be only a limited
 number of interleavings that produce an error. 
 
+\section{Concurrency Errors}
+It is important to introduce the notion of concurrency error.
+
+\begin{definition}{(Concurrency Error)}
+    Concurrency error is an error caused by the scheduler's non-determinism.
+\end{definition}
+
+An example of a program containing a concurrency error is shown in the Listing \ref{Concurrency error}. In this program variable $x$ equals 1 in the beginning of the program. However,
+if thread $t_2$ is scheduled before $t_1$ a division by zero will take place. On the other hand, a division by $x$ cannot be considered a concurrency error in other cases
+such as the one shown in Listing \ref{Non-concurrency error} where a division by zero occurs without the scheduler's intervention.
+
+\Code{./code/zero.c}{Non-concurrency error}
+\Code{./code/zeroconc.c}{Concurrency error}
+
 \section{Testing, Model Checking and Verification}
 
-Dynamic software model checking consists of adapting model check-ing into a form of systematic testing that is applicable to industrial-size software. 
-Over the last two decades, dozens of tools following this paradigm have been de-veloped for checking concurrent and data-driven software. Compared to 
-traditionalsoftware testing, dynamic software model checking provides better coverage, butis more computationally expensive. Compared to more general 
-forms of programverification like interactive theorem proving, this approach provides more limitedverification guarantees, but is cheaper due to its higher
+Dynamic software model checking consists of adapting model checking into a form of systematic testing that is applicable to industrial-size software. 
+Over the last two decades, dozens of tools following this paradigm have been developed for checking concurrent and data-driven software. Compared to 
+traditional software testing, dynamic software model checking provides better coverage, but is more computationally expensive. Compared to more general 
+forms of program verification like interactive theorem proving, this approach provides more limited verification guarantees, but is cheaper due to its higher
 level of automation. Dynamic software model checking thus offers an attractive practical trade-off between testing and formal verification. 
 
-A graph that greatly demonstrates the differences between these terms is show in 
+The graph shown in Figure \ref{Comparing Testing, Model Checking and Verification} greatly demonstrates the differences between testing, model checking and verification.
 
 \trace{testmodver.png}{Comparing Testing, Model Checking and Verification}
-
 
 \section{Stateless model checking and partial order reduction}
 
@@ -42,9 +55,12 @@ In order to find an error of a concurrent program, one must examine every possib
 would occur only under some interleaving the programmer did not take into consideration, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
 the program along all these possible interleavings. However, this approach suffers from state explosion, i.e., the number of all possible interleavings grows 
 exponentially with the size of the program and the number of threads. Several approaches to this problem have been proposed in order to deal with this challenge: 
-partial order reduction \cite{Godefroid1996} and bounded search \cite{BPOR}. Partial order reduction is aiming to reduce the number of interleavings explored by eliminating equivalent interleavings.
+partial order reduction \cite{Godefroid1996} and bounded search \cite{BPOR}. 
+
+Partial order reduction aims to reduce the number of interleavings explored by eliminating the 
+exploration of equivalent interleavings.
 These equivalent traces are produced by the inversion of independent events which do not affect the results of the program. For example, the scheduling of two threads that read a local
-variable can be inverted since the result of the operation is affected by the order under which each operation occurs. 
+variable can be inverted since the result of the operation is not affected by the order under which these operations occurs. 
 There are two ways that a partial order reduction algorithm can be implemented. The first is a
 static partial order reduction algorithm \cite{Static1997} where the dependencies between two threads are tracked before the execution of the concurrent program. 
 The second is the Dynamic partial order reduction (DPOR) which observes the program's dependencies of runtime. It is important to notice that the size of
@@ -55,6 +71,12 @@ in contrast to DPOR, alleviates state-space explosion by pruning the executions 
 such as preemption bounded search \cite{BPOR} or delay bounded search \cite{Delay11}. All bounded search techniques are based on the notion that many of the concurrency bugs can be
 tracked even when the bound limit is set to be small, thus the time required for a bug to be found is significantly smaller.
 
+When it comes to bounded search, new challenges arise \cite{BPOR} since more dependencies, related to the bound limit, are introduced. 
+Many redundant traces must be explored in order to compensate with the bound since a bounded search algorithm cannot be aware if an equivalent trace with greater bound count
+has already been explored.
+
+It is important to notice that some bounded techniques can be regarded as testing, in the sense that explore only a subset of total state space, while
+others can be considered as verification, in the sense that can verify that no error can occur in the given bound.
 
 \section{Vector Clocks}
 

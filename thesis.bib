@@ -1,75 +1,193 @@
 @article{Musu07,
-author = "Musuvathi , M., and Qadder S." ,
-title = "Iterative context bounding for systematic testing of multithreaded programs.",
-journal = "ACM Conference on Programming Language Design and Implementation",
-year = "2007"
+ author = {Musuvathi, Madanlal and Qadeer, Shaz},
+ title = {Iterative Context Bounding for Systematic Testing of Multithreaded Programs},
+ journal = {SIGPLAN Not.},
+ issue_date = {June 2007},
+ volume = {42},
+ number = {6},
+ month = jun,
+ year = {2007},
+ issn = {0362-1340},
+ pages = {446--455},
+ numpages = {10},
+ url = {http://doi.acm.org/10.1145/1273442.1250785},
+ doi = {10.1145/1273442.1250785},
+ acmid = {1250785},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {concurrency, context-bounding, model checking, multithreading, partial-order reduction, shared-memory programs, software testing},
+} 
+
+@InProceedings{Static1997,
+author="Kurshan, R.
+and Levin, V.
+and Minea, M.
+and Peled, D.
+and Yenig{\"u}n, H.",
+editor="Steffen, Bernhard",
+title="Static partial order reduction",
+booktitle="Tools and Algorithms for the Construction and Analysis of Systems",
+year="1998",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="345--357",
+isbn="978-3-540-69753-4"
+%% https://link.springer.com/chapter/10.1007/BFb0054182#citeas
 }
 
-@article{Static1997,
-author = "R. Kurshan, V. Levin, M. Minea, D. Peled, H. Yenigun" ,
-title = "Static Partial Order Reduction",
-year = "2007"
+
+@techreport{Delay11,
+author = {Emmi, Michael and Qadeer, Shaz and Rakamaric, Zvonimir},
+title = {Delay-Bounded Scheduling},
+booktitle = {},
+year = {2010},
+month = {September},
+abstract = {
+
+We provide a new characterization of scheduling nondeterminism by allowing deterministic schedulers to delay their next-scheduled task. In limiting the delays an otherwise-deterministic scheduler is allowed, we discover concurrency bugs efficiently---by exploring few schedules---and robustly---i.e., independent of the number of tasks, context switches, or buffered events. Our characterization elegantly applies to any systematic exploration (e.g., testing, model checking) of concurrent programs with dynamic task-creation. Additionally, we show that certain delaying schedulers admit efficient reductions from concurrent to sequential program analysis.
+
+
+},
+publisher = {},
+url = {https://www.microsoft.com/en-us/research/publication/delay-bounded-scheduling/},
+address = {},
+pages = {},
+journal = {},
+volume = {},
+chapter = {},
+isbn = {},
 }
 
-@article{Delay11,
-author = "Michael Emmi, Shaz Qadeer, Zvonimir Rakamaric",
-title = "Delay-Bounded Scheduling",
-journal = "Proceeding of Principles of Programming Languages ",
-year = "2011"
+@article{Lamp,
+author = {Lamport, Leslie},
+title = {Time, Clocks and the Ordering of Events in a Distributed System},
+booktitle = {},
+year = {1978},
+month = {July},
+publisher = {},
+url = {https://www.microsoft.com/en-us/research/publication/time-clocks-ordering-events-distributed-system/},
+address = {},
+pages = {558-565},
+journal = {},
+volume = {},
+chapter = {},
+isbn = {},
 }
 
-@misc{Lamp,
-    author = "Leslie Lamport",
-    title = "Time, Clocks and Ordering of Events in Distributed Systems",
-    year = "1978"
+@InProceedings{God97,
+author="Godefroid, Patrice
+and Pirottin, Didier",
+editor="Courcoubetis, Costas",
+title="Refining dependencies improves partial-order verification methods (extended abstract)",
+booktitle="Computer Aided Verification",
+year="1993",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="438--449",
+abstract="Partial-order verification methods exploit ``independency'' between transitions of a concurrent program to avoid parts of the state space explosion due to the modeling of concurrency by interleaving. In this paper, we study the influence of refining dependencies between transitions of the program on the effectiveness of these methods. We show that carefully tracking dependencies can yield substantial improvements for their performances. For instance, we were able to decrease the memory requirements needed for the verification of a real-size protocol with such a method from a factor of 5 to a factor of 25 by only refining dependencies.",
+isbn="978-3-540-47787-7"
 }
 
-@misc{God97,
-    author = "GODEFROID P. AND PIROTTIN D.",
-    title = "Refining dependencies improves partial-order verification methods",
-    year = "1997"
+
+@inproceedings{BPOR,
+author = {Coons, Katherine E. and Musuvathi, Madan and McKinley, Kathryn S},
+title = {Bounded Partial-Order Reduction},
+booktitle = {},
+year = {2013},
+month = {October},
+publisher = {ACM SIGPLAN Conference on Object-Oriented Programming, Systems, Languages, and Applications (OOPSLA)},
+url = {https://www.microsoft.com/en-us/research/publication/bounded-partial-order-reduction/},
+address = {},
+pages = {},
+journal = {},
+volume = {},
+chapter = {},
+isbn = {},
 }
 
-@misc{BPOR,
-    author = "Coons Katherine E., Musuvathi Madanlal, McKinley Kathryn S.",
-    title = "Bounded Partial Order Reduction",
-    month = "October",
-    day = "1",
-    year = "2013",
-    note = "Available: \url{http://lwn.net/Articles/262464/}" 
+
+@article{Thomson,
+ author = {Thomson, Paul and Donaldson, Alastair F. and Betts, Adam},
+ title = {Concurrency Testing Using Controlled Schedulers: An Empirical Study},
+ journal = {ACM Trans. Parallel Comput.},
+ issue_date = {March 2016},
+ volume = {2},
+ number = {4},
+ month = feb,
+ year = {2016},
+ issn = {2329-4949},
+ pages = {23:1--23:37},
+ articleno = {23},
+ numpages = {37},
+ url = {http://doi.acm.org/10.1145/2858651},
+ doi = {10.1145/2858651},
+ acmid = {2858651},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Concurrency, context bounding, stateless model checking, systematic concurrency testing},
+} 
+
+@article{AbdS17,
+ author = {Abdulla, Parosh Aziz and Aronis, Stavros and Jonsson, Bengt and Sagonas, Konstantinos},
+ title = {Source Sets: A Foundation for Optimal Dynamic Partial Order Reduction},
+ journal = {J. ACM},
+ issue_date = {September 2017},
+ volume = {64},
+ number = {4},
+ month = aug,
+ year = {2017},
+ issn = {0004-5411},
+ pages = {25:1--25:49},
+ articleno = {25},
+ numpages = {49},
+ url = {http://doi.acm.org/10.1145/3073408},
+ doi = {10.1145/3073408},
+ acmid = {3073408},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Dynamic partial order reduction, concurrency, software model checking, source sets, systematic testing, wakeup trees},
+} 
+
+@Inbook{AbdM17,
+author="Abdulla, Parosh
+and Aronis, Stavros
+and Jonsson, Bengt
+and Sagonas, Konstantinos",
+editor="Aceto, Luca
+and Bacci, Giorgio
+and Bacci, Giovanni
+and Ing{\'o}lfsd{\'o}ttir, Anna
+and Legay, Axel
+and Mardare, Radu",
+title="Comparing Source Sets and Persistent Sets for Partial Order Reduction",
+bookTitle="Models, Algorithms, Logics and Tools: Essays Dedicated to Kim Guldstrand Larsen on the Occasion of His 60th Birthday",
+year="2017",
+publisher="Springer International Publishing",
+address="Cham",
+pages="516--536",
+abstract="Partial order reduction has traditionally been based on persistent sets, ample sets, stubborn sets, or variants thereof. Recently, we have presented a strengthening of this foundation, using source sets instead of persistent/ample/stubborn sets. Source sets subsume persistent sets and are often smaller than persistent sets. We introduced source sets as a basis for Dynamic Partial Order Reduction (DPOR), in a framework which assumes that processes are deterministic and that all program executions are finite. In this paper, show how to use source sets for partial order reduction in a framework which does not impose these restrictions. We also compare source sets with persistent sets, providing some insights into conditions under which source sets and persistent sets do or do not differ.",
+isbn="978-3-319-63121-9",
+doi="10.1007/978-3-319-63121-9_26",
+url="https://doi.org/10.1007/978-3-319-63121-9_26"
 }
 
-@misc{Thomson,
-    author = "Paul Thomson, Alastair F. Donaldson, Adam Betts",
-    title = "Concurrency Testing Using Controlled Schedulers: An Empirical Study",
-    month = "March",
-    year = "2016",
-    note = "Available: \url{http://www.doc.ic.ac.uk/~afd/homepages/papers/pdfs/2016/TOPC.pdf}" 
-}
 
-@misc{AbdS17,
-    author = "PAROSH AZIZ ABDULLA, STAVROS ARONIS, BENGT JONSSON and KONSTANTINOS SAGONAS",
-    title = "Source Sets: A Foundation for Optimal Dynamic Partial Order Reduction",
-    month = "September",
-    year = "2017",
-    note = "Available: \url{https://www.researchgate.net/publication/319277772_Source_Sets_A_Foundation_for_Optimal_Dynamic_Partial_Order_Reduction}" 
-}
-
-@misc{AbdM17,
-    author = "Parosh Abdulla, Stavros Aronis, Bengt Jonsson and Konstantinos Sagonas",
-    title = "Comparing Source Sets and Persistent Sets for Partial Order Reduction",
-    month = "March",
-    year = "2017",
-    note = "Available:
-           \url{https://link.springer.com/chapter/10.1007/978-3-319-63121-9_26}" 
-}
-
-@misc{Spin,
-    author = "Michalis Kokologiannakis and Konstantinos Sagonas",
-    title = "Stateless Model Checking of the Linux Kernel’s Hierarchical Read-Copy-Update (Tree RCU)",
-    month = "July",
-    year = "2017",
-    note = "Available: \url{https://arxiv.org/abs/1610.03052}" 
+@inproceedings{Spin,
+ author = {Kokologiannakis, Michalis and Sagonas, Konstantinos},
+ title = {Stateless Model Checking of the Linux Kernel's Hierarchical Read-copy-update (Tree RCU)},
+ booktitle = {Proceedings of the 24th ACM SIGSOFT International SPIN Symposium on Model Checking of Software},
+ series = {SPIN 2017},
+ year = {2017},
+ isbn = {978-1-4503-5077-8},
+ location = {Santa Barbara, CA, USA},
+ pages = {172--181},
+ numpages = {10},
+ url = {http://doi.acm.org/10.1145/3092282.3092287},
+ doi = {10.1145/3092282.3092287},
+ acmid = {3092287},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Linux kernel, Nidhugg, Read-Copy-Update, Software model checking},
 }
 
 @unpublished{PaulEMcKenney2007WhatIsRCUFundamentally,
@@ -298,56 +416,114 @@ author = {Abdulla, Parosh and Aronis, Stavros and Jonsson, Bengt and Sagonas, Ko
     publisher = {Springer}
 }
 
-@article{POR,
-    author = "Edmund M. Clarke and Orna Grumberg and Marius Minea and Doron A. Peled",
-    title = "State Space Reduction Using Partial Order Techniques",
-    journal = "International Journal on Software Tools for Technology Transfer",
-    volume = "2",
-    number = "3",
-    pages = "279-287",
-    year = "1999"
+@Article{POR,
+author="Clarke, E.M.
+and Grumberg, O.
+and Minea, M.
+and Peled, D.",
+title="State space reduction using partial order techniques",
+journal="International Journal on Software Tools for Technology Transfer",
+year="1999",
+month="Nov",
+day="01",
+volume="2",
+number="3",
+pages="279--287",
+abstract="With the advancement of computer technology, highly concurrent systems are being developed. The verification of such systems is a challenging task, as their state space grows exponentially with the number of processes. Partial order reduction is an effective technique to address this problem. It relies on the observation that the effect of executing transitions concurrently is often independent of their ordering. In this paper we present the basic principles behind partial order reduction and its implementation.",
+issn="1433-2779",
+doi="10.1007/s100090050035",
+url="https://doi.org/10.1007/s100090050035"
 }
 
+
 @inproceedings{SMC,
-    author = "Patrice Godefroid",
-    title = "Model checking for programming languages using VeriSoft",
-    booktitle = "Proceedings of the 24th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages",
-    pages = "147-186",
-    year = "1997"
+ author = {Godefroid, Patrice},
+ title = {Model Checking for Programming Languages Using VeriSoft},
+ booktitle = {Proceedings of the 24th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+ series = {POPL '97},
+ year = {1997},
+ isbn = {0-89791-853-3},
+ location = {Paris, France},
+ pages = {174--186},
+ numpages = {13},
+ url = {http://doi.acm.org/10.1145/263699.263717},
+ doi = {10.1145/263699.263717},
+ acmid = {263717},
+ publisher = {ACM},
+ address = {New York, NY, USA},
 }
 
 @article{RCMC,
-    author = "Michalis Kokologiannakis and Ori Lahav and Konstantinos Sagonas and Victor Vafeiadis",
-    title = "Effective Stateless Model Checking for {C/C++} Concurrency",
-    journal = "Proceedings of the ACM on Programming Languages",
-    year = "2018"
+ author = {Kokologiannakis, Michalis and Lahav, Ori and Sagonas, Konstantinos and Vafeiadis, Viktor},
+ title = {Effective Stateless Model Checking for C/C++ Concurrency},
+ journal = {Proc. ACM Program. Lang.},
+ issue_date = {January 2018},
+ volume = {2},
+ number = {POPL},
+ month = dec,
+ year = {2017},
+ issn = {2475-1421},
+ pages = {17:1--17:32},
+ articleno = {17},
+ numpages = {32},
+ url = {http://doi.acm.org/10.1145/3158105},
+ doi = {10.1145/3158105},
+ acmid = {3158105},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {C/C++11, RC11, software model checking, weak memory models},
 }
 
 @article{JACM,
-    author = "Parosh Aziz Abdulla and Stavros Aronis and Bengt Jonsson and Konstantinos Sagonas",
-    title = "Effective Stateless Model Checking for C/C++ Concurrency",
-    journal = " Proceedings of the ACM on Programming Languages",
-    year = "2018"
+ author = {Abdulla, Parosh Aziz and Aronis, Stavros and Jonsson, Bengt and Sagonas, Konstantinos},
+ title = {Source Sets: A Foundation for Optimal Dynamic Partial Order Reduction},
+ journal = {J. ACM},
+ issue_date = {September 2017},
+ volume = {64},
+ number = {4},
+ month = aug,
+ year = {2017},
+ issn = {0004-5411},
+ pages = {25:1--25:49},
+ articleno = {25},
+ numpages = {49},
+ url = {http://doi.acm.org/10.1145/3073408},
+ doi = {10.1145/3073408},
+ acmid = {3073408},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Dynamic partial order reduction, concurrency, software model checking, source sets, systematic testing, wakeup trees},
 }
 
-@article{Gode05,
-author = "Patrice Godefroid",
-title = "Software Model Checking: The VeriSoft Approach",
-journal = "Formal Methods in System Design",
-volume = "26",
-number = "2",
-pages = "77-101",
-year = "2005"
+@Article{Gode05,
+author="Godefroid, Patrice",
+title="Software Model Checking: The VeriSoft Approach",
+journal="Formal Methods in System Design",
+year="2005",
+month="Mar",
+day="01",
+volume="26",
+number="2",
+pages="77--101",
+abstract="Verification by state-space exploration, also often referred to as model checking, is an effective method for analyzing the correctness of concurrent reactive systems (for instance, communication protocols). Unfortunately, traditional model checking is restricted to the verification of properties of models, i.e., abstractions, of concurrent systems.",
+issn="1572-8102",
+doi="10.1007/s10703-005-1489-x",
+url="https://doi.org/10.1007/s10703-005-1489-x"
 }
 
 @inproceedings{Musu08,
-author = "Mandanlal Musuvathi and Shaz Qadeer and Thomas Ball and Gerald Basler and Piramanayagam Arumuga Nainar and Iulian Neamtiu",
-title = "Finding and Reproducing Heisenbugs in Concurrent Programs",
-booktitle = "Proceedings of the 8th USENIX Symposium on Operating Systems Design and Implementation (OSDI '08)",
-pages = "267-280",
-publisher = {USENIX Association},
-year = "2008",
-address = {Berkeley, CA, USA}
+ author = {Musuvathi, Madanlal and Qadeer, Shaz and Ball, Thomas and Basler, Gerard and Nainar, Piramanayagam Arumuga and Neamtiu, Iulian},
+ title = {Finding and Reproducing Heisenbugs in Concurrent Programs},
+ booktitle = {Proceedings of the 8th USENIX Conference on Operating Systems Design and Implementation},
+ series = {OSDI'08},
+ year = {2008},
+ location = {San Diego, California},
+ pages = {267--280},
+ numpages = {14},
+ url = {http://dl.acm.org/citation.cfm?id=1855741.1855760},
+ acmid = {1855760},
+ publisher = {USENIX Association},
+ address = {Berkeley, CA, USA},
 }
 
 @inproceedings{Chri13,

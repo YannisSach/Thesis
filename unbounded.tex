@@ -3,7 +3,7 @@
 In this chapter the classic-DPOR and Source-DPOR algorithms are discussed. These algorithms differ in terms of the sufficient sets they use in order to cover the state space.
 DPOR is based on persistent sets while Source-DPOR relies on source sets.
 
-\subsection{Source-DPOR}
+\section{Source-DPOR}
 In this section Source-DPOR is presented. Even though Source-DPOR is posterior to Classic-DPOR, as the name suggests, we choose to present it first since any algorithm
 presented in this thesis will be related to Source-DPOR. This is due to the fact that all the algorithms were implemented in Nidhugg which is based on Source-DPOR.
 
@@ -57,7 +57,7 @@ If the next step of a process conflicts with the $next(p)$ then this process mus
 whose next steps do not interfere with the $next(p)$, i.e, $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $ 
 After finishing the exploration of $E.p$, $p$ is added to the sleep set because we want to refrain from executing an equivalent trace.
 
-\subsection{classic-DPOR}
+\section{Classic-DPOR}
 
 Since Source-DPOR uses vector clocks to track events the DPOR using Clock Vectors \cite{FlanaganDPOR} variation will be used which is shown in Algorithm \ref{DPORV}.
 
@@ -117,7 +117,7 @@ enabled transitions is added as backtracks.
 During the exploration phase a process $p$ in $enabled(s)$ is added to the backtrack point as in the Source-DPOR. 
 Then the vector clocks are updated according to Lamport's algorithm.
 
-\subsection{Comparison of Classic-DPOR and Source-DPOR}
+\section{Comparison of Classic-DPOR and Source-DPOR}
 
 As one can easily notice both algorithms consist of the same two phases i.e., the race detection phase and the exploration phase. Moreover both
 algorithms are based on vector-clocks, in spite of the fact that their usage is implied in the Source-DPOR in line ? and line ? of Algorithm \ref{Source}.
@@ -127,7 +127,7 @@ may be backtracked. On the other hand, in Source-DPOR only the last scheduled pr
 the case of non-enabled process in the backtrack addition. In the case of Classic-DPOR the whole enabled set will be added whereas none or just one process will
 be added in the Source-DPOR. All in all, Source-DPOR takes advantage of Clock vectors more than Classic-DPOR does.
 
-\subsection{Combining Classic-DPOR and Source-DPOR}
+\section{Combining Classic-DPOR and Source-DPOR}
 
 In order to take advantage of Nidhugg's infrastructure Algorithm \ref{NBPOR} will be used. As a result there is no need to add all
 available threads when $p$ is not enabled. If no sufficient candidate is found

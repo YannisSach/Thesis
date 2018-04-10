@@ -286,7 +286,9 @@
 
 \input{./ch1.tex}
 \input{./ch2.tex}
-\input{./ch3.tex}
+\input{./unbounded.tex}
+\input{./bounded.tex}
+\input{./implementations.tex}
 \input{./ch4.tex}
 \input{./ch5.tex}
 \input{./ch6.tex}
@@ -305,6 +307,15 @@
 \appendix
 
 \chapter{ \label{appendix_a}}
+
+\section{Modifications in test suite}
+For any implementation to be verified the test suit already available with Nidhugg was used. However in the test suit there are many limitations related to the source-DPOR
+that do not hold true in the BPOR and Source-DPOR. For example the test suit driver would report equivalent traces as errors even though that these traces cannot be eliminated 
+when bounded DPOR takes place. The reasons of this behavior have already been explained. In the section the changes on the test driver are reported.
+The modification took place was rather straightforward since we just had to mute warnings when the number of traces exceeded the anticipated or equivalent traces were explored more than
+once. However, in two cases (Atomic\_9,Intrinsic\_2) the only check that takes place concerns the number of the traces. In these cases only the test suit will report an error. 
+The report of the test suit when bounded DPOR is executed is shown below.
+
 
 Below are listed some testcases examined throughout.
 

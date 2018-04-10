@@ -35,4 +35,10 @@ tables
 
 Nidhugg discuss before presented.
 Arrow in clock vectors hasn't been introduced.
-Complete lines.
+Complete challenges 
+
+Should I add BPOR? Probably
+
+Change RCU
+Add BPOR
+

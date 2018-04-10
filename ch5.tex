@@ -1,58 +1,9 @@
 \chapter{Further Discussion on Bounding Problem}
 \label{Chapter 5}
 
-In this chapter alternative ideas of approaching the preemption bounding problem of the DPOR are discussed. Firstly, it is explained why a better solution,
-where conservative branches are utilized, is difficult to be found. Secondly, it is shown that optimizations that have already been used for the DPOR algorithm cannot solve the problem.
+In this chapter alternative ideas of approaching the preemption bounding problem of the DPOR are discussed. It is shown that optimizations that have already been used for the DPOR algorithm cannot solve the problem.
 Finally a new approach is suggested which is shown to be equivalent to the addition of conservative branches. This approach however can be used to better approximate
 a sound solution of the problem. 
-
-\section{Conservative Branches}
-It has been shown in a previous chapter that conservative sets cannot utilize the sleep set optimization. This is due to the fact that these branches are not produced by conflicts
-and as a result it is impossible to "wake up" another process whose next step may be a local operation. The problem is getting even more complex considering that when a conservative branch
-is added the algorithm "forgets" what was previously in this place. This lack of memory leads to an explosion of the state space. This explosion is greater than
-the explosion happening when exploring the unbounded state space. 
-In order to explain this better an example with a writer and 3 readers is given in Figure \ref{writer-3readers explosion}.
-
-\trace{w3rbpor.pdf}{writer-3readers explosion}
-
-As we can infer from the example there are more states to be explored than the expected ones. This is caused by the addition of conservative branches. 
-The extra trace suchs as the r2.r1.w trace which explores the already explored r1.r2.w trace. The algorithm is not aware when adding the 
-conservative trace whether an equivalent trace will be explored. The situation is worse when more readers are to read the same global variable.
-The total traces explored for a big bound approach the $N!$ where $N$ the total number of threads. We can easily notice that execution seems to be aware of the previous executions since sleep sets cannot
-be used. This happens due to the redundant inversions of the reading operations. 
-
-\section{Sleep Sets}
-The results of the various bounding algorithms suggest that the number of sleep set blocked traces is subtle compared to the number of the explored traces. This is due to the conservative
-branches. It was made clear that when both a conservative and a non conservative branch of the same thread is added then the conservative branch prevails. This trace would be 
-redundant in an unbounded version of the algorithm but it is not in a bounded version since the non conservative branch may had been rejected. Moreover, even if both threads had been accepted 
-by the algorithm there may be a later scheduling which may be rejected when the trace was caused by the non-conservative branch and be accepted by the equivalent trace caused by the conservative
-branch. 
-
-Another "problem" with the sleep sets is that are "in favor" of the branches that increase the bound count while they block traces with lower bound count.
-In the example below it is shown that the branch which would not have caused a increase of the bound is rejected.
-
-\trace{sleepsetproblem.pdf}{Sleep set contradiction}
-
-This behavior is quite reasonable if we consider the depth-first nature of the algorithm. As it was demonstrated in the first chapter, the DPOR algorithm performs a DPOR search. As a result
-it takes the branches which are located lower in the traces where the bound count is higher since more preemptive switches have taken place. The purpose of the sleep sets is to block redundant traces, i.e. traces that have already been
-explored. As a result the equivalent traces with lower bound count will be rejected.
-
-It is clear that the problem lies on the nature of the DPOR algorithm. A method that would explore the state space in breadth first way would be unfeasible since it would
-entail a huge memory overhead which stems from the storage of the traces that have not be completely explored. 
-
-\section{Source Sets - Optimal DPOR}
-The source set technique which can lead many times to optimal coverage of the state space manages avoid the exploration of redundant sets. However as it was discussed
-in the previous section it avoids the scheduling of the traces. Unfortunately it cannot be used in the when conservative branches are added since these branches are not
-related to the sleep sets. As a result the conservative branches alone will never lead to sleep set blocked traces.
-
-However, in many test cases there are some sleep set blocked traces which are caused by conditional reads and writes. When a technique which does not utilize 
-the sleep sets is to be used these traces would have been easily eliminated. Unfortunately, it was experimentally shown that explored traces outnumber the sleepset blocked
-traces and, consequently, the implementation of such an algorithm would have a minor impact.
-
-Moreover, we have shown that even if we maintain the source-set optimization for the non-conservative branches the results will be equivalent with using
-persistent sets. 
-The idea of keeping the rejected traces from Source-DPOR that would have been added from DPOR (with persistent sets) was rejected since it harms
-the soundness of the algorithm.
 
 \section{Techniques without the Addition of Conservative Branches}
 

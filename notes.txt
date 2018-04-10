@@ -33,7 +33,7 @@ tables
 Να αλλάξω το κείμενο με το παράδειγμα του persistent. 
 Να βάλω κώδικες δίπλα στα παραδείγματα.
 
-Nidhugg discuss before presented.
+Nidhugg discussed before presented.
 Arrow in clock vectors hasn't been introduced.
 Complete challenges 
 

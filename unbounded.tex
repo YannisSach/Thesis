@@ -1,0 +1,191 @@
+\chapter{Unbounded DPOR}
+
+In this chapter the classic-DPOR and Source-DPOR algorithms are discussed. These algorithms differ in terms of the sufficient sets they use in order to cover the state space.
+DPOR is based on persistent sets while Source-DPOR relies on source sets.
+
+\subsection{Source-DPOR}
+In this section Source-DPOR is presented. Even though Source-DPOR is posterior to Classic-DPOR, as the name suggests, we choose to present it first since any algorithm
+presented in this thesis will be related to Source-DPOR. This is due to the fact that all the algorithms were implemented in Nidhugg which is based on Source-DPOR.
+
+\SetKwProg{Fn}{Function}{}{}
+\SetKwHangingKw{Let}{let}
+\begin{algorithm}
+    \caption{Source-DPOR}
+    \label{Source}
+    Explore($\langle \rangle$,$\emptyset$)\;
+    \Fn{Explore($E$,$Sleep$)}{
+        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$}{
+            $backtrack(E) :={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep)$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
+                        add some $q' \in I_{[E']}(u) \text{ to } backtrack(E') $ \;
+                    }
+                }
+                let $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $ \;
+                $Explore(E.p, Sleep')$ \;
+                add $p$ to $Sleep$ \;
+
+            }
+        }
+    }
+\end{algorithm}
+
+\noindent Initially an arbitrary enabled and not sleeping
+process is chosen and added to the $backtrack(E)$. 
+
+Each step of the algorithm consists of two separate phases. 
+During the first phase of the algorithm the race detection takes place.
+The algorithm picks a process $p$ which can execute its next step i.e, $p \in enabled(s_{[E]})$ and appends it to the explored trace $E$.
+Then the algorithm finds every event $e$ which is already contained in the explored trace ($e \in dom(E)$) and can be reversed with the next step of $p$.
+
+This happens in order to explore the execution sequence where $p$ happens-before $e$.
+This execution sequence consists of:
+\begin{itemize} 
+\item $E' \equiv pre(E,e)$: the subsequence $E'$ which consists of events scheduled before $e$ in $E$.
+\item $u \equiv notdep(e,E).p$: the concatination $u$ of all the events that are scheduled after $e$ in $E$ but are independent with $e$ and $p$.
+\item $proc(e)$ which is the id of the process that caused the event $e$.
+\end{itemize}
+Then the algorithm checks whether some process in $I_{[E']}(u)$ is already in $backtrack(E')$. 
+If not, then a process in $I_{[E']}(u)$ is added to backtrack. 
+
+In the exploration phase, the exploration starts from $E.p$. The important part is the calculation of the new sleep set at that step since some processes 
+may have woken up.
+If the next step of a process conflicts with the $next(p)$ then this process must wake up. As a result, the sleep set consists of the already sleeping processes
+whose next steps do not interfere with the $next(p)$, i.e, $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $ 
+After finishing the exploration of $E.p$, $p$ is added to the sleep set because we want to refrain from executing an equivalent trace.
+
+\subsection{classic-DPOR}
+
+Since Source-DPOR uses vector clocks to track events the DPOR using Clock Vectors \cite{FlanaganDPOR} variation will be used which is shown in Algorithm \ref{DPORV}.
+
+\begin{algorithm}
+    \caption{DPOR using Clock Vectors}
+    \label{DPORV}
+    \SetKwInOut{Input}{input}
+    \SetKwInput{Initialization}{Explore($\emptyset, \lambda x. \bot$)}
+    \SetKwHangingKw{Let}{let}
+    \Fn{Explore($E$,$C$)}{
+        \Let{$s := last(E)$}
+        \For{all process $p$}{
+            \If{$\exists i = max(\{ i \in dom(E) \mid E_i$ is dependent and may be co-enabled with $next(s,p)$ and $i \not \leq  C(p)(proc(E_i)) \} $}{
+                \uIf{$p \in enabled(pre(E,i)))$}{
+                    add $p$ to $backtrack(pre(E,i))$ \;
+                }
+                \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
+            }
+        }
+        \If{$\exists p \in enabled(s)$}{
+            $backtrack(s) := {p}$ \;
+            \Let{$done = \emptyset$}
+            \While{$\exists p \in (backtrack(s) \backslash done)$}{
+               add $p$ to $done$ \;
+               \Let{$t = next(s,p)$} 
+                \Let{$E' = E.t$} 
+                \Let{$cu = max \{ C(i) \mid i \in 1.. | S |$ and $E_i$ dependent with $t \}$} 
+                \Let{$cu2 = cu [ p := | E' | ] $} 
+               \Let{$C' = C [p:= cu2, |E'| := cu2 ]$} 
+                $Explore(E',C')$ \;
+            }
+        }
+    }
+\end{algorithm}
+
+A clock vector $C(p)$ is maintained through out the algorithm for each process $p$. $C(p_i) = \langle c_1, c_2, ..., c_m \rangle$ represents the clock vector of process $p_i$.
+where $c_j$ is the index of the last transition by process $p_j$ such that
+$c_j \rightarrow_s p_i$. Intuitively, the clock vector of a process $p_j$ informs the process $p_j$ about the execution steps of the other processes that 
+happen-before the execution steps of $p_j$. The clock vectors are based on the Lamport's algorithm \cite{Lamp} and more details of their usage in DPOR can
+be found here \cite{FlanaganDPOR}. We represent the initial state of all vector clocks as $\bot = \langle 0, ..., 0 \rangle$. With $C(p)(proc(E_i ))$ we represent the 
+value of clock vector of process $p$ for the process in the i-th step of $E$.
+
+The initial state of Classic-DPOR is an empty sequence of events with all vector clocks set to $\bot$.
+
+The Classic-DPOR consists of two phases. The first phase is the race detection. During that phase, the next transition
+of all processes $p$ is considered.
+For each such transition $next(s, p)$ (which may be enabled or disabled
+in s), the last transition dependent transition  $i$ in $E$ is computed.
+The computation takes place in line 4.
+If there exists such a transition $i$, there might be a race
+condition or dependency between $i$ and $next(s, p)$, and hence
+we might need to introduce a “backtracking point” in the
+state $pre(S, i)$, i.e., in the state just before executing the
+transition $i$. If $p$ is enabled then it is added as backtrack point. Otherwise the whole set of the 
+enabled transitions is added as backtracks.
+
+During the exploration phase a process $p$ in $enabled(s)$ is added to the backtrack point as in the Source-DPOR. 
+Then the vector clocks are updated according to Lamport's algorithm.
+
+\subsection{Comparison of Classic-DPOR and Source-DPOR}
+
+As one can easily notice both algorithms consist of the same two phases i.e., the race detection phase and the exploration phase. Moreover both
+algorithms are based on vector-clocks, in spite of the fact that their usage is implied in the Source-DPOR in line ? and line ? of Algorithm \ref{Source}.
+
+The major difference lies in the race detection phase. During the race detection in Classic-DPOR all processes $p$ are considered, before even be scheduled, and, thus, many of them
+may be backtracked. On the other hand, in Source-DPOR only the last scheduled process is considered. Moreover the two algorithms differ in the way they deal with
+the case of non-enabled process in the backtrack addition. In the case of Classic-DPOR the whole enabled set will be added whereas none or just one process will
+be added in the Source-DPOR. All in all, Source-DPOR takes advantage of Clock vectors more than Classic-DPOR does.
+
+\subsection{Combining Classic-DPOR and Source-DPOR}
+
+In order to take advantage of Nidhugg's infrastructure Algorithm \ref{NBPOR} will be used. As a result there is no need to add all
+available threads when $p$ is not enabled. If no sufficient candidate is found
+a candidate suggested by the Source-DPOR algorithm is added. This way of calculating persistent sets is considered to be more 
+complex and thus a bad option \cite{Gode05}. However, source sets algorithm is closer to this approach.
+
+\begin{algorithm}
+    \caption{Nidhugg-DPOR}
+    \label{NDPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$)\;
+    \Fn{Explore($E$,$Sleep$)}{
+        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep)$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E'}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI \text{ to } backtrack(E') $ \;
+                        }
+                        \Else{add some $q' I_{E'}(u) \text{ to } backtrack(E')$}
+                    }
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $ } 
+                $Explore(E.p, Sleep)$ \;
+                add $p$ to $Sleep$ \;
+            }
+        }
+    }
+\end{algorithm}
+
+The Algorithm \ref{NDPOR} differs from Source-DPOR (Alg. \ref{Source}) in the calculation of the initials.
+It is clear that persistent algorithm implemented differentiates from Source-DPOR in the calculation of the initials. 
+Specifically a subset of the initials that happen before $p$ is used. 
+Intuitively in the case of a writer and two readers, both readers will be added to the branch since the first read does not
+happen before the second one.
+To generalize this idea: since Nidhugg does not enable us to create branches for $last(E)$ when it is scheduled we add the 
+branches later as in Source-DPOR (Alg. \ref{Source}). When a race is considered usually only the thread that causes the race will be added since 
+$CI$ contains this thread only.
+
+We will prove that DPOR calculates a persistent set or that when the algorithm finishes a persistent set will have been calculated in each step.
+
+Let us assume two processes that are in race with $last(S)$.
+\begin{itemize}
+
+\item Case 1: at least one of them is a write process.
+We know that the Nidhugg's DPOR should calculate a superset of the Source DPOR branches, thus, we know that the read and the write processes at some point
+will be inverted. Moreover we will the $CI$ set will consider both ignoring padding (see Figure \ref{Construction of persistent sets in Nidhugg}.As a result both processes will be considered and will be added to the persistent set.
+
+\trace{nidhuggpersistent.pdf}{Construction of persistent sets in Nidhugg}
+
+\item Case 2: both processes are read operations.
+Since we do not calculate $I$ but $CI$ the first read operation will not be considered as it does not happen before the second read operation and as result
+both processes will be added to $backtrack$. 
+
+\end{itemize}
+It is clear that no process that does not belong to the backtrack(S) has race with a process that belongs to backtrack(S).

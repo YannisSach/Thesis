@@ -1,3 +1,6 @@
+'''
+Compares DPOR with BPOR by finding the lowest branch limit that can find the bug. It checks all the files SB_i.out ( i in [0..5] )
+'''
 import sys
 import re
 
@@ -24,86 +27,87 @@ def process_text(text):
 
 
 
+if __name__ == "__main__":
+	file = open(sys.argv[1],"r")
+	dpor_text = file.read()
+	file.close()
 
-file = open(sys.argv[1],"r")
-dpor_text = file.read()
-file.close()
+	dpor_results = process_text(dpor_text)
+	#print(len(van_results))
 
-dpor_results = process_text(dpor_text)
-#print(len(van_results))
-
-file = open("SB_0.out", "r")
-pb_text = file.read()
-file.close()
-pb_results = process_text(pb_text)
-
-for i,_ in enumerate(pb_results):
-	if pb_results[i][2] == "F" :
-		pb_results[i] = (pb_results[i][0], pb_results[i][1], "0")
-
-for b in range(1,5):
-	file = open("SB_" + str(b) + ".out", "r")
+	file_name = "SB_%d.out"
+	file = open(file_name%0, "r")
 	pb_text = file.read()
 	file.close()
-	temp_results = process_text(pb_text)
-	for i,_ in enumerate(temp_results):
-		if(pb_results[i][2] == "NF" and temp_results[i][2] == "F"):
-			pb_results[i] = (temp_results[i][0], temp_results[i][1], str(b))
+	pb_results = process_text(pb_text)
 
-#print(pb_results)
-#print(len(pb_results))
-results = list(zip(dpor_results,pb_results))
-#print(len(results))
-i = 0
-for v in versions:
-	for f_i,f in enumerate(failures):
-		f_r = " & ".join([y for x in results[i] for y in x]) 
-		failures[f_i] = failures[f_i] + " & " + f_r
-		#print(v,failures[f_i])
-		i+=1
+	for i,_ in enumerate(pb_results):
+		if pb_results[i][2] == "F" :
+			pb_results[i] = (pb_results[i][0], pb_results[i][1], "0")
 
-columns = failures[0].count("&")
-#print(columns)
-columns = "|c|" + columns*"c|"
-#print(columns)
+	for b in range(1,5):
+		file = open(file_name%b, "r")
+		pb_text = file.read()
+		file.close()
+		temp_results = process_text(pb_text)
+		for i,_ in enumerate(temp_results):
+			if(pb_results[i][2] == "NF" and temp_results[i][2] == "F"):
+				pb_results[i] = (temp_results[i][0], temp_results[i][1], str(b))
 
-multicolumn = "\\multicolumn{1}{|c|}{ver:}"
-for v in versions:
-	multicolumn += " & \\multicolumn{6}{c|}{" + v + "}"
+	#print(pb_results)
+	#print(len(pb_results))
+	results = list(zip(dpor_results,pb_results))
+	#print(len(results))
+	i = 0
+	for v in versions:
+		for f_i,f in enumerate(failures):
+			f_r = " & ".join([y for x in results[i] for y in x]) 
+			failures[f_i] = failures[f_i] + " & " + f_r
+			#print(v,failures[f_i])
+			i+=1
 
-multicolumn += " \\\\"
+	columns = failures[0].count("&")
+	#print(columns)
+	columns = "|c|" + columns*"c|"
+	#print(columns)
 
-method_mult = "\\multicolumn{1}{|c|}{method:}"
+	multicolumn = "\\multicolumn{1}{|c|}{ver:}"
+	for v in versions:
+		multicolumn += " & \\multicolumn{6}{c|}{" + v + "}"
 
-headers = "  "
+	multicolumn += " \\\\"
 
-for v in versions:
-	for m in methods:
-		if m == "DPOR":
-			method_mult += " & \\multicolumn{3}{c|}{" + m + "}"
-			headers += " & traces & time & error" 
-		else:
-			method_mult += " & \\multicolumn{3}{c|}{" + m + "}"
-			headers += " & traces & time & bound" 
+	method_mult = "\\multicolumn{1}{|c|}{method:}"
 
-method_mult += " \\\\"
-headers += " \\\\"
+	headers = "  "
+
+	for v in versions:
+		for m in methods:
+			if m == "DPOR":
+				method_mult += " & \\multicolumn{3}{c|}{" + m + "}"
+				headers += " & traces & time & error" 
+			else:
+				method_mult += " & \\multicolumn{3}{c|}{" + m + "}"
+				headers += " & traces & time & bound" 
+
+	method_mult += " \\\\"
+	headers += " \\\\"
 
 
-#[print(f) for f in failures]
+	#[print(f) for f in failures]
 
-#print("\\begin{center}")
-print("\\begin{tabular}{" + columns + "}")
-print("\\hline")
-print(multicolumn)
-print("\\hline")
-print(method_mult)
-print("\\hline")
-print(headers)
-print("\\hline")
-for f in failures:
-	print(f + " \\\\")
+	#print("\\begin{center}")
+	print("\\begin{tabular}{" + columns + "}")
 	print("\\hline")
+	print(multicolumn)
+	print("\\hline")
+	print(method_mult)
+	print("\\hline")
+	print(headers)
+	print("\\hline")
+	for f in failures:
+		print(f + " \\\\")
+		print("\\hline")
 
-print("\\end{tabular}")
-#print("\\end{center}")
+	print("\\end{tabular}")
+	#print("\\end{center}")

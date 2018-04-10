@@ -27,3 +27,12 @@ Questions
 BUG priority
 RCU
 tables
+
+Στόχοι:
+Να αλλάξω το κείμενο του testing vs Verification και να βάλω citation. 
+Να αλλάξω το κείμενο με το παράδειγμα του persistent. 
+Να βάλω κώδικες δίπλα στα παραδείγματα.
+
+Nidhugg discuss before presented.
+Arrow in clock vectors hasn't been introduced.
+Complete lines.

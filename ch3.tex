@@ -144,7 +144,7 @@ the vector that represents $E$ until the closest to the end of the trace thread 
 calculation of the
 $I$ (initials) set. As suggested in the algorithm if there is an already added thread to the branch or the sleep set the procedure will be terminated.
 
-As a result \verb|add_branc()| calculates a source set.
+As a result \verb|add_branch()| calculates a source set.
 
 \section{Implementation of the preemption-bound counter}
 
@@ -277,13 +277,13 @@ check all the other threads and add them to the branch if they contain a command
 completely contradicts with the whole philosophy of Nidhugg which stems from the nature of source sets and, thus, would not be feasible. 
 The option that was finally chosen was an implementation based on the DPOR using Vector Clocks.
 
-\subsection{classic-DPOR}
+\subsection{Classic-DPOR}
 
 Since Nidhugg uses vector clocks to track events the DPOR using Clock Vectors variation will be used which is shown in Algorithm \ref{DPORV}.
 
 
 \begin{algorithm}
-    \caption{DPOR using Clock Vectors}
+    \caption{Classic-DPOR using Clock Vectors}
     \label{DPORV}
     \SetKwInOut{Input}{input}
     \SetKwInput{Initialization}{Explore($\emptyset, \lambda x. \bot$)}

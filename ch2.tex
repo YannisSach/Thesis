@@ -39,13 +39,13 @@ such as the one shown in Listing \ref{Non-concurrency error} where a division by
 
 \section{Testing, Model Checking and Verification}
 
-Dynamic software model checking consists of adapting model checking into a form of systematic testing that is applicable to industrial-size software. 
-Over the last two decades, dozens of tools following this paradigm have been developed for checking concurrent and data-driven software. Compared to 
-traditional software testing, dynamic software model checking provides better coverage, but is more computationally expensive. Compared to more general 
-forms of program verification like interactive theorem proving, this approach provides more limited verification guarantees, but is cheaper due to its higher
-level of automation. Dynamic software model checking thus offers an attractive practical trade-off between testing and formal verification. 
+Dynamic software model checking is a form of systematic testing which is applicable to industrial-size software and consists of adapting model checking.
+Many tools have been developed over the last decades that use this paradigm which aim to test concurrent and data-driven software. Model checking is more computationally
+expensive than traditional software testing since it provides better coverage. However, it is cheaper than more general forms of verification such as interactive theorem
+proving, which provides more extended verification guarantees, since it can be automated in a higher level.
+Dynamic software model checking thus offers an attractive practical trade-off between testing and formal verification. 
 
-The graph shown in Figure \ref{Comparing Testing, Model Checking and Verification} greatly demonstrates the differences between testing, model checking and verification.
+The graph shown in Figure \ref{Comparing Testing, Model Checking and Verification} \cite{TestingvsVerification} greatly demonstrates the differences between testing, model checking and verification.
 
 \trace{testmodver.png}{Comparing Testing, Model Checking and Verification}
 
@@ -405,7 +405,7 @@ an example is given were source sets and persistent sets differ.
   \end{figure*}
 
 From the example, it is clear that the reason why source sets are an improvement over persistent sets is the fact that minimum source sets can eliminate
-sleep set blocked traces i.e. traces that would eventually be blocked by the sleep sets. An algorithm that would only calculate minimal source sets would be optimal \cite{AbdullaAronisJohnssonSagonasDPOR2014}, hence
+sleep set blocked traces i.e., traces that would eventually be blocked by the sleep sets. An algorithm that would only calculate minimal source sets would be optimal \cite{AbdullaAronisJohnssonSagonasDPOR2014}, hence
 would never explore two equivalent interleavings.
 
 It is obvious that a single transition cannot be a source set. For

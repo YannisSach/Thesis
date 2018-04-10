@@ -1,3 +1,6 @@
+'''
+Creates a table from one result file.
+'''
 import sys
 import re
 
@@ -23,58 +26,59 @@ def process_text(text):
 	return results
 
 
+if __name__ = "__main__":
 
-file = open(sys.argv[1], "r")
-pb_text = file.read()
-file.close()
+	file = open(sys.argv[1], "r")
+	pb_text = file.read()
+	file.close()
 
-pb_results = process_text(pb_text)
+	pb_results = process_text(pb_text)
 
-results = pb_results
-#print(len(results))
+	results = pb_results
+	#print(len(results))
 
-i = 0
-for v in versions:
-	for f_i,f in enumerate(failures):
-		f_r = " & ".join([x for x in results[i]]) 
-		failures[f_i] = failures[f_i] + " & " + f_r
-		#print(v,failures[f_i])
-		i+=1
+	i = 0
+	for v in versions:
+		for f_i,f in enumerate(failures):
+			f_r = " & ".join([x for x in results[i]]) 
+			failures[f_i] = failures[f_i] + " & " + f_r
+			#print(v,failures[f_i])
+			i+=1
 
-columns = failures[0].count("&")
-#print(columns)
-columns = "|c|" + columns*"c|"
-#print(columns)
+	columns = failures[0].count("&")
+	#print(columns)
+	columns = "|c|" + columns*"c|"
+	#print(columns)
 
-multicolumn = "\\multicolumn{1}{|c|}{ver:}"
-for v in versions:
-	multicolumn += " & \\multicolumn{3}{c|}{" + v + "}"
+	multicolumn = "\\multicolumn{1}{|c|}{ver:}"
+	for v in versions:
+		multicolumn += " & \\multicolumn{3}{c|}{" + v + "}"
 
-multicolumn += " \\\\"
+	multicolumn += " \\\\"
 
-method_mult = "\\multicolumn{1}{|c|}{method:}"
-for v in versions:
-	for m in methods:
-		method_mult += " & \\multicolumn{3}{c|}{" + m + "}"
+	method_mult = "\\multicolumn{1}{|c|}{method:}"
+	for v in versions:
+		for m in methods:
+			method_mult += " & \\multicolumn{3}{c|}{" + m + "}"
 
-method_mult += " \\\\"
+	method_mult += " \\\\"
 
-headers = "  " + len(methods)*len(versions)*" & traces & time & error" + " \\\\"
+	headers = "  " + len(methods)*len(versions)*" & traces & time & error" + " \\\\"
 
-#[print(f) for f in failures]
+	#[print(f) for f in failures]
 
-#print("\\begin{center}")
-print("\\begin{tabular}{" + columns + "}")
-print("\\hline")
-print(multicolumn)
-print("\\hline")
-print(method_mult)
-print("\\hline")
-print(headers)
-print("\\hline")
-for f in failures:
-	print(f + " \\\\")
+	#print("\\begin{center}")
+	print("\\begin{tabular}{" + columns + "}")
 	print("\\hline")
+	print(multicolumn)
+	print("\\hline")
+	print(method_mult)
+	print("\\hline")
+	print(headers)
+	print("\\hline")
+	for f in failures:
+		print(f + " \\\\")
+		print("\\hline")
 
-print("\\end{tabular}")
-#print("\\end{center}")
+	print("\\end{tabular}")
+	#print("\\end{center}")

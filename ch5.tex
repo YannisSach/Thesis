@@ -1,44 +1,50 @@
 \chapter{Further Discussion on Bounding Problem}
 \label{Chapter 5}
 
-In this chapter alternative ideas of approaching the preemption bounding problem of the DPOR are discussed. It is shown that optimizations that have already been used for the DPOR algorithm cannot solve the problem.
-Finally a new approach is suggested which is shown to be equivalent to the addition of conservative branches. This approach however can be used to better approximate
-a sound solution of the problem. 
+In this chapter we discuss alternative ideas of approaching the preemption bounding problem of the DPOR. 
+We suggest a new approach which is shown to be equivalent to the addition of conservative branches but does not require the addition of conservative
+branches.
 
 \section{Techniques without the Addition of Conservative Branches}
 
-It was shown that no apparent significant improvement can be made with the use of conservative branches. In this section, techniques without the usage of 
-conservative branches are discussed.
+In previous chapters we discussed the challenges one have to deal with when designing a Bounded DPOR algorithm. We saw that there there is 
+no apparent significant improvement can be made with the use of conservative branches and that other optimizations used for the unbouded versions of DPOR
+cannot have analogous results. 
 
 \subsection{Motivation}
-The only algorithm that does not add any conservative branch is the Vanilla-BPOR. For a sufficient bound an erroneous trace would have still be found using this technique.
+The only algorithm that does not add any conservative branch is the Naive-BPOR. For a sufficient bound an erroneous trace would have still be found using this technique.
 The drawback of this algorithm is its unsoundness. In this algorithm a function which calculates the number of preemptive switches in the current thread is used.
 However many of the preemptive switches that are counted would be avoided.
 
-An example is given further explaining this idea.
+An example is given in Figure \ref{Motivation} further explaining this idea. Let us assume a program consisting of two processes $p$ and $q$. 
+Process $p$ writes a shared variable $x$ and process $q$ reads the shared variable $y$ (which is not modified at any point by any other process), 
+and the shared variable $x$. There are only two possible schedulings i.e. one that the writing of $x$ precedes the reading and one that these two
+commands are reversed. However, in order to make the reversion a preemptive switch must be introduced. Suppose that the first execution sequence is 
+$q.q.p$, the other will be $q.p.q$ since the first step of $q$ has no race with step of $p$.
 
 \trace{motivation.pdf}{Motivation}
 
-As it is clear the preemptive switch that takes places would have been easily avoided there is an obvious inversion of the two blocks.
-
+In Figure \ref{Motivation} the preemptive switch that takes places would have been easily avoided there is an obvious inversion of the two blocks $q:read(y)$ and $p$.
 But what allows such an inversion?
 
-The answer lies to the events of each block. The first block reads a variable which is not used by any other block. It is fathomable that this block can be switched with the
-next block since there is no a happen before relationship with the two blocks.
+The answer lies to the events of block (in this particular case the block consists of one step only). The first block reads a variable which is not used by any other block. 
+It is fathomable that this block can be switched with the
+next block since there is no a happens before relationship with the two blocks.
 
 This observation leads to the next question: Which of the preemption switches are compulsory? (Or equivalently which traces cannot be produced without a preemption switch?)
-Moreover is it possible for a given trace to calculate the minimum number of preemptive switches among all the equivalent traces?
+Moreover, is it possible for a given trace to calculate the minimum number of preemptive switches among all the equivalent traces?
 
 \subsection{An Algorithm without Conservative Branches}
-An algorithm that would preform such a bounded search would be different from the Vanilla-BPOR only concerning the function calculates the bound count of the traces.
-This function of would have to be constantly ascending i.e. it would not be possible to calculate a lower bound later for the same traces.
-Given a suffix $E$, $f(E) <= f(E.E')$ for any $E'$.
+An algorithm that would preform such a bounded search would be different from the Naive-BPOR only concerning the function that calculates the bound count 
+of the traces. This function $f$ would have to be constantly ascending i.e. it would not be possible to calculate a lower bound later for the same traces.
+Given a suffix $E$, $f(E) \leq f(E.E')$ for any $E'$.
 
-The general form of the algorithm is given below:
+The general form of the algorithm is given in Algorithm \ref{NBBPOR}.
 
 \begin{algorithm}[H]
     \SetAlgoLined
     \caption{General form of the BPOR without branch addition}
+    \label{NBBPOR}
     \KwResult{Explore the whole state space within the bound}
     Explore($\emptyset$)\;
     \Fn{Explore($S$)}{
@@ -51,29 +57,32 @@ The general form of the algorithm is given below:
     }
 \end{algorithm}
 
-We notice that instead of calculating the $Bv$ value we calculate minimum of all $Bv$ values of the traces that are equivalent with $S.t$.
+We notice that instead of calculating the $Bv(S.t)$ i.e., the bound count of the current trace value, 
+we calculate the $min(Bv[S.t])$ i.e., minimum of all $Bv$ values of the traces that are equivalent with $S.t$.
 
 \subsection{Calculating Minimum Bound Count}
 The only thing left is the construction of this function f.
-For a given trace $E$ which consists of blocks many happen-before relations hold. Each equivalent trace should also compensate to these relations.
-It is also possible for different instructions in one block different happen before relations hold true. For this section only we will consider that 
-a happen before relation is a relation that happens between blocks. This is done for two main reasons:
+For a given trace $E$ which consists of blocks many happens-before relations hold. Each equivalent trace should also compensate to these relations.
+It is also possible for different instructions in one block different happens-before relations hold true. For this section only, we will consider that 
+a happens-before relation is a relation that holds between blocks. This is done for two main reasons:
 
 \begin{itemize}
     \item The algorithm described later is simplified.
     \item We are not interested in further breaking each block and as a result we can regard is block as an entity.
 \end{itemize}
 
-The existence of these happen before relations imply the existence of a graph. This graph consists of nodes which are the blocks and edges which are these
-relations. Obviously blocks of the same thread have a happen before relation. We can also move from one block to another as long as these blocks happen
+These happens-before relations form a graph. This graph consists of nodes which are the blocks and edges which are these
+relations. Obviously blocks of the same thread have a happens-before relation. We can also move from one block to another as long as these blocks happen
 concurrently. We add weights to each edge. The edges that connect to blocks of the same thread weigh 0. Edges that start from a block that 
 is blocked or the most recently added block of each thread weigh 0 since blocked blocks do not increase the bound count and we do not know if the last block of
-each thread is indeed the last one. All the other edges which represent preemptive switch have weight 1.
+each thread is indeed the last one. All the other edges which represent preemption points have weight 1.
 
-The construction of the graph would not allow to traverse a block A that happens-before B before B, thus, all the happen before relations should still hold true.
+
+Any traversal of the graph would not allow to traverse a block A that happens-before B before B, thus, all the happens-before relations should still hold true.
 All traversals that cover the whole graph passing from each node only once are equivalent traces.
 
-\noindent An algorithm on how to add a block to a given graph is given at \ref{Adding a new block to the dependencies graph}. The algorithm works using induction.
+\noindent An algorithm on how to add a block to a given graph is given at Algorithm \ref{Adding a new block to the dependencies graph}. 
+The algorithm works using induction.
 Initially the graph consists of the first block. When a block of the trace is completed then we add it to the dependency graph. We connect the new block with each 
 concurrent block with double edges with the new block. Moreover we connect the most recent block of each thread that happens before the new block with a directed edge
 ending to the new block. 
@@ -115,35 +124,37 @@ ending to the new block.
 
 \trace{compulsoryswitch.pdf}{Graph example}
 
-In Figure \ref{Graph example} a simple example of such a graph is demonstrated. For this trace we notice that w(y) of q thread is concurrent with r(x) while 
-it happens before w(y) of the p thread. Each transition costs 1 preemption switch that is why the weight is 1. Moreover transitions between the same thread cost 0.
-The most important fact, however, is that if for any reason we try to violate the happen before relation (e.g. starting from r(x) we jump to w(x)) there is no way to 
+In Figure \ref{Graph example} a simple example of such a graph is demonstrated. For this trace we notice that $w(y)$ of $q$ thread is concurrent with $r(x)$ while 
+it happens before $w(y)$ of the $p$ thread. Each transition costs 1 preemption switch that is why the weight is 1. Moreover transitions between the same thread cost 0.
+The most important fact, however, is that if for any reason we try to violate the happen before relation (e.g. starting from $r(x)$ we jump to $w(x)$) there is no way to 
 traverse all the nodes. 
 
 We can see that there is a hamiltonian path with weight 1 for the given trace. In fact, this is the minimum hamiltonian path of the graph. We can easily realize that 
 there is no equivalent trace with the initial one that has bound count less than 1. 
 
-We can infer that the calculation of this bound count is reduced to the weight of the minimum hamiltonian path of this graph. This problem it is known to be $NP-complete$. 
+We can infer that the calculation of this bound count is reduced to the weight of the minimum hamiltonian path of this graph. This problem it is known to be NP-complete. 
 As a result any algorithm that would calculate this weight would not be significantly better than a DFS-exploration. 
 
 This is an extremely interesting indication of the difficulty of the DPOR bounding problem since the addition of the conservative sets imply this DFS
 exploration at the state space. As a result this algorithm would not be better than the already proposed BPOR algorithm.
 
 Now that the difficulty of this approach is clear a new question arises. Is it possible to approximate the total weight of the minimum hamiltonian path?
-Such an algorithm would cover a greater state space than the Vanilla-BPOR without the explosion caused by the conservative branches.
+Such an algorithm would cover a greater state space than the Naive-BPOR without the explosion caused by the conservative branches.
 
 \subsection{Approximating Bound Count}
-There are two approaches examined in order to approximate a value were considered. The notion of both algorithms is based on this observation: A preemption switch is compulsory
-when for two blocks of the same thread A a block of another thread B must intervene in order for the happen before relations to hold true. As a result the execution of 
-the first A block should stop so the execution of the B block take place followed by the execution of the A block again. Hence it should hold $e_1(A) \rightarrow e(B) \rightarrow e_2(A)$.
-In case of $e_1(A) \not \rightarrow e(B)$ or $e(B) \not \rightarrow e_2(A)$ we could invert the blocks without affecting the happen before relations and, thus construct an
+There are two approaches examined in order to approximate the value of the bound count. The idea of both algorithms is based on this observation: 
+A preemption switch is compulsory
+when for two blocks of the same process A a block of another process B must intervene in order for the happens-before relations to hold true. As a result, the execution of 
+the first A block should stop so the execution of the B block takes place followed by the execution of the A block again. Hence it should hold $e_1(A) \rightarrow e(B) \rightarrow e_2(A)$.
+In case of $e_1(A) \not \rightarrow e(B)$ or $e(B) \not \rightarrow e_2(A)$ we could invert the blocks without affecting the happens-before relations and, thus construct an
 equivalent trace with lower bound count.
 
 The algorithm is presented here:\\
 
 \SetKwProg{Fn}{Function}{}{}
 \begin{algorithm}[H]
-    \caption{First Estimation Algorithm}
+    \caption{First Approximation Algorithm}
+    \label{First Approximation Algorithm}
     \Fn{BoundCount($E$,$current\_bound$)}{
         \For{$i=0 \text{ to } len(E)-1$}{
             \If{$E[i].pid = last(E).pid$}{
@@ -160,16 +171,16 @@ The algorithm is presented here:\\
     }
 \end{algorithm}
 
-In the above algorithm we find the most recent block with the same pid as with the last block. We, then try to find if there is an event that happens before the first
+In Algorithm \ref{First Approximation Algorithm} we find the most recent block with the same pid as with the last block. We, then try to find if there is an event that happens before the first
 and after the last event. If exists such an event we increase the counter.
-Notice that for establishing the happen before relation vector clocks can be used.
-Moreover, it is obvious that more happen before relations can be counted.
+Notice that for establishing the happens-before relation vector clocks can be used.
+Moreover, it is obvious that more happens-before relations can be counted.
 
 
 Th second algorithm explores more state space than it is required.\\
 
 \begin{algorithm}[H]
-    \caption{Second Estimation Algorithm}
+    \caption{Second Approximation Algorithm}
     \Fn{BoundCount($E$,$current\_bound$)}{
         \For{$i=len(E)-1 \text{ to } 0$}{
             \If{$E[i].pid = last(E).pid$}{
@@ -186,7 +197,8 @@ Th second algorithm explores more state space than it is required.\\
     }
 \end{algorithm}
 
-This algorithm starts the search for an event that intervenes the two events of the same the immediately previous block with the same thread as the last one.
+This algorithm starts the search for an event that intervenes the two events of the same id from the immediately previous block 
+with the same id. 
 
 \subsection{Evaluation}
 The previous discussed approaches were tested and produced some interesting results. The both estimation algorithms seem to be "more sound" than the BPOR and
@@ -204,18 +216,18 @@ a shared variable is executed.
 \graph{/home/yannis/nidhugg/tests/mytests/wNrL2B.png}{writer-N-readers bounded by the second estimation algorithm}
 \smalltabular{"/home/yannis/nidhugg/tests/mytests/lazy2_bounded.tex"}{Traces for the second estimation algorithm for various bound limits}
 
-\subsection{Implementation of LBPOR}
+\subsection{Implementation of Lazy-BPOR}
 
 Some of the testcases made clear that an implementation of a bound count function which does not simply counts the preemptive switches in traces can prevent
-the state space explosion caused by the conservative branches added. The next step is to implement the LBPOR, an algorithm that calculates the number of compulsory
-preemptive switches (preemptive switches that cannot be avoided in any equivalent trace with the one examined). The main difference from the Vanilla-BPOR is that
-the LBPOR maintains throughout the execution of the DPOR a graph of the blocks that are contained in the traces. When a new block is created, it is added by the
+the state space explosion caused by the conservative branches added. The next step is to implement the Lazy-BPOR, an algorithm that calculates the number of compulsory
+preemptive switches (preemptive switches that cannot be avoided in any equivalent trace with the one examined). The main difference from the Naive-BPOR is that
+the Lazy-BPOR maintains throughout the execution of the DPOR a graph of the blocks that are contained in the traces. When a new block is created, it is added by the
 algorithm previously described. When it comes to the calculation of the bound count, the minimum hamiltonian path is calculated. The weight of this path corresponds
 to the bound count taken into consideration.
 
 \begin{algorithm}
-    \caption{LBPOR}
-    \label{LBPOR}
+    \caption{Lazy-BPOR}
+    \label{Lazy-BPOR}
     \Let{$G =: \emptyset$}
     Explore($\langle \rangle$,$\emptyset$,$G$,$b$)\;
     \Fn{Explore($E$,$Sleep$,$G$,$b$)}{
@@ -244,20 +256,20 @@ to the bound count taken into consideration.
 \end{algorithm}
 
 
-\subsection{LBPOR - RCU Evaluation}
+\subsection{Lazy-BPOR - RCU Evaluation}
 
-The results are demonstrated below. Since we have to compare LBPOR with BPOR the bugged versions of the DPOR must be used. The bugged version
+The results are demonstrated below. Since we have to compare Lazy-BPOR with BPOR the bugged versions of the DPOR must be used. The bugged version
 of DPOR is that where the last running thread is prioritized.
 
 Here we present the evaluation of the algorithm on RCU.
 
-\bigtabular{"/home/yannis/rcu/valtree/lazy_comp.tex"}{Comparison between DPOR and LBPOR}
+\bigtabular{"/home/yannis/rcu/valtree/lazy_comp.tex"}{Comparison between DPOR and Lazy-BPOR}
 
-\bigtabular{"/home/yannis/rcu/valtree/lazy_buged_comp.tex"}{Comparison between DPOR and LBPOR without the bug}
+\bigtabular{"/home/yannis/rcu/valtree/lazy_buged_comp.tex"}{Comparison between DPOR and Lazy-BPOR without the bug}
 
 
-We compare the algorithm with BPOR. We notice that LBPOR examines less traces but requires longer time since the cost of the lazy bound count is significantly
+We compare the algorithm with BPOR. We notice that Lazy-BPOR examines less traces but requires longer time since the cost of the lazy bound count is significantly
 increased.
 
-\bigtabular{"/home/yannis/rcu/valtree/preem_lazy_comp.tex"}{Comparison between BPOR and LBPOR(buged)}
+\bigtabular{"/home/yannis/rcu/valtree/preem_lazy_comp.tex"}{Comparison between BPOR and Lazy-BPOR(buged)}
 

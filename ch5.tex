@@ -87,6 +87,8 @@ Initially the graph consists of the first block. When a block of the trace is co
 concurrent block with double edges with the new block. Moreover we connect the most recent block of each thread that happens before the new block with a directed edge
 ending to the new block. 
 
+\SetKw{Return}{return \;}
+\SetKw{Break}{break \;}
 \begin{algorithm}[H]
     \caption{Adding a new block to the dependencies' graph}
     \label{Adding a new block to the dependencies graph}
@@ -99,22 +101,22 @@ ending to the new block.
             list:= preceding blocks t\;
             \For{l in reversed(list)}{
                 \If{$l \leftrightarrow block$}{
-                    add edge from block to l with weight 0 \;
+                    add edge from $block$ to $l$ with weight $0$ \;
                     \If{$l$ is not last}{
-                        add edge from l to block with weight 1 \;
+                        add edge from $l$ to $block$ with weight $1$ \;
                     }
                     \Else{
-                        add edge from l to block with weight 0 \; 
+                        add edge from $l$ to $block$ with weight $0$ \; 
                     }
                 }
                 \If{$l \rightarrow block$}{
                     \If{$l$ is not last}{
-                        add edge from l to block with weight 1 \;
+                        add edge from $l$ to $block$ with weight $1$ \;
                     }
                     \Else{
-                        add edge from l to block with weight 0 \; 
+                        add edge from $l$ to block with weight $0$ \; 
                     }
-                    break \;
+                    \Break
                 }
             }
         }
@@ -159,13 +161,13 @@ The algorithm is presented here:\\
         \For{$i=0 \text{ to } len(E)-1$}{
             \If{$E[i].pid = last(E).pid$}{
                 $higher\_block = i$ \;
-                break \;
+                \Break
             }
         }
         \For{$i = higher\_block+1 \text{ to } len(E)-1$}{
             \If{$ E[higher\_block] \rightarrow E[i] \rightarrow last(E)$}{
                 current\_bound++ \;
-                return \;
+                \Return
             }
         }
     }
@@ -185,13 +187,14 @@ Th second algorithm explores more state space than it is required.\\
         \For{$i=len(E)-1 \text{ to } 0$}{
             \If{$E[i].pid = last(E).pid$}{
                 $lower\_block = i$ \;
+                \Break
             }
         }
 
         \For{$i = lower\_block+1 \text{ to } len(E)-1$}{
             \If{$ E[lower\_block] \rightarrow E[i] \rightarrow last(E)$}{
                 current\_bound++\;
-                return \;
+                \Return
             }
         }
     }
@@ -218,7 +221,7 @@ a shared variable is executed.
 
 \subsection{Implementation of Lazy-BPOR}
 
-Some of the testcases made clear that an implementation of a bound count function which does not simply counts the preemptive switches in traces can prevent
+Some of the testcases such as lastzero or writer-N-readers made clear that an implementation of a bound count function which does not simply counts the preemptive switches in traces can prevent
 the state space explosion caused by the conservative branches added. The next step is to implement the Lazy-BPOR, an algorithm that calculates the number of compulsory
 preemptive switches (preemptive switches that cannot be avoided in any equivalent trace with the one examined). The main difference from the Naive-BPOR is that
 the Lazy-BPOR maintains throughout the execution of the DPOR a graph of the blocks that are contained in the traces. When a new block is created, it is added by the

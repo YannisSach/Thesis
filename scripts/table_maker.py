@@ -5,12 +5,13 @@ Gets two parameters: The simple results and the BPOR results
 import sys
 import re
 
-versions = ["3.0","3.19", "4.3", "4.7", "4.9.6"]
-failures = ["-", "-DASSERT\_0"]
-methods = ["VAN", "BPOR"]
+versions = ["3.0","3.19", "4.9.6"]
+methods = ["Naive-BPOR", "Classic-BPOR"]
 #methods = ["VAN"]
 
-force_failures = ["-DFORCE\_FAILURE\_" + str(i) for i in range(1,7)]
+#failures = ["-", "-DASSERT\_0"]
+failures = ["-"]
+force_failures = ["-DFORCE\_FAILURE\_" + str(i) for i in [1,3,5]]
 liveness_check = ["-DLIVENESS\_CHECK\_" + str(i) for i in range(1,4)]
 
 failures = failures + force_failures + liveness_check
@@ -32,19 +33,20 @@ def process_text(text):
 
 
 
-if __main__ == "__main__":
+if __name__ == "__main__":
 
 	with open(sys.argv[1],"r") as file:
 		van_text = file.read()
 
 	van_results = process_text(van_text)
-	#print(len(van_results))
+	# print((van_results))
 
 
 	with open(sys.argv[2], "r") as file:
 		pb_text = file.read()
 
 	pb_results = process_text(pb_text)
+	
 
 	#print(pb_results)
 	#print(len(pb_results))

@@ -4,12 +4,13 @@ Compares DPOR with BPOR by finding the lowest branch limit that can find the bug
 import sys
 import re
 
-versions = ["3.0","3.19", "4.3", "4.7", "4.9.6"]
-failures = ["-", "-DASSERT\_0"]
-methods = ["DPOR", "BPOR"]
+# versions = ["3.0","3.19", "4.3", "4.7", "4.9.6"]
+versions = ["3.0","3.19", "4.9.6"]
+failures = ["-"]
+methods = ["Source-DPOR", "Classic-BPOR"]
 #methods = ["VAN"]
 
-force_failures = ["-DFORCE\_FAILURE\_" + str(i) for i in range(1,7)]
+force_failures = ["-DFORCE\_FAILURE\_" + str(i) for i in [1,3,5]]
 liveness_check = ["-DLIVENESS\_CHECK\_" + str(i) for i in range(1,4)]
 
 failures = failures + force_failures + liveness_check
@@ -35,7 +36,7 @@ if __name__ == "__main__":
 	dpor_results = process_text(dpor_text)
 	#print(len(van_results))
 
-	file_name = "SB_%d.out"
+	file_name = "outputs/PB_%d.out"
 	file = open(file_name%0, "r")
 	pb_text = file.read()
 	file.close()

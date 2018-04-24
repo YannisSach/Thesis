@@ -86,7 +86,7 @@ runsuccess() {
 #exit
 # Alleged bug between grace-period forcing and initialization
 #runsuccess v2.6.31.1 tso init_bug.c -DCONFIG_NR_CPUS=3 \
-	   -DCONFIG_RCU_FANOUT=2 -DFQS_NO_BUG
+#	   -DCONFIG_RCU_FANOUT=2 -DFQS_NO_BUG
 
 
 # Grace-Period guarantee -- RCU tree litmus test
@@ -94,37 +94,27 @@ runsuccess() {
 for mm in sc 
 do
     runsuccess v3.0 ${mm} litmus_v3.c
-    runfailure v3.0 ${mm} litmus_v3.c -DASSERT_0
     runfailure v3.0 ${mm} litmus_v3.c -DFORCE_FAILURE_1
-    runfailure v3.0 ${mm} litmus_v3.c -DFORCE_FAILURE_2
     runsuccess v3.0 ${mm} litmus_v3.c -DFORCE_FAILURE_3
 #exit
-    runfailure v3.0 ${mm} litmus_v3.c -DFORCE_FAILURE_4
     runsuccess v3.0 ${mm} litmus_v3.c -DFORCE_FAILURE_5
-    unroll=19
-    runfailure v3.0 ${mm} litmus_v3.c -DFORCE_FAILURE_6
     unroll=5
     runsuccess v3.0 ${mm} litmus_v3.c -DLIVENESS_CHECK_1 -DASSERT_0
     runsuccess v3.0 ${mm} litmus_v3.c -DLIVENESS_CHECK_2 -DASSERT_0
     runsuccess v3.0 ${mm} litmus_v3.c -DLIVENESS_CHECK_3 -DASSERT_0
 done
 # Linux kernels v3.19, v4.3, v4.7, and v4.9.6
-for version in v3.19 v4.3 v4.7 v4.9.6
+for version in v3.19 v4.9.6
 do
     for mm in sc
     do
 	runsuccess ${version} ${mm} litmus.c
-	runfailure ${version} ${mm} litmus.c -DASSERT_0
 	runfailure ${version} ${mm} litmus.c -DFORCE_FAILURE_1
-	runfailure ${version} ${mm} litmus.c -DFORCE_FAILURE_2
 	runfailure ${version} ${mm} litmus.c -DFORCE_FAILURE_3
 	#echo "Trace count: 100000 (also 0 sleepset blocked, 0 schedulings and 0 branches were rejected due to the bound)"
 	#echo "No errors were detected."
 	#echo "Total wall-clock time: 0.0 s"
-	runfailure ${version} ${mm} litmus.c -DFORCE_FAILURE_4
 	runfailure ${version} ${mm} litmus.c -DFORCE_FAILURE_5
-	unroll=19
-	runfailure ${version} ${mm} litmus.c -DFORCE_FAILURE_6
 	unroll=5
 	runsuccess ${version} ${mm} litmus.c -DLIVENESS_CHECK_1 -DASSERT_0
 	runsuccess ${version} ${mm} litmus.c -DLIVENESS_CHECK_2 -DASSERT_0

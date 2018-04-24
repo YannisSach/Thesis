@@ -1,12 +1,13 @@
 import sys
 import re
 
-versions = ["3.0","3.19", "4.3", "4.7", "4.9.6"]
-failures = ["-", "-DASSERT\_0"]
+# versions = ["3.0","3.19", "4.3", "4.7", "4.9.6"]
+versions = ["3.0","3.19", "4.9.6"]
+failures = ["-"]
 methods = ["BPOR", "LBPOR"]
 #methods = ["VAN"]
 
-force_failures = ["-DFORCE\_FAILURE\_" + str(i) for i in range(1,7)]
+force_failures = ["-DFORCE\_FAILURE\_" + str(i) for i in [1,3,5]]
 liveness_check = ["-DLIVENESS\_CHECK\_" + str(i) for i in range(1,4)]
 
 failures = failures + force_failures + liveness_check

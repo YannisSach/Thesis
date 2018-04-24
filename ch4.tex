@@ -142,12 +142,12 @@ Moreover there is a cell indicating whether the assertion was found (We note F f
 
 
 \bigtabular{"/home/yannis/rcu/valtree/nobound.tex"}{RCU results without bound}
-\bigtabular{"/home/yannis/rcu/valtree/bound_0.tex"}{RCU results for bound $b=0$}
-\bigtabular{"/home/yannis/rcu/valtree/bound_1.tex"}{RCU results for bound $b=1$}
-\bigtabular{"/home/yannis/rcu/valtree/bound_2.tex"}{RCU results for bound $b=2$}
-\bigtabular{"/home/yannis/rcu/valtree/bound_3.tex"}{RCU results for bound $b=3$}
-\bigtabular{"/home/yannis/rcu/valtree/bound_4.tex"}{RCU results for bound $b=4$}
-\bigtabular{"/home/yannis/rcu/valtree/comp_traces.tex"}{Comparison between DPOR and BPOR}
+\bigtabular{"tables/naivevsbpor0.tex"}{RCU results for bound $b=0$}
+\bigtabular{"tables/naivevsbpor1.tex"}{RCU results for bound $b=1$}
+\bigtabular{"tables/naivevsbpor2.tex"}{RCU results for bound $b=2$}
+\bigtabular{"tables/naivevsbpor3.tex"}{RCU results for bound $b=3$}
+\bigtabular{"tables/naivevsbpor4.tex"}{RCU results for bound $b=4$}
+\bigtabular{"tables/dporvsbpor.tex"}{Comparison between DPOR and BPOR}
 
 
 We notice that some assertions are found significantly faster. The most spectacular result is the \verb|-DFORCE_FAILURE_3| which is found in only 6 seconds for bound b=3 whereas it requires 464.77 seconds in the unbounded version. Moreover we notice for bound b=4 all the errors that are found in the unbounded version are
@@ -163,7 +163,7 @@ increase the bound count. However this alternation in the priority causes Nidhug
 this problem alternation in priority occurs only when bound is applied. As a result the comparison between DPOR and BPOR is not fair. Looking at table \ref{Comparison between DPOR and BPOR with the bug}
 we can clearly see that the minimum traces required for BPOR to track the bug for the first time are always less than DPOR
 
-\bigtabular{"/home/yannis/rcu/valtree/comp_trace_priority.tex"}{Comparison between DPOR and BPOR with the bug}
+\bigtabular{"tables/dporvsbporpriority.tex"}{Comparison between DPOR and BPOR with the bug}
 
 \section{Equivalence between BPOR and Source-BPOR (Correctness of Source-BPOR)}
 Surprisingly the results of BPOR and Source-BPOR always coincide. However, further investigation of this behavior can reveal that these two techniques

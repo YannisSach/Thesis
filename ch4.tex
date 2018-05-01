@@ -81,7 +81,7 @@ results are given in Table \ref{Source-DPOR vs DPOR for synthetic tests} so they
 
 \graph{/home/yannis/nidhugg/tests/mytests/wNr.png}{writer-N-readers}
 
-\smalltabular{"/home/yannis/nidhugg/tests/mytests/unbounded.tex"}{Source-DPOR vs DPOR for synthetic tests}
+\smalltabular{"tables/synthetic_unbounded.tex"}{Source-DPOR vs Classic-DPOR for synthetic tests}
 
 \subsection{Evaluation of Persistent sets on RCU}
 We noticed that there is no difference between Source sets and persistent sets thus no results are presented since they coincide with \cite{Spin}. 
@@ -127,16 +127,16 @@ The results for the testcases are demonstrated below. Again they are presented i
 %%    \hline
 %%    \end{tabular}
 %%\end{center}
-\graph{/home/yannis/nidhugg/tests/mytests/wNrB.png}{writer-N-readers bounded}
+\graph{img/wNrB.png}{writer-N-readers bounded}
 \smalltabular{"/home/yannis/nidhugg/tests/mytests/bounded.tex"}{Traces for various bound limits}
 
-As it was expected the Vanilla-BPOR explores significantly less traces than the BPOR and the source-DPOR. However, as it was previously discussed, the whole
+As it was expected the Naive-BPOR explores significantly less traces than the BPOR and the source-DPOR. However, as it was previously discussed, the whole
 state space is not explored. The number of traces explored by the sound algorithms is significantly greater and it caused by the many conservative branches that are
 added in order to achieve soundness. Surprisingly, there is no difference between the other two bounding techniques. An explanation is given later.
 
-\subsection{Evalution of Bounding Techniques on RCU}
+\subsection{Evaluation of Bounding Techniques on RCU}
 The results are demonstrated below. Notice that since the Source-DPOR did not resulted less traces than the DPOR we could not expect from the Source-BPOR and BPOR
-to differentiate. Moreover tests did not show any difference. For these reasons only the performance of Vanilla-BPOR and BPOR is examined. In each table
+to differentiate. Moreover tests did not show any difference. For these reasons only the performance of Naive-BPOR and BPOR is examined. In each table
 the results with a given bound are demonstrated. Specifically the exploration time and the number of traces are shown. 
 Moreover there is a cell indicating whether the assertion was found (We note F for found and NF for not found).
 

@@ -6,7 +6,7 @@ takes longer than the developers are willing to wait. In these cases, bounded se
 in contrast to the DPOR, alleviates state-space explosion by pruning the executions that exceed a bound. 
 
 This thesis describes the implementation of the preemption bounded DPOR (BPOR) on Nidhugg, a bug finding tool which targets bugs caused by concurrency
-and relaxed memory consistency in concurrent programs. Specifically three bounding techniques were implemented: the Vanilla-BPOR, the BPOR,
+and relaxed memory consistency in concurrent programs. Specifically three bounding techniques were implemented: the Naive-BPOR, the BPOR,
 and the Source-BPOR. The three techniques were evaluated both in synthetic and in real world software. Specifically Read-Copy-Update mechanism of Linux Kernel
 was verified again. Moreover it is examined whether optimizations that have been suggested for the 
 unbounded DPOR can improve the efficiency of BPOR.

@@ -24,7 +24,7 @@ not always clear which thread command will be executed. Moreover the error may n
 number of interleavings that produce an error. 
 
 \section{Concurrency Errors}
-It is important to introduce the notion of concurrency error.
+At this point, it is important to introduce the notion of concurrency error and how explain how it differs from any other error.
 
 \begin{definition}{(Concurrency Error)}
     Concurrency error is an error caused by the scheduler's non-determinism.
@@ -43,7 +43,7 @@ Dynamic software model checking is a form of systematic testing which is applica
 Many tools have been developed over the last decades that use this paradigm which aim to test concurrent and data-driven software. Model checking is more computationally
 expensive than traditional software testing since it provides better coverage. However, it is cheaper than more general forms of verification such as interactive theorem
 proving, which provides more extended verification guarantees, since it can be automated in a higher level.
-Dynamic software model checking thus offers an attractive practical trade-off between testing and formal verification. 
+Hence, dynamic software model checking offers an attractive practical trade-off between testing and formal verification. 
 
 The graph shown in Figure \ref{Comparing Testing, Model Checking and Verification} \cite{TestingvsVerification} greatly demonstrates the differences between testing, model checking and verification.
 
@@ -51,24 +51,24 @@ The graph shown in Figure \ref{Comparing Testing, Model Checking and Verificatio
 
 \section{Stateless model checking and partial order reduction}
 
-In order to find an error of a concurrent program, one must examine every possible interleaving this program can produce. Usually the error 
+In order to find an error of a concurrent program, one must examine every possible interleaving, (i.e., all the different ways that a program can be executed) this program can produce. Usually the error 
 would occur only under some interleaving the programmer did not take into consideration, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
 the program along all these possible interleavings. However, this approach suffers from state explosion, i.e., the number of all possible interleavings grows 
-exponentially with the size of the program and the number of threads. Several approaches to this problem have been proposed in order to deal with this challenge: 
-partial order reduction \cite{Godefroid1996} and bounded search \cite{BPOR}. 
+exponentially with the size of the program and the number of threads. Several approaches to this problem have been proposed in order to deal with this challenge such as
+partial order reduction \cite{Godefroid1996} and bounding techniques \cite{BPOR}. 
 
 Partial order reduction aims to reduce the number of interleavings explored by eliminating the 
-exploration of equivalent interleavings.
+exploration of equivalent interleavings. Each interleaving can be represented by a trace.
 These equivalent traces are produced by the inversion of independent events which do not affect the results of the program. For example, the scheduling of two threads that read a local
 variable can be inverted since the result of the operation is not affected by the order under which these operations occurs. 
 There are two ways that a partial order reduction algorithm can be implemented. The first is a
 static partial order reduction algorithm \cite{Static1997} where the dependencies between two threads are tracked before the execution of the concurrent program. 
-The second is the Dynamic partial order reduction (DPOR) which observes the program's dependencies of runtime. It is important to notice that the size of
+The second is the Dynamic partial order reduction (DPOR) \cite{FlanaganDPOR} which observes the program's dependencies of runtime. It is important to notice that the size of
 the state space still grows exponentially. 
 
-For larger programs DPOR often runs longer than developers are willing to wait. In these cases, bounded search can be proved useful. Bounded search,
+For larger programs DPOR often runs longer than developers are willing to wait. In these cases, bounding techniques can be proved useful. Bounded techniques,
 in contrast to DPOR, alleviates state-space explosion by pruning the executions that exceed a bound \cite{Thomson}. There have been proposed many bounded techniques
-such as preemption bounded search \cite{BPOR} or delay bounded search \cite{Delay11}. All bounded search techniques are based on the notion that many of the concurrency bugs can be
+such as preemption bounded exploration \cite{BPOR} or delay bounded exploration \cite{Delay11}. All bounded search techniques are based on the notion that many of the concurrency bugs can be
 tracked even when the bound limit is set to be small, thus the time required for a bug to be found is significantly smaller.
 
 When it comes to bounded search, new challenges arise \cite{BPOR} since more dependencies, related to the bound limit, are introduced. 
@@ -82,7 +82,7 @@ others can be considered as verification, in the sense that can verify that no e
 
 A vector clock is an algorithm for generating a partial ordering of events in a distributed or concurrent system and detecting causality violations. 
 Just as in Lamport timestamps \cite{Lamp}, interprocess messages contain the state of the sending process's logical clock. 
-A vector clock of a system of N processes is an array/vector of N logical clocks, one clock per process; 
+A vector clock of a system of $N$ processes is an array/vector of $N$ logical clocks, one clock per process; 
 a local "smallest possible values" copy of the global clock-array is kept in each process, with the following rules for clock updates:
 
 \begin{enumerate}
@@ -210,7 +210,7 @@ Intuitively, two events, $e$ and $e'$ in an execution sequence $E$, where
 $e$ occurs before $e'$ in $E$, are in a race if
 \begin{itemize}
 \item $e$ happens-before $e'$ in $E$, and
-\item $e$ and $e'$ are “concurrent”, i.e. there is an equivalent execution
+\item $e$ and $e'$ are “concurrent”, i.e., there is an equivalent execution
 sequence $E' \simeq E$ in which $e$ and $e'$ are adjacent.
 \end{itemize}
 Formally, let $e \lessdot_E e'$ denote that $proc(e) \not = proc(e')$, that $e \rightarrow_E e'$,
@@ -227,7 +227,7 @@ and $e$ occurs immediately before $e'$ in $E'$, then $proc(e')$ was not
 blocked before the occurrence of $e$.
 
 
-\section{Dynamic partial order reduction}
+\section{Dynamic Partial Order Reduction}
 
 Before explaining the DPOR algorithm it is important to define sufficient sets.
 
@@ -235,7 +235,7 @@ Before explaining the DPOR algorithm it is important to define sufficient sets.
 A set of transitions is sufficient in a state $s$ if any relevant
 state reachable via an enabled transition from s is also reachable from $s$ via at least one of the transitions in the sufficient
 set. A search can thus explore only the transitions in the
-sufficient set from s because all relevant states still remain
+sufficient set from $s$ because all relevant states still remain
 reachable. The set containing all enabled threads is trivially
 sufficient in $s$, but smaller sufficient sets enable more state
 space reduction.
@@ -277,7 +277,7 @@ In this thesis we mainly focus on persistent sets and on source sets.
 
 A persistent set in a state $s$ is a sufficient set of transitions to
 explore from $s$ while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
-sets explores a persistent set of transitions from each state s where $enabled(s) \neq \emptyset$ and prunes enabled transitions that
+sets explores a persistent set of transitions from each state $s$ where $enabled(s) \neq \emptyset$ and prunes enabled transitions that
 are not persistent in s.
 In a more formal way:\\
 
@@ -296,16 +296,16 @@ Notice that the definition of persistent sets suggests a way to construct them.
 In Figure \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
 In the first, let a concurrent program contain 3 threads $p$, $q$, and $r$. Thread $p$ changes the value of the variable (writer) and the other ($q$ and $r$) just read this variable (readers).
 Let $p.q.r$ be an interleaving. According to the definition of the persistent sets $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
-of the first command of the interleaving. In Figure \ref{Construction of persistent set} we notice that both $r$ and $q$ threads are added to the persistent set of the first
+of the first command of the interleaving. In Figure \ref{Construction of persistent sets} we notice that both $r$ and $q$ threads are added to the persistent set of the first
 command of the trace since both conflict with the write operation. 
 In the second example, let $p$ and $r$  be a readers and $q$ be a writer. We notice that both $r$ and $q$ are added. However, there is no conflict between $p$ and $r$ since both $p$ and $r$
 just read the variable $x$. The reason why the thread $r$ is added is the conflict that will be produced by the $q$'s write operation.
 
-\trace{persistent.pdf}{Construction of persistent set}
+\trace{persistent.pdf}{Construction of persistent sets}
 
 \section{Source sets}
 
-Before defining source sets, we give some other useful definitions.
+Before defining source sets, we have to give some more useful definitions.
 
 \begin{definition}{($dom(E)$)}
     The set of events-transitions happening during the scheduling of $E$.
@@ -321,25 +321,23 @@ $e \rightarrow_{E.w} next_{[E]}(p)$.
 
 By relaxing the definition of Initials we can get the definition of Weak Initials $WI$.
 
-
 \begin{definition}{(Weak Initials after an execution sequence $E.w$, $WI_{[E]}(w)$)}
 For an execution sequence $E.w$, let $WI_{[E]}(w)$ denote the union of $I_{[E]}(w)$ and the set of
 processes that perform events $p$ such that $p \in enabled(s_{[E]}) $.
 \end{definition}
 
 \begin{definition}{(Source Sets)}
-Let $S$ be an execution sequence,
+Let $E$ be an execution sequence,
 and let $W$ be a set of sequences, such that $E.w$ is an execution
 sequence for each $w \in W$. A set $T$ of processes is a source set for
 $W$ after $E$ if for each $w \in W$ we have $WI_{[E]}(w) \cap P  = \emptyset$.
 \end{definition}
 
 A source set is a set of threads that guarantee that the whole state space will be explored. 
-Notice that their is no requirement related to the races
-of the events.
+Notice that their is no requirement related to the races of the events.
 What the above definition implies is that source can be considered every set of threads that contains these threads 
 that are able to cover the whole state-space.
-It actually suggests a property for the sufficient sets to hold.
+In fact, it suggests a property for the sufficient sets to hold.
 
 \section{Sleep sets}
 
@@ -353,15 +351,15 @@ via $t_0$ that were not already reachable via t from s. Thus, t
 “sleeps” unless a dependent transition is explored.
 
 A short example on sleep sets is the following:
-Let us the concurrent program of one writer and two readers.
+Let the concurrent program of one writer and two readers.
 let w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) and r2 <0.2>: (local operations), r(x).
 
 The resulted traces are demonstrated in the Listing \ref{Sleep set example}.
 
 \Output{./code/sleep_sets.out}{Sleep set example}
 
-As we can see from the execution of the DPOR algorithm the interleaving which started from r2 was blocked since it would lead to an interleaving which
-has already been explored. Notice that this is due to the fact that r1 cannot wakeup since its first transition (local operations) does not conflict with any other transition
+As we can infer from the execution of the DPOR algorithm the interleaving which started from r2 was blocked since it would lead to an interleaving which
+has already been explored. Notice that this is due to the fact that r1 cannot "wake up" since its first transition (local operations) does not conflict with any other transition
 in the program. 
 It can be proved \cite{Godefroid1996} that sleeps will eventually block all the redundant interleavings and thus the only interleavings that will be explored till their end (where all threads that could be executed, have been executed).
 As a result an optimal algorithm should be able to not consider these interleavings whatsoever.
@@ -537,7 +535,7 @@ In the Figure \ref{Example of blocks} there are three blocks. The first block is
 
 \trace{blocks.pdf}{Example of blocks}
 
-Let us assume that $P$ is a persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
+Let $P$ be persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
 threads that would be added in a block that would be created when $p$ was scheduled. These threads are called conservative threads and their 
 goal is to allow the coverage of interleavings that would not exceed the bound. Notice that an interleaving can be both conservative and non-conservative.
 Preemption bounded persistent sets extend a persistent set by adding all the threads that will create a new block

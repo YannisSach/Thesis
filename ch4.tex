@@ -165,8 +165,8 @@ we can clearly see that the minimum traces required for BPOR to track the bug fo
 
 \bigtabular{"tables/dporvsbporpriority.tex"}{Comparison between DPOR and BPOR with the bug}
 
-\section{Equivalence between BPOR and Source-BPOR (Correctness of Source-BPOR)}
-Surprisingly the results of BPOR and Source-BPOR always coincide. However, further investigation of this behavior can reveal that these two techniques
+\section{Equivalence between Classic-BPOR and Source-BPOR (Correctness of Source-BPOR)}
+Surprisingly the results of Classic-BPOR and Source-BPOR always coincide. However, further investigation of this behavior can reveal that these two techniques
 are actually equivalent. 
 
 It can be proved that a branch which was rejected by the Source-DPOR but accepted by the Classic-BPOR algorithm as a non-conservative one will be added as 
@@ -188,7 +188,7 @@ When $s$ is scheduled another block will be created.
 \item Case 1: $s$ has an execution step which conflicts with $b$. Hence, there must be a trace where $b$ happens before some step of $s$ and $s$ 
 happens before $t$. Since $b$ happens-before some execution step of $s$ but share the same initials with $s$, $b$ must be added as a conservative
 branch at the point where it was rejected at the initially.
-As shown in the Figure \ref{Source-BPOR and BPOR equivalence Case 1}, the branch which seems to be initially rejected, 
+As shown in the Figure \ref{Source-BPOR and Classic-BPOR equivalence Case 1}, the branch which seems to be initially rejected, 
 will finally be added by the Source-BPOR and as a result belongs to the source-set. 
 \trace{equivalence_case1w.pdf}{Source-BPOR and BPOR equivalence Case 1}
    
@@ -196,7 +196,7 @@ will finally be added by the Source-BPOR and as a result belongs to the source-s
    $s$ doesn’t conflict with $b$ (both $b$ and $s$ are read operations). There must $b$ a trace s.b.t (where s,b,t is the execution
    of all the steps of s,b,t). 
    Since $t$ conflicts with an execution step of $s$ the first step of $b$ is an initial for $t$ and it will be added both as non-conservative branch and 
-   as conservative at the beginning of the block where it was rejected by the Source-DPOR. For Figure \ref{Source-BPOR and BPOR equivalence Case 2}, both $s$ and $b$ belong to the persistent set. However,
+   as conservative at the beginning of the block where it was rejected by the Source-DPOR. For Figure \ref{Source-BPOR and Classic-BPOR equivalence Case 2}, both $s$ and $b$ belong to the persistent set. However,
    the $b$ thread will be rejected since it shares the same initials with the $s$ thread. However it will be added as a conservative set. Notice that it would be added as a
    non-conservative as well but we have already shown that when both conservative and non-conservative branches of the same thread are added we must keep the conservative one.
 
@@ -209,7 +209,7 @@ A more intuitive explanation of the equivalence of the two techniques would be b
   \item The points in the trace where the bound count increases are those where branches are added.
 \end{itemize}
 
-As a result a BPOR algorithm would have to add conservative branches at points where the bound increases. The non-conservative branches that would have been
+As a result a Classic-BPOR algorithm would have to add conservative branches at points where the bound increases. The non-conservative branches that would have been
 rejected by the Source-DPOR are added as conservative ones to since the lead to already explored traces but with a smaller bound count.
 
-We have proved that Source-BPOR is sound since the traces explored by the BPOR are subset of the traces explored by the Source-BPOR.
+We have proved that Source-BPOR is sound since the traces explored by the Classic-BPOR are subset of the traces explored by the Source-BPOR.

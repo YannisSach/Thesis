@@ -1,7 +1,7 @@
 \chapter{Background}
 \label{Chapter 2}
 
-\section{Concurrent programming}
+\section{Concurrent Programming}
 
 Concurrent computing, which is implemented by concurrent programming paradigm, is a form of computing in which several 
 computations are executed during overlapping time 
@@ -37,7 +37,7 @@ such as the one shown in Listing \ref{Non-concurrency error} where a division by
 \Code{./code/zero.c}{Non-concurrency error}
 \Code{./code/zeroconc.c}{Concurrency error}
 
-\section{Testing, Model Checking and Verification}
+\section{Testing, Model Checking, and Verification}
 
 Dynamic software model checking is a form of systematic testing which is applicable to industrial-size software and consists of adapting model checking.
 Many tools have been developed over the last decades that use this paradigm which aim to test concurrent and data-driven software. Model checking is more computationally
@@ -49,7 +49,7 @@ The graph shown in Figure \ref{Comparing Testing, Model Checking and Verificatio
 
 \trace{testmodver.png}{Comparing Testing, Model Checking and Verification}
 
-\section{Stateless model checking and partial order reduction}
+\section{Stateless Model Checking and Partial Order Reduction}
 
 In order to find an error of a concurrent program, one must examine every possible interleaving this program can produce. Usually the error 
 would occur only under some interleaving the programmer did not take into consideration, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
@@ -181,7 +181,7 @@ and $e'$ are two consecutive events in E with $e \not \rightarrow_{E} e'$, then 
 be swapped and the (global) state after the two events remains the
 same.
 
-\section{Independence and races}
+\section{Independence and Races}
 
 We now define independence between events of a computation. If
 $E.p$ and $E.w$ are both execution sequences, then $E \models p\diamondsuit w$ denotes
@@ -227,7 +227,7 @@ and $e$ occurs immediately before $e'$ in $E'$, then $proc(e')$ was not
 blocked before the occurrence of $e$.
 
 
-\section{Dynamic partial order reduction}
+\section{Dynamic Partial Order Reduction}
 
 Before explaining the DPOR algorithm it is important to define sufficient sets.
 
@@ -303,7 +303,7 @@ just read the variable $x$. The reason why the thread $r$ is added is the confli
 
 \trace{persistent.pdf}{Construction of persistent set}
 
-\section{Source sets}
+\section{Source Sets}
 
 Before defining source sets, we give some other useful definitions.
 
@@ -341,7 +341,7 @@ What the above definition implies is that source can be considered every set of 
 that are able to cover the whole state-space.
 It actually suggests a property for the sufficient sets to hold.
 
-\section{Sleep sets}
+\section{Sleep Sets}
 
 Another technique complementary to the persistent or source sets aiming to reduce the number of interleavings is the sleep set technique.
 Sleep sets prohibit visited transitions from executing again
@@ -366,7 +366,7 @@ in the program.
 It can be proved \cite{Godefroid1996} that sleeps will eventually block all the redundant interleavings and thus the only interleavings that will be explored till their end (where all threads that could be executed, have been executed).
 As a result an optimal algorithm should be able to not consider these interleavings whatsoever.
 
-\section{Comparing Persistent sets with Source Sets}
+\section{Comparing Persistent Sets with Source Sets}
 
 Note that the definition of source sets is much more relaxed than the definition of the persistent sets. 
 This relaxation enables the source sets to be much more efficient than the persistent sets. In Figure \ref{Non-minimal persistent sets}
@@ -441,7 +441,8 @@ note some rather direct properties, including the following.
 \end{itemize}
 
 
-\section{Bounded search - preemption bounded search}
+\section{Bounded Search and Preemption Bounding}
+
 Bounded search explores only executions that do not exceed
 a bound \cite{BPOR,Thomson}. The bound may be any property of a
 sequence of transitions. A bound evaluation function $Bv(S)$
@@ -492,7 +493,7 @@ $\\
 The previous definition describes what a preemptive context switch is. A preemptive context switch happens when the previously running thread could execute
 its next step but it does not due to the scheduling of another thread. Hence, a preemptive switch will increase the preemption bound.
 
-\section{Preemption-bound persistent sets}
+\section{Preemption-bound Persistent Sets}
 
 A set that has been proposed as a sufficient for preemption bounded search is the preemption bounded persistent set \cite{BPOR}.
 

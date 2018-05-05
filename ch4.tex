@@ -88,22 +88,28 @@ We noticed that there is no difference between Source sets and persistent sets t
 The reason why the results of DPOR and Source-DPOR are the same may be due to the operations that take place which not allow for the optimization of the Source-DPOR 
 to be effective. Another reason is the LLVM IR which is used by Nidhugg and will be explained in the next section.
 
-\section{Comparison with Concuerror results - Why DPOR may be enough for LLVM}
+\section{Comparison with Concuerror results}
 The are many cases where Concuerror's Source-DPOR explores less traces than Classic-DPOR while Nidhugg's Source-DPOR doesn't. 
 In fact Nidhugg's Classic-DPOR implementation seems to explore less number of traces than Concuerror's Classic-DPOR \cite{AbdullaAronisJohnssonSagonasDPOR2014}.
-which equals with the numbers of traces explored by Source-DPOR. However, a look on the code that Nidhugg tests justifies this behavior.
-LLVM produces much more code than the code in the source file. Due to this extra code that is added, the number of conflicting events is less than the 
-number of conflicting events in an Erlang program.
+which equals with the numbers of traces explored by Source-DPOR. There are many reasons that justify this behavior.
 
-At Figure \ref{Padding impact on persistent sets} the reason is visualized. As shown in the figure we would expect that both p and r would be added in the persistent set. However when the p thread is added the write event is no longer visible, 
-according to the persistent set definition. As a the r thread is not added. We can compare the LLVM code with the relative Erlang code.
+\begin{itemize}
+  \item The implementation of the persistent set calculation. In Concuerror this calclation is more relaxed than the in Nidhugg as a result 
+  Nidhugg calculates sometimes smaller persistent sets. In Figure \ref{Lastzero Concuerror} the example of lastzero testcase in Concuerror is given when a 
+  larger persistent set is calculated. In fact, the process $q$ should never have been added to the persistent set since it does not conflict with any other
+  process.
 
-\trace{rwrpersistent.pdf}{Padding impact on persistent sets}
+  \item The number of traces explored is closely related by scheduling of the events. Let a program consist of a process which writes on 
+  variable $x$ and two process that read variable $x$. In Figure \ref{Scheduling Effect reader-writer-reader} the exploration is demonstrated when
+  one reader is scheduled first. We notice that exactly 4 traces are explored. On the other hand, provided that the writer was scheduled first 
+  \ref{Scheduling Effect writer-reader-reader} 5 traces with one sleep set blocked traces would have been explored.
 
-\Code{./code/readers_rwr.erl}{Erlang code for rwr}
-%%\Code{"./code/rwr.c"}{C code for rwr}
-%%\Code{"./code/rwr.ll"}{Produced LLVM code for rwr}
-\Side{./code/rwr.c}{C code for writer and reader}{./code/rwr.ll}{LLVM code for writer and reader}{Comparison between C and LLVM}
+\end{itemize}
+
+\tracelong{lastzero.pdf}{Lastzero Concuerror}
+
+\trace{schedulingrwr.pdf}{Scheduling Effect reader-writer-reader}
+\trace{schedulingwrr.pdf}{Scheduling Effect writer-reader-reader}
 
 
 \section{Evaluation of Bounding Techniques}
@@ -127,6 +133,7 @@ The results for the testcases are demonstrated below. Again they are presented i
 %%    \hline
 %%    \end{tabular}
 %%\end{center}
+
 \graph{img/wNrB.png}{writer-N-readers bounded}
 \smalltabular{"/home/yannis/nidhugg/tests/mytests/bounded.tex"}{Traces for various bound limits}
 

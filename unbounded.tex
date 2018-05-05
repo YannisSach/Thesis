@@ -164,7 +164,7 @@ complex and thus a bad option \cite{Gode05}. However, source sets algorithm is c
 \end{algorithm}
 
 The Algorithm \ref{NDPOR} differs from Source-DPOR (Alg. \ref{Source}) in the calculation of the initials.
-It is clear that persistent algorithm implemented differentiates from Source-DPOR in the calculation of the initials. 
+It is clear that persistent algorithm implemented differs from Source-DPOR in the calculation of the initials. 
 Specifically a subset of the initials that happen before $p$ is used. 
 Intuitively in the case of a writer and two readers, both readers will be added to the branch since the first read does not
 happen before the second one.
@@ -173,23 +173,27 @@ branches later as in Source-DPOR (Alg. \ref{Source}). When a race is considered 
 $CI$ contains this thread only.
 
 We will give an intuition why Nidhugg-DPOR calculates a persistent set and explain why when the algorithm finishes a persistent set will have been calculated in each step.
+The interesting part is to show for every branch that is a write command all the process that conflict with this write command happen concurrently with this
+command will be added to the branch set.
 
 Let us assume two processes that are in race with $last(S)$.
 \begin{itemize}
 
-\item Case 1: at least one of them is a write process.
-We know that the Nidhugg-DPOR should calculate a superset of the Source-DPOR branches, thus, we know that the read and the write processes at some point
-will be inverted. Moreover $CI$ set will consider both ignoring padding. As a result both processes will be considered and will be added to the persistent set.
+\item Case 1: at least on process contains a write command.
+We know that the two processes will be inverted at some point. Since Nidhugg-DPOR ignores weak initials it will branch both processes. 
+In the Figure \ref{Construction of persistent sets in Nidhugg when there is a write process} we notice that processes $q$ and $r$ are inverted. In Source-DPOR only one of the two processes should be branched since
+they share the same initials. However, in Nidhugg-DPOR this is not true since the $CI$ set does not contain steps from the other process.
 
+\trace{nidhuggpersistent1.pdf}{Construction of persistent sets in Nidhugg when there is a write process}
 
 \item Case 2: both processes are read operations.
 Since we do not calculate $I$ but $CI$ the first read operation will not be considered as it does not happen before the second read operation and as result
-both processes will be added to $backtrack$. In Figure \ref{Construction of persistent sets in Nidhugg} we notice that by calculating the $CI$ set when the race
-between $p$ and $r$ is detected $q$ process will be ingored and, thus, $r$ will be added as a branch.
+both processes will be added to $backtrack$. In Figure \ref{Construction of persistent sets in Nidhugg when both are read processes} we notice that by calculating the $CI$ set when the race
+between $p$ and $r$ is detected $q$ process will be ignored and, thus, $r$ will be added as a branch.
 
-\trace{nidhuggpersistent.pdf}{Construction of persistent sets in Nidhugg}
+\trace{nidhuggpersistent.pdf}{Construction of persistent sets in Nidhugg when both are read processes}
 
 \end{itemize}
 
-It is clear that no process that does not belong to the backtrack(S) has race with a process that belongs to backtrack(S). The introduction of $CI$ set allows
+It is clear that no process that does not belong to the $backtrack(S)$ has race with a process that belongs to $backtrack(S)$. The introduction of $CI$ set allows
 as to ignore the initials that Source-DPOR takes advantage of in order to optimize the exploration.

@@ -378,7 +378,16 @@ It is clear that no process that does not belong to the backtrack(S) has race wi
 \subsection{Implementation of DPOR using persistent-sets}
 
 The implementation of the persistent sets is based on the already implemented infrastructure of vector clocks. Specifically the \verb|include()| function of vector clocks
-lets as determine whether $i \rightarrow p$.
+lets as determine whether $i \rightarrow p$. The algorithm of the \verb|includes()| is given in Algorithm \ref{include routine}. Following the notation
+of Source-DPOR $\langle e, i \rangle$ is an already scheduled event which is the i th step of process $e$  and $p$ is the most recently backtracked event of process $p$. 
+
+\begin{algorithm}
+    \caption{includes() routine}
+    \label{include routine}
+    \Fn{includes($ \langle e, i \rangle$, p)}{
+        return $i \leq p.clock[e]$
+    }
+\end{algorithm}
 
 To calculate the $CI$ set we just need to prevent the \verb|add\_branch()| function from rejecting branches due to threads that belong to $I$ but not to $CI$.
 An example of the modification is presented at Algorithm \ref{addbranch routine for persistent sets}.

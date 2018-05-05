@@ -1,10 +1,10 @@
 \chapter{Unbounded DPOR}
 
-In this chapter the classic-DPOR and Source-DPOR algorithms are discussed. These algorithms differ in terms of the sufficient sets they use in order to cover the state space.
+In this chapter the Classic-DPOR and Source-DPOR algorithms are discussed. These algorithms differ in terms of the sufficient sets they use in order to cover the state space.
 DPOR is based on persistent sets while Source-DPOR relies on source sets.
 
 \section{Source-DPOR}
-In this section Source-DPOR is presented. Even though Source-DPOR is posterior to Classic-DPOR, as the name suggests, we choose to present it first since any algorithm
+In this section Source-DPOR \cite{AbdullaAronisJohnssonSagonasDPOR2014} is presented. Even though Source-DPOR is posterior to Classic-DPOR, as the name suggests, we choose to present it first since any algorithm
 presented in this thesis will be related to Source-DPOR. This is due to the fact that all the algorithms were implemented in Nidhugg which is based on Source-DPOR.
 
 \SetKwProg{Fn}{Function}{}{}
@@ -120,7 +120,7 @@ Then the vector clocks are updated according to Lamport's algorithm.
 \section{Comparison of Classic-DPOR and Source-DPOR}
 
 As one can easily notice both algorithms consist of the same two phases i.e., the race detection phase and the exploration phase. Moreover both
-algorithms are based on vector-clocks, in spite of the fact that their usage is implied in the Source-DPOR in line ? and line ? of Algorithm \ref{Source}.
+algorithms are based on vector-clocks, in spite of the fact that their usage is implied in the Source-DPOR in line 6 and line 8 of Algorithm \ref{Source}.
 
 The major difference lies in the race detection phase. During the race detection in Classic-DPOR all processes $p$ are considered, before even be scheduled, and, thus, many of them
 may be backtracked. On the other hand, in Source-DPOR only the last scheduled process is considered. Moreover the two algorithms differ in the way they deal with
@@ -129,7 +129,7 @@ be added in the Source-DPOR. All in all, Source-DPOR takes advantage of Clock ve
 
 \section{Combining Classic-DPOR and Source-DPOR}
 
-In order to take advantage of Nidhugg's infrastructure Algorithm \ref{NBPOR} will be used. As a result there is no need to add all
+In order to take advantage of Nidhugg's infrastructure Algorithm \ref{NDPOR} will be used. As a result there is no need to add all
 available threads when $p$ is not enabled. If no sufficient candidate is found
 a candidate suggested by the Source-DPOR algorithm is added. This way of calculating persistent sets is considered to be more 
 complex and thus a bad option \cite{Gode05}. However, source sets algorithm is closer to this approach.
@@ -168,24 +168,28 @@ It is clear that persistent algorithm implemented differentiates from Source-DPO
 Specifically a subset of the initials that happen before $p$ is used. 
 Intuitively in the case of a writer and two readers, both readers will be added to the branch since the first read does not
 happen before the second one.
-To generalize this idea: since Nidhugg does not enable us to create branches for $last(E)$ when it is scheduled we add the 
+To generalize this idea: since Nidhugg does not enable us to create branches for $last(E)$, when at the scheduling phase, we add the 
 branches later as in Source-DPOR (Alg. \ref{Source}). When a race is considered usually only the thread that causes the race will be added since 
 $CI$ contains this thread only.
 
-We will prove that DPOR calculates a persistent set or that when the algorithm finishes a persistent set will have been calculated in each step.
+We will give an intuition why Nidhugg-DPOR calculates a persistent set and explain why when the algorithm finishes a persistent set will have been calculated in each step.
 
 Let us assume two processes that are in race with $last(S)$.
 \begin{itemize}
 
 \item Case 1: at least one of them is a write process.
-We know that the Nidhugg's DPOR should calculate a superset of the Source DPOR branches, thus, we know that the read and the write processes at some point
-will be inverted. Moreover we will the $CI$ set will consider both ignoring padding (see Figure \ref{Construction of persistent sets in Nidhugg}.As a result both processes will be considered and will be added to the persistent set.
+We know that the Nidhugg-DPOR should calculate a superset of the Source-DPOR branches, thus, we know that the read and the write processes at some point
+will be inverted. Moreover $CI$ set will consider both ignoring padding. As a result both processes will be considered and will be added to the persistent set.
 
-\trace{nidhuggpersistent.pdf}{Construction of persistent sets in Nidhugg}
 
 \item Case 2: both processes are read operations.
 Since we do not calculate $I$ but $CI$ the first read operation will not be considered as it does not happen before the second read operation and as result
-both processes will be added to $backtrack$. 
+both processes will be added to $backtrack$. In Figure \ref{Construction of persistent sets in Nidhugg} we notice that by calculating the $CI$ set when the race
+between $p$ and $r$ is detected $q$ process will be ingored and, thus, $r$ will be added as a branch.
+
+\trace{nidhuggpersistent.pdf}{Construction of persistent sets in Nidhugg}
 
 \end{itemize}
-It is clear that no process that does not belong to the backtrack(S) has race with a process that belongs to backtrack(S).
+
+It is clear that no process that does not belong to the backtrack(S) has race with a process that belongs to backtrack(S). The introduction of $CI$ set allows
+as to ignore the initials that Source-DPOR takes advantage of in order to optimize the exploration.

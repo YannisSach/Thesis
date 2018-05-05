@@ -1,5 +1,5 @@
 '''
-Creates a table that compares simple-BPOR and BPOR.
+Creates a table that compares Naive-BPOR and BPOR.
 Gets two parameters: The simple results and the BPOR results
 '''
 import sys
@@ -34,20 +34,14 @@ def process_text(text):
 
 
 if __name__ == "__main__":
-
 	with open(sys.argv[1],"r") as file:
 		van_text = file.read()
-
 	van_results = process_text(van_text)
 	# print((van_results))
-
-
 	with open(sys.argv[2], "r") as file:
 		pb_text = file.read()
 
 	pb_results = process_text(pb_text)
-	
-
 	#print(pb_results)
 	#print(len(pb_results))
 	results = list(zip(van_results,pb_results))
@@ -56,10 +50,10 @@ if __name__ == "__main__":
 	# The results for each version are together in the list.
 	for v in versions:
 		for f_i,f in enumerate(failures):
-			f_r = " & ".join([y for x in results[i] for y in x]) 
-			failures[f_i] = failures[f_i] + " & " + f_r
-			#print(v,failures[f_i])
-			i+=1
+                    f_r = " & ".join([y for x in results[i] for y in x])
+                    failures[f_i] = failures[f_i] + " & " + f_r
+                    #print(v,failures[f_i])
+                    i+=1
 
 	columns = failures[0].count("&")
 	#print(columns)

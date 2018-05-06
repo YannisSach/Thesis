@@ -31,7 +31,7 @@ The answer lies to the events of block (in this particular case the block consis
 It is fathomable that this block can be switched with the
 next block since there is no a happens before relationship with the two blocks.
 
-This observation leads to the next question: Which of the preemption switches are compulsory? (Or equivalently which traces cannot be produced without a preemption switch?)
+This observation leads to the next question: Which of the preemption switches are compulsory? (Or equivalently, which traces cannot be produced without a preemption switch?)
 Moreover, is it possible for a given trace to calculate the minimum number of preemptive switches among all the equivalent traces?
 
 \subsection{An Algorithm without Conservative Branches}
@@ -61,8 +61,8 @@ We notice that instead of calculating the $Bv(S.t)$ i.e., the bound count of the
 we calculate the $min(Bv[S.t])$ i.e., minimum of all $Bv$ values of the traces that are equivalent with $S.t$.
 
 \subsection{Calculating Minimum Bound Count}
-The only thing left is the construction of this function f.
-For a given trace $E$ which consists of blocks many happens-before relations hold. Each equivalent trace should also compensate to these relations.
+The only thing left is the construction of this function $f$.
+For a given trace $E$ which consists of blocks many happens-before relations hold. Each equivalent trace should also compensate with these relations.
 It is also possible for different instructions in one block different happens-before relations hold true. For this section only, we will consider that 
 a happens-before relation is a relation that holds between blocks. This is done for two main reasons:
 
@@ -77,9 +77,11 @@ concurrently. We add weights to each edge. The edges that connect to blocks of t
 is blocked or the most recently added block of each thread weigh 0 since blocked blocks do not increase the bound count and we do not know if the last block of
 each thread is indeed the last one. All the other edges which represent preemption points have weight 1.
 
+In order to find the minimum bound count we have to traverse this all the blocks of this graph without breaking at any point the happens-before relations. 
+Hence, the minimum bound count corresponds to the minimum hamiltonian path that compensates with all happens-before relations of the trace that is explored.
 
-Any traversal of the graph would not allow to traverse a block A that happens-before B before B, thus, all the happens-before relations should still hold true.
-All traversals that cover the whole graph passing from each node only once are equivalent traces.
+Since the calculation of the minimum hamiltonian path is demanding we have to create a graph that limits as much as possible traverses that break the happens-before
+relations. All traversals that cover the whole graph passing from each node only once are equivalent traces. 
 
 \noindent An algorithm on how to add a block to a given graph is given at Algorithm \ref{Adding a new block to the dependencies graph}. 
 The algorithm works using induction.
@@ -212,12 +214,8 @@ a shared variable is executed.
 
 \subsection{Evaluation of Approximating algorithms}
 
-\graph{/home/yannis/nidhugg/tests/mytests/wNrL1B.png}{writer-N-readers bounded by the first estimation algorithm}
+\graph{img/wNrLB.png}{writer-N-readers bounded by the first estimation algorithm}
 \smalltabular{"/home/yannis/nidhugg/tests/mytests/lazy1_bounded.tex"}{Traces for the first estimation algorithm for various bound limits}
-
-
-\graph{/home/yannis/nidhugg/tests/mytests/wNrL2B.png}{writer-N-readers bounded by the second estimation algorithm}
-\smalltabular{"/home/yannis/nidhugg/tests/mytests/lazy2_bounded.tex"}{Traces for the second estimation algorithm for various bound limits}
 
 \subsection{Implementation of Lazy-BPOR}
 
@@ -234,7 +232,7 @@ to the bound count taken into consideration.
     \Let{$G =: \emptyset$}
     Explore($\langle \rangle$,$\emptyset$,$G$,$b$)\;
     \Fn{Explore($E$,$Sleep$,$G$,$b$)}{
-        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) <= b$ }{
+        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b$ }{
             backtrack(E) $:={p}$ \;
             \While{$\exists p \in (backtrack(E) \backslash Sleep $}{
                 \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p) $}{
@@ -249,7 +247,7 @@ to the bound count taken into consideration.
                     \Let{$block$ = $last\_block(E)$}
                     \Let{$G'$ = add\_block($block$,$G$)}
                 }
-                \If{$min \{ Hamiltonian\_path(G') \} <= b $}{
+                \If{$min \{ Ham\_path(G') \text{ which compensate with all happens-before relations of } E \} \leq b $}{
                     $Explore(E.p, Sleep,G',b)$ \;
                     add $p$ to $Sleep$ \;
                 }
@@ -259,12 +257,15 @@ to the bound count taken into consideration.
 \end{algorithm}
 
 
+
 \subsection{Lazy-BPOR - RCU Evaluation}
 
 The results are demonstrated below. Since we have to compare Lazy-BPOR with BPOR the bugged versions of the DPOR must be used. The bugged version
 of DPOR is that where the last running thread is prioritized.
 
-Here we present the evaluation of the algorithm on RCU.
+At Figures \ref{Comparison between DPOR and Lazy-BPOR} and \ref{Comparison between BPOR and Lazy-BPOR} we present the results for the various
+testcases of RCU test suite.
+
 
 \bigtabular{"/home/yannis/rcu/valtree/lazy_comp.tex"}{Comparison between DPOR and Lazy-BPOR}
 
@@ -272,7 +273,20 @@ Here we present the evaluation of the algorithm on RCU.
 
 
 We compare the algorithm with BPOR. We notice that Lazy-BPOR examines less traces but requires longer time since the cost of the lazy bound count is significantly
-increased.
+increased. This is due to the calculation of the minimum hamiltonian path.
 
 \bigtabular{"tables/lazy_comp_pandas.tex"}{Comparison between BPOR and Lazy-BPOR}
+
+\section{Conclusion}
+Even though the Lazy-BPOR is not proved to be a more efficient way than all the other sound BPOR algorithms examined in this thesis it
+provides some interesting results.
+
+\begin{itemize}
+    \item It is possible to explore a preemption-bounded state space without the addition of conservative branches.
+    \item It provides an upper bound for the number of traces explored in BPOR no matter the bound. In fact the number of traces
+    explored by Lazy-BPOR at worst case equal to the number of traces explored by the unbounded DPOR. This is true since no conservative
+    branches are added.
+    \item The most important is that provides a reduction of the preemption-bounded search to a well known graph problem where many heuristics can
+    be applied in order to expedite the calculation of the minimum hamiltonian path.
+\end{itemize}
 

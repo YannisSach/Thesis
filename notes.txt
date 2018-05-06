@@ -50,6 +50,8 @@ Search vs Techniques (OOPSLA)
     - change table names <<< Kostis
     - Add Hamiltonian Path Time limitation
     - Add include pseudo code -> Done
-    - Change reasons why Concuerror is not valid
+    - Change reasons why Concuerror is not valid -> Done
+
+Lazy-BPOR better because of upper bound and reduces to a problem that heuristics can be found
 
 

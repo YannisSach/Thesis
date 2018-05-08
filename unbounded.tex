@@ -62,7 +62,7 @@ After finishing the exploration of $E.p$, $p$ is added to the sleep set because 
 Since Source-DPOR uses vector clocks to track events the DPOR using Clock Vectors \cite{FlanaganDPOR} variation will be used which is shown in Algorithm \ref{DPORV}.
 
 \begin{algorithm}
-    \caption{DPOR using Clock Vectors}
+    \caption{DPOR using Clock Vectors (Classic-DPOR)}
     \label{DPORV}
     \SetKwInOut{Input}{input}
     \SetKwInput{Initialization}{Explore($\emptyset, \lambda x. \bot$)}
@@ -119,8 +119,8 @@ Then the vector clocks are updated according to Lamport's algorithm.
 
 \section{Comparison of Classic-DPOR and Source-DPOR}
 
-As one can easily notice both algorithms consist of the same two phases i.e., the race detection phase and the exploration phase. Moreover both
-algorithms are based on vector-clocks, in spite of the fact that their usage is implied in the Source-DPOR in line 6 and line 8 of Algorithm \ref{Source}.
+As one can easily notice, both algorithms consist of the same two phases i.e., the race detection phase and the exploration phase. Moreover both
+algorithms are based on vector-clocks, in spite of the fact that their usage is just implied in the Source-DPOR in line 6 and line 8 of Algorithm \ref{Source}.
 
 The major difference lies in the race detection phase. During the race detection in Classic-DPOR all processes $p$ are considered, before even be scheduled, and, thus, many of them
 may be backtracked. On the other hand, in Source-DPOR only the last scheduled process is considered. Moreover the two algorithms differ in the way they deal with
@@ -165,7 +165,7 @@ complex and thus a bad option \cite{Gode05}. However, source sets algorithm is c
 
 The Algorithm \ref{NDPOR} differs from Source-DPOR (Alg. \ref{Source}) in the calculation of the initials.
 It is clear that persistent algorithm implemented differs from Source-DPOR in the calculation of the initials. 
-Specifically a subset of the initials that happen before $p$ is used. 
+Specifically a subset of the initials ($CI$) that happen-before $p$ is used. 
 Intuitively in the case of a writer and two readers, both readers will be added to the branch since the first read does not
 happen before the second one.
 To generalize this idea: since Nidhugg does not enable us to create branches for $last(E)$, when at the scheduling phase, we add the 
@@ -179,9 +179,9 @@ command will be added to the branch set.
 Let us assume two processes that are in race with $last(S)$.
 \begin{itemize}
 
-\item Case 1: at least on process contains a write command.
+\item Case 1: at least one process contains a write command.
 We know that the two processes will be inverted at some point. Since Nidhugg-DPOR ignores weak initials it will branch both processes. 
-In the Figure \ref{Construction of persistent sets in Nidhugg when there is a write process} we notice that processes $q$ and $r$ are inverted. In Source-DPOR only one of the two processes should be branched since
+In Figure \ref{Construction of persistent sets in Nidhugg when there is a write process} we notice that processes $q$ and $r$ are inverted. In Source-DPOR only one of the two processes should be branched since
 they share the same initials. However, in Nidhugg-DPOR this is not true since the $CI$ set does not contain steps from the other process.
 
 \trace{nidhuggpersistent1.pdf}{Construction of persistent sets in Nidhugg when there is a write process}

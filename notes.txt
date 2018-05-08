@@ -54,4 +54,8 @@ Search vs Techniques (OOPSLA)
 
 Lazy-BPOR better because of upper bound and reduces to a problem that heuristics can be found
 
+Names of tables
+overview
+bounded search or Techniques
+
 

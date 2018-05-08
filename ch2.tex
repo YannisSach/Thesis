@@ -30,12 +30,12 @@ At this point, it is important to introduce the notion of concurrency error and 
     Concurrency error is an error caused by the scheduler's non-determinism.
 \end{definition}
 
-An example of a program containing a concurrency error is shown in the Listing \ref{Concurrency error}. In this program variable $x$ equals 1 in the beginning of the program. However,
-if thread $t_2$ is scheduled before $t_1$ a division by zero will take place. On the other hand, a division by $x$ cannot be considered a concurrency error in other cases
-such as the one shown in Listing \ref{Non-concurrency error} where a division by zero occurs without the scheduler's intervention.
+An example of a program containing a concurrency error is shown in the Listing \ref{Example of concurrency error}. In this program variable $x$ equals 1 in the beginning of the program. However,
+if thread $zero$ is scheduled before $divider$ a division by zero will take place. On the other hand, a division by $x$ cannot be considered a concurrency error in other cases
+such as the one shown in Listing \ref{Example of non-concurrency error} where a division by zero occurs without the scheduler's intervention.
 
-\Code{./code/zero.c}{Non-concurrency error}
-\Code{./code/zeroconc.c}{Concurrency error}
+\Code{./code/zero.c}{Example of non-concurrency error}
+\Code{./code/zeroconc.c}{Example of concurrency error}
 
 \section{Testing, Model Checking, and Verification}
 
@@ -93,7 +93,7 @@ a local "smallest possible values" copy of the global clock-array is kept in eac
 \end{enumerate}
 
 An example execution of the algorithm is shown in Figure \ref{Clock example} where both the source code and an explored trace are given.
-As we can easily notice for each command the clock of the main thread increases. The thread <0.0> starts to run its clock for the thread <0> is 8 since 
+As we can easily notice for each command of thread <0> (main thread) the clock of the main thread increases. The thread <0.0> starts to run its clock for the thread <0> is 8 since 
 that is the moment when the thread was spawned. When the value of y is read the clock for <0> increases again so it corresponds with the y=1 event. When the first thread is
 scheduled again then its clock for the <0.0> is 7 since \verb|pthread_join()| command takes place.
 
@@ -105,7 +105,7 @@ Every algorithm that is presented in this thesis is based on vector clocks.
 
 \section{Notation}
 
-Before examining delving in the problem of dynamic partial order reduction it is crucial to explain the notation that will be used.
+Before delving in the problem of dynamic partial order reduction it is crucial to explain the notation that will be used.
 An execution sequence $E$ of a system is a finite sequence of
 execution steps of its processes that is performed from the initial
 state which we denote as $s_0$. Since each execution step is deterministic, an execution
@@ -233,7 +233,7 @@ Before explaining the DPOR algorithm it is important to define sufficient sets.
 
 \begin{definition}{(Sufficient Sets)}
 A set of transitions is sufficient in a state $s$ if any relevant
-state reachable via an enabled transition from s is also reachable from $s$ via at least one of the transitions in the sufficient
+state reachable via an enabled transition from $s$ is also reachable from $s$ via at least one of the transitions in the sufficient
 set. A search can thus explore only the transitions in the
 sufficient set from $s$ because all relevant states still remain
 reachable. The set containing all enabled threads is trivially
@@ -249,7 +249,7 @@ Many techniques have been proposed in order to implement a DPOR algorithm. What 
     \caption{General form of DPOR}
     Explore($\emptyset$)\;
     \Fn{Explore($E$)}{
-     \Let{T = Sufficient\_set($final(E)$)}
+     \Let{$T = Sufficient\_set(final(E)$)}
      \For{all $t \in T$}{
         Explore($E.t$) \;
     }
@@ -265,7 +265,7 @@ As it can be inferred from the algorithm the most important step is that of the 
     Given a state $s$, $enabled(s)$ represents the set of all the threads that can be scheduled immediately after $s$.
 \end{definition}
 
-An obvious property that the sufficient sets must hold is that Sufficient\_set$(final(E)) \subseteq enabled(E)$.
+An obvious property the sufficient sets must hold is that Sufficient\_set$(final(E)) \subseteq enabled(E)$.
 
 Intuitively $enabled(s)$ represents the threads that are not blocked or have already finished their execution.
 
@@ -295,7 +295,7 @@ Notice that the definition of persistent sets suggests a way to construct them.
 
 In Figure \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
 In the first, let a concurrent program contain 3 threads $p$, $q$, and $r$. Thread $p$ changes the value of the variable (writer) and the other ($q$ and $r$) just read this variable (readers).
-Let $p.q.r$ be an interleaving. According to the definition of the persistent sets $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
+Let $p.q.q.r.r$ be an interleaving. According to the definition of the persistent sets, $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
 of the first command of the interleaving. In Figure \ref{Construction of persistent sets} we notice that both $r$ and $q$ threads are added to the persistent set of the first
 command of the trace since both conflict with the write operation. 
 In the second example, let $p$ and $r$  be a readers and $q$ be a writer. We notice that both $r$ and $q$ are added. However, there is no conflict between $p$ and $r$ since both $p$ and $r$
@@ -319,7 +319,7 @@ $p \in I_{[E]}(w)$ if $p \in w$ and there is no other event $e \in dom_{[E]}(w)$
 $e \rightarrow_{E.w} next_{[E]}(p)$.
 \end{definition}
 
-By relaxing the definition of Initials we can get the definition of Weak Initials $WI$.
+By relaxing the definition of Initials we can get the definition of Weak Initials, $WI$.
 
 \begin{definition}{(Weak Initials after an execution sequence $E.w$, $WI_{[E]}(w)$)}
 For an execution sequence $E.w$, let $WI_{[E]}(w)$ denote the union of $I_{[E]}(w)$ and the set of
@@ -347,22 +347,23 @@ until the search explores a dependent transition. Assume that
 the search explores transition $t$ from state $s$, backtracks $t$,
 then explores $t_0$ from $s$ instead. Unless the search explores
 a transition that is dependent with $t$, no states are reachable
-via $t_0$ that were not already reachable via t from s. Thus, t
+via $t_0$ that were not already reachable via $t$ from s. Thus, $t$
 “sleeps” unless a dependent transition is explored.
 
 A short example on sleep sets is the following:
-Let the concurrent program of one writer and two readers.
+Let the concurrent program of one writer (w1) and two readers (r1,r2).
 let w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) and r2 <0.2>: (local operations), r(x).
 
-The resulted traces are demonstrated in the Listing \ref{Sleep set example}.
-
-\Output{./code/sleep_sets.out}{Sleep set example}
-
+The resulted traces are demonstrated in the Listing \ref{Sleep set example}. Notice that whenever a process executes a command 
+which is in race with some command of another process and the latter process is "sleeping", it wakes up. 
 As we can infer from the execution of the DPOR algorithm the interleaving which started from r2 was blocked since it would lead to an interleaving which
 has already been explored. Notice that this is due to the fact that r1 cannot "wake up" since its first transition (local operations) does not conflict with any other transition
 in the program. 
+
 It can be proved \cite{Godefroid1996} that sleeps will eventually block all the redundant interleavings and thus the only interleavings that will be explored till their end (where all threads that could be executed, have been executed).
 As a result an optimal algorithm should be able to not consider these interleavings whatsoever.
+
+\Output{./code/sleep_sets.out}{Sleep set example}
 
 \section{Comparing Persistent Sets with Source Sets}
 
@@ -444,7 +445,7 @@ note some rather direct properties, including the following.
 Bounded search explores only executions that do not exceed
 a bound \cite{BPOR,Thomson}. The bound may be any property of a
 sequence of transitions. A bound evaluation function $Bv(S)$
-computes the bounded value for a sequence of transitions S.
+computes the bounded value for a sequence of transitions $S$.
 A bound evaluation function $B_v$ and bound $c$ are inputs to
 bounded search. Bounded search may not visit all relevant
 reachable states; it visits only those that are reachable within
@@ -467,10 +468,10 @@ An algorithm that could describe a bounded search would be the following:
     }
 \end{algorithm}
 
-\noindent The only difference between the unbounded and the bounded version of the algorithm is the if statement on line 4 which allows for an interleaving to be explored
+\noindent The only difference between the unbounded and the bounded version of the algorithm is the if-statement on line 4 which allows for an interleaving to be explored
 only if the bound has not been exceeded.
 
-What is needed next is an appropriate definition of the function $B_v$ that calculates a value that the bounded-DPOR tries to keep bounded, 
+What is needed next is an appropriate definition of the function $Bv$ that calculates a value that the bounded-DPOR tries to keep bounded, 
 and the sufficient set. 
 
 In this thesis, we mainly focus on preemption-bounded search. 
@@ -478,8 +479,9 @@ In this thesis, we mainly focus on preemption-bounded search.
 Preemption-bounded search limits the number of preemptive context switches that occur in an execution \cite{Musu07}. The 
 preemption bound is defined recursively as follows.
 
-\begin{definition}{Preemption bound}
-$P_b(t) = 0$ \\
+\begin{definition}{(Preemption bound)}
+\\
+$P_b(\emptyset) = 0$ \\
 $P_b(S.t) = 
  \begin{cases} 
     P_b(S) + 1 & \text{ if } t.tid = last(S).tid \text{ and } last(S).tid \in enabled(final(S)) \\
@@ -528,7 +530,7 @@ $\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
 
 When dealing with preemption bounded DPOR it is useful to introduce the idea of blocks in an execution sequence.
 
-\begin{definition}{(Block of execution sequence}
+\begin{definition}{(Block of execution sequence)}
     Block in an execution sequence is the maximal subsequence of execution steps that consists of execution steps of the same thread.
 \end{definition}
 

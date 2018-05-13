@@ -49,7 +49,12 @@ for i in range(2):
 
 #### PRINTING SECTION                        
 
-l = ['l']
+l = ['c']
 cols = len(versions) * len(methods)*len(attributes) + 1
 col_form = '|' + '|'.join(cols*l) + '|'
-print(df.to_latex(column_format=col_form, multicolumn_format='c|'))
+df = df[:-3]
+table = df.to_latex(column_format=col_form, multicolumn_format='c|')
+table = table.split('\n')
+table = [t for t in table if not "rule" in t]
+table = '\n\\hline\n'.join(table[:-1])
+print(table)

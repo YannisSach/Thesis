@@ -255,13 +255,13 @@ this purpose.
      }
 \end{algorithm}
 
-In case the \verb|add_branch()| invokes directly, the \verb|add_conservative_branch()| is called which works as the "conservative"
+In case the \verb|add_branch()| invokes directly, the \verb|add_conservative_branch()| is called which works as the ``conservative''
 part of the \verb|see_events()|. The pseudo code for this procedure is shown in Algorithm \ref{try to add conservative branch}.
 The \verb|add_branch()| has already been described in Algorithm \ref{addbranch routine for persistent sets}.
 
 \begin{algorithm}[H]
     \caption{try\_to\_add\_conservative\_branches()}
-    \label{seeevents routine for BPOR}
+    \label{try to add conservative branch}
     Explore($\langle \rangle$,$\emptyset$)\;
     \Fn{try\_to\_add\_conservative\_branches($b$)}{
         \If{$last(E).id \in enabled($ at the beggining of block $b)$}{

@@ -11,6 +11,7 @@
 \usepackage{colortbl}
 \usepackage{subcaption}
 \usepackage{booktabs}
+\usepackage{pdflscape}
 
 %\usepackage{refcheck}
 
@@ -189,6 +190,18 @@
     \caption{#2}
     \label{#2}
  \end{table}
+}
+
+\newcommand{\landscapetabular}[2]{
+\begin{landscape}
+ \begin{table} 
+   \resizebox{\linewidth}{!}{
+      \input{#1}
+    }
+    \caption{#2}
+    \label{#2}
+ \end{table}
+\end{landscape}
 }
 
 \newcommand{\smalltabular}[2]{

@@ -1,4 +1,5 @@
 \chapter{Algorithms' Implementations}
+\label{implementations}
 
 Nidhugg is a bug-finding tool which targets bugs caused by scheduling non-determinism
 and relaxed memory consistency in concurrent programs. It works on the
@@ -208,8 +209,9 @@ Moreover in order for the trace builder to know whether the trace was blocked du
 was added. Finally modifications should be made in the DPORDriver so it can print correct messages about the reason why
 the trace was blocked.
 
-Running a random program will result the Listing \ref{Vanilla-BPOR output}.
-\Output{./code/vanilla_output.out}{Vanilla-BPOR output}
+Running a random program will result the Listing \ref{Naive-BPOR output}.
+
+\Output{./code/vanilla_output.out}{Naive-BPOR output}
 
 We notice that Nidhugg gives the number of scheduling that were rejected. Nidhugg schedules threads by giving priority
 to the older ones. As a result, as soon as an old thread becomes available it will be scheduled immediately. This will

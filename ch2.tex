@@ -51,11 +51,13 @@ The graph shown in Figure \ref{Comparing Testing, Model Checking and Verificatio
 
 \section{Stateless Model Checking and Partial Order Reduction}
 
-In order to find an error of a concurrent program, one must examine every possible interleaving, (i.e., all the different ways that a program can be executed) this program can produce. Usually the error 
-would occur only under some interleaving the programmer did not take into consideration, making its detection extremely difficult. Stateless model checking is based on the idea of driving 
-the program along all these possible interleavings. However, this approach suffers from state explosion, i.e., the number of all possible interleavings grows 
-exponentially with the size of the program and the number of threads. Several approaches to this problem have been proposed in order to deal with this challenge such as
-partial order reduction \cite{Godefroid1996} and bounding techniques \cite{BPOR}. 
+In order to find an error of a concurrent program, one must examine every possible interleaving, (i.e., all the
+different ways that a program can be executed) this program can produce. Usually the error would occur only under some
+interleaving the programmer did not take into consideration, making its detection extremely difficult. Stateless model
+checking is based on the idea of driving the program along all these possible interleavings. However, this approach
+suffers from state explosion, i.e., the number of all possible interleavings grows exponentially with the size of the
+program and the number of threads. Several approaches to this problem have been proposed in order to deal with this
+challenge such as partial order reduction \cite{Godefroid1996} and bounding techniques \cite{BPOR}. 
 
 Partial order reduction aims to reduce the number of interleavings explored by eliminating the 
 exploration of equivalent interleavings. Each interleaving can be represented by a trace.
@@ -446,8 +448,8 @@ note some rather direct properties, including the following.
 
 Bounded search explores only executions that do not exceed
 a bound \cite{BPOR,Thomson}. The bound may be any property of a
-sequence of transitions. A bound evaluation function $B_v(S)$
-computes the bounded value for a sequence of transitions $S$.
+sequence of transitions. A bound evaluation function $B_v(E)$
+computes the bounded value for a sequence of transitions $E$.
 A bound evaluation function $B_v$ and bound $c$ are inputs to
 bounded search. Bounded search may not visit all relevant
 reachable states; it visits only those that are reachable within
@@ -460,11 +462,11 @@ An algorithm that could describe a bounded search would be the following:
     \caption{Bounded-DPOR}
     \KwResult{Explore the whole statespace}
     Explore($\emptyset$)\;
-    \Fn{Explore($S$)}{
-        T = Sufficient\_set($final(S)$)
+    \Fn{Explore($E$)}{
+        T = Sufficient\_set($final(E)$)
      \For{all $t \in T$}{
-         \If{$B_v(S.t) \leq c$}{
-            Explore($S.t$)
+         \If{$B_v(E.t) \leq c$}{
+            Explore($E.t$)
          }
         }
     }
@@ -484,10 +486,10 @@ preemption bound is defined recursively as follows.
 \begin{definition}{(Preemption bound)}
 \\
 $P_b(\emptyset) = 0$ \\
-$P_b(S.t) = 
+$P_b(E.t) = 
  \begin{cases} 
-    P_b(S) + 1 & \text{ if } t.tid = last(S).tid \text{ and } last(S).tid \in enabled(final(S)) \\
-    P_b(S) & \text{ otherwise }
+    P_b(E) + 1 & \text{ if } t.tid = last(E).tid \text{ and } last(E).tid \in enabled(final(E)) \\
+    P_b(E) & \text{ otherwise }
  \end{cases}
 $\\
 \end{definition}
@@ -502,12 +504,12 @@ A set that has been proposed as a sufficient for preemption bounded search is th
 An important observation is that the execution of a thread until it gets blocked or terminates will not increase
 the bound count.
 \begin{definition}{($ext(s,t)$)}
-    Given a state $s = final(S)$ and a transition $t \in enabled(s)$,
+    Given a state $s = final(E)$ and a transition $t \in enabled(s)$,
     $ext(s,t)$ returns the unique sequence of transitions $\beta$ from $s$
     such that
     \begin{enumerate}
         \item $\forall i \in dom(\beta): \beta_i.tid = t.tid$
-        \item $t.tid \notin enabled(final(S.\beta))$
+        \item $t.tid \notin enabled(final(E.\beta))$
     \end{enumerate}
 \end{definition}
 
@@ -517,15 +519,15 @@ an execution sequence $a$
 
 \begin{definition}{(Preemption bounded persistent set)}
 
-A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(S)$
+A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(e)$
 is preemption-bound persistent in $s$ iff for all nonempty
 sequences $a$ of transitions from $s$ in $A_G(P_b,c)$ such that
 $\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
 
 \begin{enumerate}
-\item $Pb(S.t) \leq Pb(S.a_1)$
-\item if $Pb(S.t)<Pb(S.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(S.a), last(a).tid)$
-\item if $Pb(S.t)=Pb(S.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(S.a), last(a).tid)$
+\item $Pb(E.t) \leq Pb(E.a_1)$
+\item if $Pb(E.t)<Pb(E.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(E.a), last(a).tid)$
+\item if $Pb(E.t)=Pb(E.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(E.a), last(a).tid)$
 \end{enumerate}
 
 \end{definition}

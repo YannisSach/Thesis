@@ -126,22 +126,8 @@ space.
 
 The results for the testcases are demonstrated in this section. Again they are presented in two different ways.
 
-%%\begin{center}
-%%    \begin{tabular}{ |c|c|c|c|c|c|c|}
-%%    \hline
-%%    \multicolumn{1}{|c|}{Technique:} & \multicolumn{2}{c|}{Vanilla-BPOR} & \multicolumn{2}{c|}{BPOR} & \multicolumn{2}{c|}{Source-BPOR} \\
-%%    \hline
-%%    Bound: & 0 & 1 & 0 & 1 & 0 & 1 \\
-%%    \hline \hline
-%%    account.c & 1 & 6 & 6 & 1 & 27 & 27 \\
-%%    \hline
-%%    lazy.c & 1 & 6 & 6 & 1 & 27 & 27 \\
-%%    \hline
-%%    \end{tabular}
-%%\end{center}
-
 \graph{img/wNrB.png}{writer-N-readers bounded}
-\smalltabular{"/home/yannis/nidhugg/tests/mytests/bounded.tex"}{Traces for various bound limits}
+\smalltabular{"tables/bounded.tex"}{Traces for various bound limits}
 
 As it was expected the Naive-BPOR explores significantly less traces than the Nidhugg-BPOR and the Source-DPOR. However,
 as it was previously discussed, the whole state space is not explored. The number of traces explored by the sound

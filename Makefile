@@ -10,7 +10,7 @@ default: $(FILE).pdf
 
 greek: $(FILE)_gr.pdf
 
-%.pdf: %.tex FORCE
+%.pdf: %.tex FORCE clean
 	latexmk -pdf -f -e '$$pdflatex=q/xelatex %O %S/' $<
 
 clean:

@@ -1,4 +1,4 @@
-.PHONY: FORCE default clean distclean
+.PHONY: FORCE default clean distclean presentation
 
 FILE=thesis
 
@@ -19,3 +19,7 @@ clean:
 
 distclean: clean
 	$(RM) $(FILE).{dvi,ps,pdf}
+
+presentation: 
+	cd presentation;\
+	xelatex presentation_1.tex

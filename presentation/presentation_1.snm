@@ -1,0 +1,39 @@
+\beamer@slide {Example of non-concurrency error}{5}
+\beamer@slide {Example of concurrency error}{5}
+\beamer@slide {Comparing Testing, Model Checking and Verification}{6}
+\beamer@slide {GeneralDPOR}{14}
+\beamer@slide {Construction of persistent sets}{16}
+\beamer@slide {Construction of Source Sets}{19}
+\beamer@slide {Example of Sleep Set Optimization}{21}
+\beamer@slide {Source}{26}
+\beamer@slide {DPORV}{27}
+\beamer@slide {NDPOR}{29}
+\beamer@slide {Construction of persistent sets in Nidhugg when there is a write process}{30}
+\beamer@slide {Construction of persistent sets in Nidhugg when both are read processes}{31}
+\beamer@slide {Vanilla}{32}
+\beamer@slide {Naive-BPOR for bound=$0$}{33}
+\beamer@slide {BPOR}{34}
+\beamer@slide {Nidhugg BPOR}{35}
+\beamer@slide {Following source sets for conservative branches}{37}
+\beamer@slide {SBPOR}{39}
+\beamer@slide {writer-3-readers explosion}{41}
+\beamer@slide {Sleep set contradiction}{42}
+\beamer@slide {Nidhugg's Flow Chart}{44}
+\beamer@slide {writer-N-readers}{46}
+\beamer@slide {Source-DPOR vs Nidhugg-DPOR for Synthetic tests}{46}
+\beamer@slide {writer-N-readers bounded}{47}
+\beamer@slide {Traces for various bound limits}{47}
+\beamer@slide {RCU results for bound $b=1$}{48}
+\beamer@slide {RCU results for bound $b=4$}{49}
+\beamer@slide {Comparison between DPOR and BPOR with the bug}{50}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 1}{51}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 2}{52}
+\beamer@slide {An example of avoidable preemption-switch}{53}
+\beamer@slide {NBBPOR}{54}
+\beamer@slide {Adding a new block to the dependencies graph}{55}
+\beamer@slide {Graph example}{56}
+\beamer@slide {Lazy-BPOR}{57}
+\beamer@slide {writer-N-readers bounded by the first estimation algorithm}{58}
+\beamer@slide {Traces for the first estimation algorithm for various bound limits}{58}
+\beamer@slide {Comparison between DPOR and Lazy-BPOR without the bug}{59}
+\beamer@slide {Comparison between BPOR and Lazy-BPOR}{60}

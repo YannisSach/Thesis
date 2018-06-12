@@ -330,6 +330,12 @@ For an execution sequence $E.w$, let $WI_{[E]}(w)$ denote the union of $I_{[E]}(
 processes that perform events $p$ such that $p \in enabled(s_{[E]}) $.
 \end{definition}
 
+The point of these concepts is that for an execution sequence $E.w$:
+\begin{itemize}
+    \item  $p \in I_{[E]}(w)$ iff there is a sequence $w'$ such that $E.w \simeq E.p.w'$, and
+    \item  $p \in WI_{[E]}(w)$ iff there are sequences $w'$ and $v$ such that $E.w.v \simeq E.p.w'$.
+\end{itemize}
+
 \begin{definition}{(Source Sets)}
 Let $E$ be an execution sequence,
 and let $W$ be a set of sequences, such that $E.w$ is an execution

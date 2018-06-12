@@ -314,15 +314,33 @@ A simple example:
     
 \end{frame}
 
+\begin{frame}{The Idea of Interleaving}
+
+\begin{itemize}
+    \item We need to model our state space!
+    \item An Interleaving represents a scheduling of the concurrent program.
+    \item In order to find an error of a concurrent program, one must examine every possible interleaving BUT leads to state explosion.
+\end{itemize}
+    
+
+\end{frame}
+
 \begin{frame} {Stateless Model Checking and Partial Order Reduction}
  
-\begin{itemize}
     
-\item In order to find an error of a concurrent program, one must examine every possible interleaving BUT leads to state
-explosion.
-\item Partial order reduction aims to reduce the number of interleavings explored by eliminating the exploration of
+Partial order reduction aims to reduce the number of interleavings explored by eliminating the exploration of
 equivalent interleavings.
+
+For example:
+\trace{../img/interleavings}{Examples of Interleavings}
+
+\end{frame}
+
+\begin{frame}{Stateless Model Checking and Partial Order Reduction}
+
+\begin{itemize}
 \item Static Partial Order Reduction: Dependencies are tracked before execution.
+
 \item Dynamic Partial Order Reduction: Dependencies are observed during runtime.
 \end{itemize}
 
@@ -340,6 +358,11 @@ that exceed a bound.
     
 \end{frame}
 
+\begin{frame}
+
+We need to introduce some basic ideas and notation!
+    
+\end{frame}
 
 \begin{frame}{Vector Clocks}
 
@@ -429,7 +452,7 @@ space reduction.
 \end{figure}
 
 \end{frame}
-\begin{frame}{Persistent Sets}
+\begin{frame}{Sufficient Sets: Persistent Sets}
     
 \begin{definition}[Persistent Sets]
 Let $s$ be a state, and let $W \subseteq E(s)$ be a set
@@ -439,15 +462,14 @@ of a transition in $T$,  we have $E \vdash t \diamondsuit w$ for each $t \in T$.
 \end{definition}
 \end{frame}
 
-\begin{frame}{Persistent Sets}
+\begin{frame}{Sufficient Sets: Persistent Sets}
 A simple example:
-FIX THE MISSING ARROW
     
 \trace{../img/persistent.pdf}{Construction of persistent sets}
     
 \end{frame}
 
-\begin{frame}{Source Sets}
+\begin{frame}{Sufficient Sets: Source Sets}
 \begin{definition}[$dom(E)$]
     The set of events-transitions happening during the scheduling of $E$.
 \end{definition}
@@ -469,7 +491,12 @@ processes that perform events $p$ such that $p \in enabled(s_{[E]}) $.
     
 \end{frame}
 
-\begin{frame}{Source Sets}
+\begin{frame}{Sufficient Sets: Source Sets}
+    
+    
+\end{frame}
+
+\begin{frame}{Sufficient Sets: Source Sets}
 
 \begin{definition}[Source Sets]
 Let $E$ be an execution sequence,
@@ -485,7 +512,7 @@ An example:
 \trace{../img/source.pdf}{Construction of Source Sets}
 \end{frame}
 
-\begin{frame}{Sleep Sets}
+\begin{frame}{Further Optimizations: Sleep Sets}
 The idea behind Sleep Set Optimization:
 
 \begin{itemize}
@@ -515,7 +542,9 @@ Given a bound evaluation function $B_v$ and a bound $c$:
     \KwResult{Explore the whole statespace}
     Explore($\emptyset$)\;
     \Fn{Explore($E$)}{
-        T = Sufficient\_set($final(E)$)
+
+     $T = Sufficient\_set$($final(E)$)
+
      \For{all $t \in T$}{
          \If{$B_v(E.t) \leq c$}{
             Explore($E.t$)
@@ -781,7 +810,7 @@ A Naive-BPOR execution example and the problem with it.
 \begin{frame}{Classic-BPOR}
     
 \begin{figure}
-\scalebox{.7}{
+\scalebox{0.4}{
 \begin{algorithm}[H]
     \SetKwInOut{Input}{input}
     \SetKwHangingKw{Let}{let}
@@ -996,7 +1025,7 @@ The Preformance - Soundness Tradeoff
 \end{frame}
 
 \begin{frame}
-The implementation mainly is focused, as expected, % on  \verb|see_events()| and \verb|add_branches()| 
+The implementation mainly is focused, as expected,  on see\_events() and add\_branches()
 \end{frame}
 
 \section{Evaluation}
@@ -1189,7 +1218,7 @@ What if calculate something more than the preemption-bound?
 \end{frame}
 
 \begin{frame}{Evaluation of Lazy-BPOR}
-Evalution on Synthetic Tests:
+Evaluation on Synthetic Tests:
 
 \graph{../img/wNrLB.png}{writer-N-readers bounded by the first estimation algorithm}
 \smalltabular{../tables/lazy1_bounded.tex}{Traces for the first estimation algorithm for various bound limits}
@@ -1211,7 +1240,7 @@ Evaluation on RCU (Nidhugg-BPOR vs Lazy-BPOR):
 \end{frame}
 
 \begin{frame}
-Conclusion
+Conclusion:
 
 \begin{itemize}
     \item It is possible to explore a preemption-bounded state space without the addition of conservative branches.

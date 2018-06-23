@@ -97,7 +97,7 @@ Since Source-DPOR uses vector clocks to track events the DPOR using Clock Vector
 A clock vector $C(p)$ is maintained through out the algorithm for each process $p$. $C(p_i) = \langle c_1, c_2, ..., c_m \rangle$ represents the clock vector of process $p_i$.
 where $c_j$ is the index of the last transition by process $p_j$ such that
 $c_j \rightarrow_s p_i$. Intuitively, the clock vector of a process $p_j$ informs the process $p_j$ about the execution steps of the other processes that 
-happen-before the execution steps of $p_j$. The clock vectors are based on the Lamport's algorithm \cite{Lamp} and more details of their usage in DPOR can
+happen-before the execution steps of $p_j$. The clock vectors are based on the Lamport's algorithm \cite{Lamport@CACM-89} and more details of their usage in DPOR can
 be found here \cite{FlanaganDPOR}. We represent the initial state of all vector clocks as $\bot = \langle 0, ..., 0 \rangle$. With $C(p)(proc(E_i ))$ we represent the 
 value of clock vector of process $p$ for the process in the i-th step of $E$.
 

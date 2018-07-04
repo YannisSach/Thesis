@@ -1,10 +1,10 @@
 .PHONY: FORCE default clean distclean presentation
 
-FILE=thesis
+export TEXINPUTS := .:./Styles//:${TEXINPUTS}
+export BSTINPUTS := .:./Styles//:${BSTINPUTS}
+export SHELL := /bin/bash
 
-export SHELL=/bin/bash
-export TEXINPUTS:=.:./Styles//:${TEXINPUTS}
-export BSTINPUTS:=.:./Styles//:${BSTINPUTS}
+FILE=thesis
 
 default: $(FILE).pdf
 

@@ -70,7 +70,7 @@ the state space still grows exponentially.
 
 For larger programs DPOR often runs longer than developers are willing to wait. In these cases, bounding techniques can be proved useful. Bounded techniques,
 in contrast to DPOR, alleviates state-space explosion by pruning the executions that exceed a bound \cite{Thomson}. There have been proposed many bounded techniques
-such as preemption bounded exploration \cite{BPOR} or delay bounded exploration \cite{Delay11}. All bounded search techniques are based on the notion that many of the concurrency bugs can be
+such as preemption bounded exploration \cite{BPOR} or delay bounded exploration \cite{DelayBounded@POPL-11}. All bounded search techniques are based on the notion that many of the concurrency bugs can be
 tracked even when the bound limit is set to be small, thus the time required for a bug to be found is significantly smaller.
 
 When it comes to bounded search, new challenges arise \cite{BPOR} since more dependencies, related to the bound limit, are introduced. 
@@ -83,7 +83,7 @@ others can be considered as verification, in the sense that can verify that no e
 \section{Vector Clocks}
 
 A vector clock is an algorithm for generating a partial ordering of events in a distributed or concurrent system and detecting causality violations. 
-Just as in Lamport timestamps \cite{Lamp}, interprocess messages contain the state of the sending process's logical clock. 
+Just as in Lamport timestamps \cite{Lamport@CACM-89}, interprocess messages contain the state of the sending process's logical clock. 
 A vector clock of a system of $N$ processes is an array/vector of $N$ logical clocks, one clock per process; 
 a local ``smallest possible values'' copy of the global clock-array is kept in each process, with the following rules for clock updates:
 

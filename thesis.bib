@@ -34,43 +34,37 @@ pages="345--357",
 isbn="978-3-540-69753-4"
 }
 
+@inproceedings{DelayBounded@POPL-11,
+  author = {Emmi, Michael and Qadeer, Shaz and Rakamari\'{c}, Zvonimir},
+  title = {Delay-bounded Scheduling},
+  booktitle = {Proceedings of the 38th Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+  series = {POPL '11},
+  year = {2011},
+  isbn = {978-1-4503-0490-0},
+  location = {Austin, Texas, USA},
+  pages = {411--422},
+  numpages = {12},
+  url = {http://doi.acm.org/10.1145/1926385.1926432},
+  doi = {10.1145/1926385.1926432},
+  acmid = {1926432},
+  publisher = {ACM},
+  address = {New York, NY, USA},
+  keywords = {asynchronous programs, concurrency, delay, sequentialization},
+} 
 
-@techreport{Delay11,
-author = {Emmi, Michael and Qadeer, Shaz and Rakamaric, Zvonimir},
-title = {Delay-Bounded Scheduling},
-booktitle = {},
-year = {2010},
-month = {September},
-abstract = {
-
-We provide a new characterization of scheduling nondeterminism by allowing deterministic schedulers to delay their next-scheduled task. In limiting the delays an otherwise-deterministic scheduler is allowed, we discover concurrency bugs efficiently---by exploring few schedules---and robustly---i.e., independent of the number of tasks, context switches, or buffered events. Our characterization elegantly applies to any systematic exploration (e.g., testing, model checking) of concurrent programs with dynamic task-creation. Additionally, we show that certain delaying schedulers admit efficient reductions from concurrent to sequential program analysis.
-
-
-},
-publisher = {},
-url = {https://www.microsoft.com/en-us/research/publication/delay-bounded-scheduling/},
-address = {},
-pages = {},
-journal = {},
-volume = {},
-chapter = {},
-isbn = {},
-}
-
-@article{Lamp,
-author = {Lamport, Leslie},
-title = {Time, Clocks and the Ordering of Events in a Distributed System},
-booktitle = {},
-year = {1978},
-month = {July},
-publisher = {},
-url = {https://www.microsoft.com/en-us/research/publication/time-clocks-ordering-events-distributed-system/},
-address = {},
-pages = {558-565},
-journal = {},
-volume = {},
-chapter = {},
-isbn = {},
+@ARTICLE{Lamport@CACM-89,
+  author = "Leslie Lamport",
+  title = "Time, Clocks and the Ordering of Events in a Distributed System",
+  journal = CACM,
+  volume = {21},
+  number = {7},
+  pages = {558--565},
+  month = jul,
+  year = {1978},
+  url = {http://doi.acm.org/10.1145/359545.359563},
+  doi = {10.1145/359545.359563},
+  publisher = {ACM},
+  address = {New York, NY, USA}
 }
 
 @InProceedings{God97,
@@ -88,20 +82,19 @@ isbn="978-3-540-47787-7"
 }
 
 
-@inproceedings{BPOR,
-author = {Coons, Katherine E. and Musuvathi, Madan and McKinley, Kathryn S},
-title = {Bounded Partial-Order Reduction},
-booktitle = {},
-year = {2013},
-month = {October},
-publisher = {ACM SIGPLAN Conference on Object-Oriented Programming, Systems, Languages, and Applications (OOPSLA)},
-url = {https://www.microsoft.com/en-us/research/publication/bounded-partial-order-reduction/},
-address = {},
-pages = {},
-journal = {},
-volume = {},
-chapter = {},
-isbn = {},
+@InProceedings{BPOR,
+  author = {Coons, Katherine E. and Musuvathi, Madan and McKinley, Kathryn S.},
+  title = {Bounded Partial-Order Reduction},
+  pages = {833--848},
+  booktitle = {Proceedings of the 2013 {ACM} {SIGPLAN} International Conference
+            on Object Oriented Programming Systems Languages {\&} Applications},
+  series = {OOPSLA 2013},
+  year = {2013},
+  month = oct,
+  publisher = {ACM},
+  address = {New York, NY, USA},
+  url = {http://doi.acm.org/10.1145/2509136.2509556},
+  doi       = {10.1145/2509136.2509556},
 }
 
 
@@ -127,23 +120,23 @@ isbn = {},
 } 
 
 
-@Inbook{AbdM17,
+@InProceedings{AbdM17,
 author="Abdulla, Parosh
 and Aronis, Stavros
 and Jonsson, Bengt
 and Sagonas, Konstantinos",
+title="Comparing Source Sets and Persistent Sets for Partial Order Reduction",
+pages="516--536",
+bookTitle="Models, Algorithms, Logics and Tools: Essays Dedicated to Kim Guldstrand Larsen on the Occasion of His 60th Birthday",
+year="2017",
 editor="Aceto, Luca
 and Bacci, Giorgio
 and Bacci, Giovanni
 and Ing{\'o}lfsd{\'o}ttir, Anna
 and Legay, Axel
 and Mardare, Radu",
-title="Comparing Source Sets and Persistent Sets for Partial Order Reduction",
-bookTitle="Models, Algorithms, Logics and Tools: Essays Dedicated to Kim Guldstrand Larsen on the Occasion of His 60th Birthday",
-year="2017",
 publisher="Springer International Publishing",
 address="Cham",
-pages="516--536",
 abstract="Partial order reduction has traditionally been based on persistent sets, ample sets, stubborn sets, or variants thereof. Recently, we have presented a strengthening of this foundation, using source sets instead of persistent/ample/stubborn sets. Source sets subsume persistent sets and are often smaller than persistent sets. We introduced source sets as a basis for Dynamic Partial Order Reduction (DPOR), in a framework which assumes that processes are deterministic and that all program executions are finite. In this paper, show how to use source sets for partial order reduction in a framework which does not impose these restrictions. We also compare source sets with persistent sets, providing some insights into conditions under which source sets and persistent sets do or do not differ.",
 isbn="978-3-319-63121-9",
 doi="10.1007/978-3-319-63121-9_26",
@@ -754,7 +747,6 @@ note = "Available: \url{https://sv-comp.sosy-lab.org/2015/rules.php}"
 
 @book{Godefroid1996,
  author = {Godefroid, Patrice},
- editor = {Leeuwen, J. van and Hartmanis, J. and Goos, G.},
  title = {Partial-Order Methods for the Verification of Concurrent Systems: An Approach to the State-Explosion Problem},
  year = {1996},
  isbn = {3540607617},

@@ -1,0 +1,41 @@
+\beamer@slide {Example of non-concurrency error}{12}
+\beamer@slide {Example of concurrency error}{12}
+\beamer@slide {Comparing Testing, Model Checking and Verification}{13}
+\beamer@slide {Examples of Interleavings}{17}
+\beamer@slide {GeneralDPOR}{24}
+\beamer@slide {Source}{25}
+\beamer@slide {Construction of persistent sets}{28}
+\beamer@slide {Construction of Source Sets}{31}
+\beamer@slide {Example of Sleep Set Optimization}{33}
+\beamer@slide {Example of Blocks and Bound Persistent Sets}{38}
+\beamer@slide {Source}{42}
+\beamer@slide {DPORV}{43}
+\beamer@slide {NDPOR}{46}
+\beamer@slide {Construction of persistent sets in Nidhugg when there is a write process}{47}
+\beamer@slide {Construction of persistent sets in Nidhugg when both are read processes}{48}
+\beamer@slide {Vanilla}{49}
+\beamer@slide {Naive-BPOR for bound=$0$}{50}
+\beamer@slide {BPOR}{51}
+\beamer@slide {Nidhugg BPOR}{52}
+\beamer@slide {Following source sets for conservative branches}{54}
+\beamer@slide {SBPOR}{56}
+\beamer@slide {writer-3-readers explosion}{58}
+\beamer@slide {Sleep set contradiction}{59}
+\beamer@slide {Nidhugg's Flow Chart}{62}
+\beamer@slide {writer-N-readers}{65}
+\beamer@slide {Source-DPOR vs Nidhugg-DPOR for Synthetic tests}{65}
+\beamer@slide {writer-N-readers bounded}{66}
+\beamer@slide {Traces for various bound limits}{66}
+\beamer@slide {RCU results for bound $b=1$}{67}
+\beamer@slide {RCU results for bound $b=4$}{68}
+\beamer@slide {Comparison between DPOR and BPOR with the bug}{69}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 1}{70}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 2}{71}
+\beamer@slide {An example of avoidable preemption-switch}{73}
+\beamer@slide {NBBPOR}{74}
+\beamer@slide {Graph example}{75}
+\beamer@slide {Lazy-BPOR}{76}
+\beamer@slide {writer-N-readers bounded by the first estimation algorithm}{77}
+\beamer@slide {Traces for the first estimation algorithm for various bound limits}{77}
+\beamer@slide {Comparison between DPOR and Lazy-BPOR}{78}
+\beamer@slide {Comparison between BPOR and Lazy-BPOR}{79}

@@ -20,6 +20,10 @@ clean:
 distclean: clean
 	$(RM) $(FILE).{dvi,ps,pdf}
 
+presentation-lite: 
+	cd presentation-lite;\
+	xelatex presentation_1.tex
+
 presentation: 
 	cd presentation;\
 	xelatex presentation_1.tex

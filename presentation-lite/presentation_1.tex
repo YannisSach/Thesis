@@ -95,6 +95,9 @@
 \usepackage{pdflscape}
 \usepackage{listings}
 \usepackage{algorithm2e}
+\usepackage{xcolor}
+
+\def\HiLi{\leavevmode\rlap{\hbox to \hsize{\color{yellow!50}\leaders\hrule height .8\baselineskip depth .5ex\hfill}}}
 
 
 \usepackage{graphicx}
@@ -157,7 +160,7 @@
 \newcommand{\graph}[2]{
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.3]{#1}
+\includegraphics[scale=0.5]{#1}
 \caption{#2}
 \label{#2}
 \end{figure}
@@ -233,7 +236,7 @@
 
 \newcommand{\smalltabular}[2]{
   \begin{table} 
-    \resizebox{0.5\textwidth}{!}{\begin{minipage}{\textwidth}
+    \resizebox{0.8\textwidth}{!}{\begin{minipage}{\textwidth}
      \input{#1}
      \caption{#2}
      \label{#2}
@@ -282,22 +285,12 @@
 
 %\subsection{} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
 
-\begin{frame}
-\frametitle{Aim of Thesis}
-\begin{itemize}[<+->]
-    \item Implement Preemption Bounded Search (BPOR) for Nidhugg. 
-    \item Explore the potential of Source-Sets for BPOR.
-    \item Evaluate the performance of various BPOR implementations.
-    \item Explore alternative approaches to BPOR problem.
-\end{itemize}
 
-\end{frame}
-
-\section{Background Knowledge}
+\section{Background}
 %% \frame{\sectionpage}
 
 \begin{frame}{Concurrent Programming}
-\emph{Concurrent Computing} is a form of computing in which several computations are executed during
+\emph{Concurrent Programming} is a form of computing in which several computations are executed during
 overlapping time periods concurrently, instead of sequentially (one completing before the next starts).
 
 Potential problems include:
@@ -320,6 +313,8 @@ Potential problems include:
 
 \end{frame}
 
+
+\iffalse
 \begin{frame}{Testing, Model Checking, and Verification}
 \begin{itemize}
 \item Testing: For some given inputs check whether the output is correct.
@@ -331,53 +326,50 @@ Potential problems include:
 \trace{../img/testmodver.png}{Comparing Testing, Model Checking and Verification}
     
 \end{frame}
+\fi
 
-\begin{frame}{But What's Our State Space?}
+\begin{frame}{Tracking Errors caused by Scheduler's non-determinism}
 
 \begin{itemize}[<+->]
-    \item We need to model our state space!
-    \item An Interleaving represents a scheduling of the concurrent program.
-    \item In order to find an error of a concurrent program, one must examine every possible interleaving BUT leads to STATE EXPLOSION!
+    \item An interleaving represents a scheduling of the concurrent program.
+    \item The state space is the set of all possible interleavings.
+    \item In order to find an error of a concurrent program, one must examine every possible interleaving.
+    \item STATE SPACE EXPLOSION!
 \end{itemize}
     
 
 \end{frame}
 
 \begin{frame} {Stateless Model Checking and Partial Order Reduction}
- 
-    
-Partial order reduction aims to reduce the number of interleavings explored by eliminating the exploration of
-equivalent interleavings.
-
-For example:
-\trace{../img/interleavings}{Examples of Interleavings}
-
-\end{frame}
-
-\begin{frame}{Stateless Model Checking and Partial Order Reduction}
 
 \begin{itemize}[<+->]
-\item Static Partial Order Reduction: Dependencies are tracked before execution.
 
-\item Dynamic Partial Order Reduction: Dependencies are observed during runtime.
+\item We need to preform Systematic Model Checking.
+\item Partial Order Reduction aims to reduce the number of interleavings explored by eliminating the exploration of equivalent
+interleavings.
+\item Dynamic Partial Order Reduction: record conflicts during runtime and add appropriate rescheduling points.
+
 \end{itemize}
 
 \end{frame}
 
-\begin{frame}{Bounding Techniques for DPOR}
+\begin{frame}{An example of Partial Order Reduction (Optimal)}
 
-\begin{itemize}[<+->]
-\item For larger programs DPOR often runs longer than developers are willing to wait. 
-\item Bounded techniques, alleviate state-space explosion by pruning the executions
-that exceed a bound. 
-\item Preemption Bounded and Delay Bounded exploration.
-\item Many of the concurrency bugs can be tracked even when the bound limit is set to be small.
-\end{itemize}
+\tracelong{../img/partial-order-reduction.pdf}{DPOR tries to avoid red nodes}
     
 \end{frame}
 
 %% \subsection{Dynamic Partial Order Reduction}
 
+\begin{frame}{Sufficient Sets}
+\begin{definition}[Sufficient Sets] A set of transitions is sufficient in a state $s$ if any relevant state reachable
+via an enabled transition from $s$ is also reachable from $s$ via at least one of the transitions in the sufficient set.
+A search can thus explore only the transitions in the sufficient set from $s$ because all relevant states still remain
+reachable. The set containing all enabled threads is trivially sufficient in $s$, but smaller sufficient sets enable
+more state space reduction.
+\end{definition}
+    
+\end{frame}
 \begin{frame}{General form of DPOR}
     
 \SetKwProg{Fn}{Function}{}{}
@@ -401,7 +393,7 @@ that exceed a bound.
 
 \end{frame}
 
-\begin{frame}{The implemented DPOR form}
+\begin{frame}{Implementation of DPOR Algorithm}
 
 \begin{figure}
     
@@ -409,7 +401,7 @@ that exceed a bound.
 \SetKwProg{Fn}{Function}{}{}
 \SetKwHangingKw{Let}{let}
 \begin{algorithm}[H]
-    \caption{Real DPOR Algorithm}
+    \caption{Implementation DPOR Algorithm}
     \label{Source}
     Explore($\emptyset$)\;
     \Fn{Explore($E$)}{
@@ -427,18 +419,6 @@ that exceed a bound.
 
 \end{frame}
 
-\begin{frame}
-\begin{definition}[Sufficient Sets]
-A set of transitions is sufficient in a state $s$ if any relevant
-state reachable via an enabled transition from $s$ is also reachable from $s$ via at least one of the transitions in the sufficient
-set. A search can thus explore only the transitions in the
-sufficient set from $s$ because all relevant states still remain
-reachable. The set containing all enabled threads is trivially
-sufficient in $s$, but smaller sufficient sets enable more state
-space reduction.
-\end{definition}
-    
-\end{frame}
 
 \begin{frame}{Sufficient Sets: Persistent Sets}
     
@@ -465,8 +445,10 @@ A simple example:
 
 
 \begin{definition}[Weak Initials after an execution sequence $E.w$, $WI_{[E]}(w)$]
-    $p \in WI_{[E]}(w)$ if and only if there are sequences $w'$ and $v$ such
+
+$p \in WI_{[E]}(w)$ if and only if there are sequences $w'$ and $v$ such
 that $E.w.v \simeq E.p.w'$.
+
 \end{definition}
     
 \end{frame}
@@ -491,7 +473,8 @@ An example:
 \begin{frame}{Further Optimizations: Sleep Sets}
 The idea behind Sleep Set Optimization:
 
-\begin{itemize}
+\begin{itemize}[<+->]
+\item Sleep Sets prevent redundant explorations.
 \item Assume that the search explores transition $t$ from state $s$, backtracks $t$, then explores $t_0$ from $s$ instead.
 Unless the search explores a transition that is dependent with $t$, no states are reachable via $t_0$ that were not
 already reachable via $t$ from s. Thus, $t$ ``sleeps'' unless a dependent transition is explored.
@@ -503,94 +486,6 @@ already reachable via $t$ from s. Thus, $t$ ``sleeps'' unless a dependent transi
 Sleep sets in action (Using Persistent Sets):
 \trace{../img/sleep.pdf}{Example of Sleep Set Optimization}
 \end{frame}
-
-
-\begin{frame}{Bounded Dynamic Partial Order Reduction General Form}
-
-Given a bound evaluation function $B_v$ and a bound $c$:
-
-\begin{figure}
-\scalebox{1.}{
-\SetKwProg{Fn}{Function}{}{}
-\begin{algorithm}[H]
-    \caption{Bounded-DPOR}
-    \KwResult{Explore the whole statespace}
-    Explore($\emptyset$)\;
-    \Fn{Explore($E$)}{
-
-     $T = Sufficient\_set$($final(E)$)
-
-     \For{all $t \in T$}{
-         \If{$B_v(E.t) \leq c$}{
-            Explore($E.t$)
-         }
-        }
-    }
-\end{algorithm}
-}
-\end{figure}
-    
-\end{frame}
-
-\begin{frame}{Preemption Bounded Search}
-
-\begin{definition}[Preemption bound]
-$P_b(\emptyset) = 0$ \\
-$P_b(E.t) = 
- \begin{cases} 
-    P_b(E) + 1 & \text{ if } t.tid = last(E).tid \text{ and } last(E).tid \in enabled(final(E)) \\
-    P_b(E) & \text{ otherwise }
- \end{cases}
-$
-\end{definition}
-    
-\end{frame}
-
-\begin{frame}
-
-\begin{definition}[$ext(s,t)$]
-    Given a state $s = final(E)$ and a transition $t \in enabled(s)$,
-    $ext(s,t)$ returns the unique sequence of transitions $\beta$ from $s$
-    such that
-    \begin{enumerate}
-        \item $\forall i \in dom(\beta): \beta_i.tid = t.tid$
-        \item $t.tid \notin enabled(final(E.\beta))$
-    \end{enumerate}
-\end{definition}
-    
-\end{frame}
-
-\begin{frame}{Preemption Bounded Persistent Sets}
-
-\begin{definition}[Preemption Bounded Persistent Set]
-
-A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(E)$
-is preemption-bound persistent in $s$ iff for all nonempty
-sequences $a$ of transitions from $s$ in $A_G(P_b,c)$ such that
-$\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
-
-\begin{enumerate}
-\item $Pb(E.t) \leq Pb(E.a_1)$
-\item if $Pb(E.t)<Pb(E.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(E.a), last(a).tid)$
-\item if $Pb(E.t)=Pb(E.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(E.a), last(a).tid)$
-\end{enumerate}
-
-\end{definition}
-    
-\end{frame}
-
-\begin{frame}{Preemption Bounded Persistent Sets}
-
-Way simplified... :
-
-\begin{itemize}[<+->]
-   \item Add conservative branches at the beginning of the block.
-   \item But what's a block?
-\end{itemize}
-   \pause
-   \trace{../img/bound-persistent-blocks.pdf}{Example of Blocks and Bound Persistent Sets}
-\end{frame}
-
 
 \begin{frame}{Source-DPOR}
 
@@ -625,8 +520,125 @@ Way simplified... :
 \end{figure}
 
 \end{frame}
+\begin{frame}{Bounding Techniques for DPOR}
 
-\section{Implemented Algorithms}
+\begin{itemize}[<+->]
+\item For larger programs DPOR often runs longer than developers are willing to wait. 
+\item Bounded techniques, alleviate state-space explosion by pruning the executions
+that exceed a bound. 
+\item Many of the concurrency bugs can be tracked even when the bound limit is set to be small.
+\item Preemption Bounded and Delay Bounded exploration.
+\end{itemize}
+    
+\end{frame}
+
+
+
+\begin{frame}{Preemption Bounded Search}
+
+\begin{definition}[Preemption bound]
+$P_b(\emptyset) = 0$ \\
+$P_b(E.t) = 
+ \begin{cases} 
+    P_b(E) + 1 & \text{ if } t.tid = last(E).tid \text{ and } last(E).tid \in enabled(final(E)) \\
+    P_b(E) & \text{ otherwise }
+ \end{cases}
+$
+\end{definition}
+    
+\end{frame}
+
+\begin{frame}{Bounded Dynamic Partial Order Reduction General Form}
+
+Given a bound evaluation function $B_v$ and a bound $c$:
+
+\begin{figure}
+\scalebox{1.}{
+\SetKwProg{Fn}{Function}{}{}
+\begin{algorithm}[H]
+    \caption{Bounded-DPOR}
+    \KwResult{Explore the whole statespace}
+    Explore($\emptyset$)\;
+    \Fn{Explore($E$)}{
+
+     $T = Sufficient\_set$($final(E)$)
+
+     \For{all $t \in T$}{
+         \If{$B_v(E.t) \leq c$}{
+            Explore($E.t$)
+         }
+        }
+    }
+\end{algorithm}
+}
+\end{figure}
+    
+\end{frame}
+
+\begin{frame}{Preemption Bounded Persistent Sets}
+
+\begin{definition}[Preemption Bounded Persistent Set]
+
+A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(E)$
+is preemption-bound persistent in $s$ iff for all nonempty
+sequences $a$ of transitions from $s$ in $A_G(P_b,c)$ such that
+$\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
+
+\begin{enumerate}
+\item $Pb(E.t) \leq Pb(E.a_1)$
+\item if $Pb(E.t)<Pb(E.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(E.a), last(a).tid)$
+\item if $Pb(E.t)=Pb(E.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(E.a), last(a).tid)$
+\end{enumerate}
+
+\end{definition}
+    
+\end{frame}
+
+\begin{frame}{Preemption Bounded Persistent Sets}
+
+Simplified version:
+
+\begin{itemize}[<+->]
+   \item Add conservative branches at the beginning of the block.
+   \item But what's a block?
+\end{itemize}
+   \pause
+   \trace{../img/bound-persistent-blocks.pdf}{Example of Blocks and Bound Persistent Sets}
+\end{frame}
+
+
+
+\begin{frame}{Nidhugg}
+    \begin{itemize}
+        
+\item Nidhugg is a bug-finding tool which targets bugs caused by concurrency
+and relaxed memory consistency in concurrent programs. It works on the
+level of LLVM internal representation, which means that it can be used
+for programs written in languages such as C or C++.
+\item Nidhugg relies on Source-Sets.
+    \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{The Nidhugg Flow Chart}
+    
+\mediumGraph{../img/flowchartv2.pdf}{Nidhugg's Flow Chart}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Aim of Thesis}
+\begin{itemize}[<+->]
+    \item Implement Preemption Bounded Search (BPOR) for Nidhugg. 
+    \item Explore the potential of Source-Sets for BPOR.
+    \item Evaluate the performance of various BPOR implementations.
+    \item Explore alternative approaches to BPOR problem.
+\end{itemize}
+
+\end{frame}
+
+\section{Algorithms}
 
 %% \frame{\sectionpage}
 
@@ -644,9 +656,9 @@ Way simplified... :
     \SetKwInOut{Input}{input}
     Explore($\langle \rangle$,$\emptyset$,$b$)\;
     \Fn{Explore($E$,$Sleep$,$b$)}{
-        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b)$ }{
+        \HiLi \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b)$ }{
             $backtrack(E) :={p}$ \;
-            \While{$\exists p \in (backtrack(E) \backslash Sleep$ and $B_v(E.p) \leq b$}{
+           \HiLi \While{$\exists p \in (backtrack(E) \backslash Sleep$ and $B_v(E.p) \leq b$}{
                 \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p) $}{
                     \Let{$E' = pre(E,e)$}
                     \Let{$u = notdep(e,E).p$}
@@ -675,6 +687,7 @@ A Naive-BPOR execution example and the problem with it.
 
 \end{frame}
 
+\iffalse
 \begin{frame}{DPOR using Clock Vectors (Classic-DPOR)}
 
 \begin{figure}
@@ -713,6 +726,7 @@ A Naive-BPOR execution example and the problem with it.
 \end{figure}
 \end{frame}
 
+
 \begin{frame}{Source-DPOR vs Classic-DPOR}
 Similarities:
 \begin{enumerate}
@@ -728,8 +742,10 @@ Differences:
 \end{enumerate}
 
 \end{frame}
+\fi
 
 \begin{frame}{Nidhugg-DPOR}
+\framesubtitle{Requirement for BPOR}
     
 \begin{figure}
     
@@ -743,17 +759,18 @@ Differences:
     Explore($\langle \rangle$,$\emptyset$)\;
     \Fn{Explore($E$,$Sleep$)}{
         \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep$}{
-            backtrack(E) $:={p}$ \;
+            backtrack(E) $:=\{p\}$ \;
             \While{$\exists p \in (backtrack(E) \backslash Sleep)$}{
                 \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
                     \Let{$E' = pre(E,e)$}
                     \Let{$u = notdep(e,E).p$}
-                    \Let{$CI = \{ i \in I_{E'}(u) \mid i \rightarrow p \}$}
-                    \If{$CI \cap backtrack(E') = \emptyset$}{
-                        \If{$CI \neq \emptyset$}{
-                            add some $q' \in CI \text{ to } backtrack(E') $ \;
-                        }
-                        \Else{add some $q' I_{E'}(u) \text{ to } backtrack(E')$}
+                    \HiLi \Let{$CI = \{ i \in I_{E'}(u) \mid i \rightarrow p \}$}
+                    \HiLi\If{$CI \cap backtrack(E') = \emptyset$}{
+                    \HiLi    \If{$CI \neq \emptyset$}{
+                    \HiLi        add some $q' \in CI \text{ to } backtrack(E') $ \;
+                         }
+                    \HiLi    \Else{
+                    \HiLi    add some $q' I_{E'}(u) \text{ to } backtrack(E')$}
                     }
                 }
                 \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $ } 
@@ -1028,19 +1045,6 @@ others are slower but sound as well.
 
 \end{frame}
 
-\begin{frame}{Nidhugg Implementation}
-Nidhugg is a bug-finding tool which targets bugs caused by concurrency
-and relaxed memory consistency in concurrent programs. It works on the
-level of LLVM internal representation, which means that it can be used
-for programs written in languages such as C or C++.
-\end{frame}
-
-
-\begin{frame}{The Nidhugg Flow Chart}
-    
-\mediumGraph{../img/flowchartv2.pdf}{Nidhugg's Flow Chart}
-
-\end{frame}
 
 \iffalse
 \begin{frame}{Modifications in Nidhugg}
@@ -1054,18 +1058,24 @@ The implementation mainly is focused, as expected,  on see\_events() and add\_br
 \begin{frame}{Nidhugg-DPOR Evaluation}
 Evaluation of Nidhugg-DPOR on Synthetic Tests
 \graph{../img/wNr.png}{writer-N-readers}
-
-\smalltabular{../tables/synthetic_unbounded.tex}{Source-DPOR vs Nidhugg-DPOR for Synthetic tests}
-    
 \end{frame}
 
+\begin{frame}{Nidhugg-DPOR Evaluation}
+\smalltabular{../tables/synthetic_unbounded.tex}{Source-DPOR vs Nidhugg-DPOR for Synthetic tests}
+\end{frame}
 
-\begin{frame}
+\begin{frame}{Nidhugg-BPOR Evaluation}
 Evaluation of Nidhugg-BPOR on Synthetic Tests
     
 \graph{../img/wNrB.png}{writer-N-readers bounded}
-\smalltabular{../tables/bounded.tex}{Traces for various bound limits}
     
+\end{frame}
+
+\begin{frame}{Nidhugg-BPOR Evaluation}
+Evaluation of Nidhugg-BPOR on Synthetic Tests
+    
+\smalltabular{../tables/bounded.tex}{Traces for various bound limits}
+
 \end{frame}
 
 \begin{frame}{Evalution of BPOR on RCU}
@@ -1107,7 +1117,7 @@ What did we achieve?
     
 \end{frame}
 
-\section{Further Discussion}
+\section{Discussion}
 %% \frame{\sectionpage}
 
 \begin{frame}{Motivation}
@@ -1196,21 +1206,35 @@ What if calculate something more than the preemption-bound?
 Evaluation on Synthetic Tests:
 
 \graph{../img/wNrLB.png}{writer-N-readers bounded by the first estimation algorithm}
-\smalltabular{../tables/lazy1_bounded.tex}{Traces for the first estimation algorithm for various bound limits}
     
 \end{frame}
 
+\begin{frame}{Evaluation of Lazy-BPOR}
+Evaluation on Synthetic Tests:
+\smalltabular{../tables/lazy1_bounded.tex}{Traces for the first estimation algorithm for various bound limits}
+\end{frame}
+
+\iffalse
 \begin{frame}{Evaluation of Lazy-BPOR}
 
 Evaluation on RCU (DPOR vs Lazy-BPOR):
 \bigtabular{"../tables/lazy_buged_comp.tex"}{Comparison between DPOR and Lazy-BPOR}
 
 \end{frame}
+\fi
 
 \begin{frame}{Evaluation of Lazy-BPOR}
 
 Evaluation on RCU (Nidhugg-BPOR vs Lazy-BPOR):
 \bigtabular{"../tables/hline_pandas_lazy_preep.tex"}{Comparison between BPOR and Lazy-BPOR}
+
+\end{frame}
+
+\begin{frame}{Evaluation of Lazy-BPOR}
+\framesubtitle{The Big Picture}
+
+Evaluation on RCU (Nidhugg-BPOR vs Lazy-BPOR):
+\bigtabular{"../tables/hline_pandas_lazy_preep_small.tex"}{Comparison between BPOR and Lazy-BPOR}
 
 \end{frame}
 

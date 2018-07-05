@@ -1,43 +1,41 @@
-\beamer@slide {Example of non-concurrency error}{13}
-\beamer@slide {Example of concurrency error}{13}
-\beamer@slide {Comparing Testing, Model Checking and Verification}{14}
-\beamer@slide {Examples of Interleavings}{18}
-\beamer@slide {GeneralDPOR}{25}
-\beamer@slide {Source}{26}
-\beamer@slide {Construction of Persistent Sets}{29}
-\beamer@slide {Construction of Source Sets}{32}
-\beamer@slide {Example of Sleep Set Optimization}{34}
-\beamer@slide {Example of Blocks and Bound Persistent Sets}{39}
-\beamer@slide {Source}{43}
-\beamer@slide {Vanilla}{45}
-\beamer@slide {Naive-BPOR for bound=$0$}{46}
-\beamer@slide {DPORV}{47}
-\beamer@slide {NDPOR}{49}
-\beamer@slide {Construction of Persistent Sets in Nidhugg when there is a write process}{50}
-\beamer@slide {Construction of Persistent Sets in Nidhugg when both are read processes}{51}
-\beamer@slide {Nidhugg BPOR}{52}
-\beamer@slide {Following source sets for conservative branches}{54}
-\beamer@slide {SBPOR}{56}
-\beamer@slide {writer-3-readers explosion}{58}
-\beamer@slide {Sleep set contradiction}{59}
-\beamer@slide {Nidhugg's Flow Chart}{62}
-\beamer@slide {writer-N-readers}{64}
+\beamer@slide {Example of non-concurrency error}{9}
+\beamer@slide {Example of concurrency error}{9}
+\beamer@slide {DPOR tries to avoid red nodes}{17}
+\beamer@slide {GeneralDPOR}{19}
+\beamer@slide {Source}{20}
+\beamer@slide {Construction of Persistent Sets}{22}
+\beamer@slide {Construction of Source Sets}{25}
+\beamer@slide {Example of Sleep Set Optimization}{28}
+\beamer@slide {Source}{29}
+\beamer@slide {Example of Blocks and Bound Persistent Sets}{37}
+\beamer@slide {Nidhugg's Flow Chart}{42}
+\beamer@slide {Vanilla}{48}
+\beamer@slide {Naive-BPOR for bound=$0$}{49}
+\beamer@slide {NDPOR}{50}
+\beamer@slide {Construction of Persistent Sets in Nidhugg when there is a write process}{51}
+\beamer@slide {Construction of Persistent Sets in Nidhugg when both are read processes}{52}
+\beamer@slide {Nidhugg BPOR}{53}
+\beamer@slide {Following source sets for conservative branches}{55}
+\beamer@slide {SBPOR}{57}
+\beamer@slide {writer-3-readers explosion}{59}
+\beamer@slide {Sleep set contradiction}{60}
+\beamer@slide {writer-N-readers}{63}
 \beamer@slide {Source-DPOR vs Nidhugg-DPOR for Synthetic tests}{64}
 \beamer@slide {writer-N-readers bounded}{65}
-\beamer@slide {Traces for various bound limits}{65}
-\beamer@slide {RCU results for bound $b=1$}{66}
-\beamer@slide {RCU results for bound $b=4$}{67}
-\beamer@slide {Comparison between DPOR and BPOR}{68}
-\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 1}{69}
-\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 2}{70}
-\beamer@slide {An example of avoidable preemption-switch}{72}
-\beamer@slide {NBBPOR}{73}
-\beamer@slide {Graph example}{74}
-\beamer@slide {Lazy-BPOR}{75}
-\beamer@slide {writer-N-readers bounded by the first estimation algorithm}{76}
-\beamer@slide {Traces for the first estimation algorithm for various bound limits}{76}
-\beamer@slide {Comparison between DPOR and Lazy-BPOR}{77}
-\beamer@slide {Comparison between BPOR and Lazy-BPOR}{78}
-\beamer@slide {Nidhugg BPOR}{84}
-\beamer@slide {SBPOR}{85}
-\beamer@slide {BPOR}{86}
+\beamer@slide {Traces for various bound limits}{66}
+\beamer@slide {RCU results for bound $b=1$}{67}
+\beamer@slide {RCU results for bound $b=4$}{68}
+\beamer@slide {Comparison between DPOR and BPOR}{69}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 1}{70}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 2}{71}
+\beamer@slide {An example of avoidable preemption-switch}{73}
+\beamer@slide {NBBPOR}{74}
+\beamer@slide {Graph example}{75}
+\beamer@slide {Lazy-BPOR}{76}
+\beamer@slide {writer-N-readers bounded by the first estimation algorithm}{77}
+\beamer@slide {Traces for the first estimation algorithm for various bound limits}{78}
+\beamer@slide {Comparison between BPOR and Lazy-BPOR}{79}
+\beamer@slide {Comparison between BPOR and Lazy-BPOR}{80}
+\beamer@slide {Nidhugg BPOR}{86}
+\beamer@slide {SBPOR}{87}
+\beamer@slide {BPOR}{88}

@@ -113,6 +113,18 @@
 %\setmainfont{Minion Pro} % substitute with any font that exists on your system
 %\setsansfont{Myriad Pro} % substitute with any font that exists on your system
 %\setmonofont{Consolas} % substitute with any font that exists on your system
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+
 
 \setbeamertemplate{theorems}[numbered]
 
@@ -237,7 +249,7 @@
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Short title]{Bounding Techniques for Dynamic Partial Order Reduction} % The short title appears at the bottom of every slide, the full title is only on the title page
+\title[Short title]{Preemption Bounding Techniques for Dynamic Partial Order Reduction} % The short title appears at the bottom of every slide, the full title is only on the title page
 
 \author{Σαχίνογλου Γιάννης} % Your name
 \institute[NTUA] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
@@ -282,7 +294,7 @@
 \end{frame}
 
 \section{Background Knowledge}
-\frame{\sectionpage}
+%% \frame{\sectionpage}
 
 \begin{frame}{Concurrent Computing and Problems}
 
@@ -290,6 +302,7 @@ Concurrent Computing: Concurrent computing is a form of computing in which sever
 overlapping time periods-concurrently-instead of sequentially (one completing before the next starts).\\
 
 Potential problems include:
+\pause
 \begin{itemize}[<+->]
 \item Race Conditions
 \item Deadlocks
@@ -364,6 +377,8 @@ that exceed a bound.
     
 \end{frame}
 
+%% \subsection{Dynamic Partial Order Reduction}
+
 \begin{frame}{General form of DPOR}
     
 \SetKwProg{Fn}{Function}{}{}
@@ -400,7 +415,7 @@ that exceed a bound.
     Explore($\emptyset$)\;
     \Fn{Explore($E$)}{
         \If{suitable $p$ exists} {
-            $backtrack(E):= {p}$ \;
+            $backtrack(E):= \{p\}$ \;
             add to previous $backtracks$ threads due to dependencies revealed by $p$\;
             \While{$\exists p \in backtrack$}{
                 $Explore(E.p)$ \;
@@ -469,7 +484,7 @@ $W$ after $E$ if for each $w \in W$ we have $WI_{[E]}(w) \cap T  \neq \emptyset$
 
 \end{frame}
 
-\begin{frame}{Souce Sets}
+\begin{frame}{Source Sets}
 An example:
 \trace{../img/source.pdf}{Construction of Source Sets}
 \end{frame}
@@ -486,7 +501,7 @@ already reachable via $t$ from s. Thus, $t$ ``sleeps'' unless a dependent transi
 \end{frame}
 
 \begin{frame}{Sleep Sets}
-Sleeps sets in action (Using Persistent Sets):
+Sleep sets in action (Using Persistent Sets):
 \trace{../img/sleep.pdf}{Example of Sleep Set Optimization}
 \end{frame}
 
@@ -612,6 +627,55 @@ Way simplified... :
 
 \end{frame}
 
+\section{Implemented Algorithms}
+
+%% \frame{\sectionpage}
+
+\begin{frame}{Naive-BPOR}
+
+\begin{figure}
+
+\scalebox{.7}{
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    \SetKwProg{Fn}{Function}{}{}
+    \caption{Naive-BPOR}
+    \label{Vanilla}
+    \SetKwInOut{Input}{input}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b)$ }{
+            $backtrack(E) :={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep$ and $B_v(E.p) \leq b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p) $}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
+                        add some $q' \in I_{[E']}(u) to backtrack(E') $ \;
+                    }
+                }
+                \Let{$Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $}
+                $Explore(E.p, Sleep, b)$ \;
+                add $p$ to $Sleep$ \;
+
+            }
+        }
+    }
+\end{algorithm}
+    }
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Example execution of Naive-BPOR}
+    
+A Naive-BPOR execution example and the problem with it.
+
+\trace{../img/w2rvbound.pdf}{Naive-BPOR for bound=$0$}
+
+\end{frame}
+
 \begin{frame}{DPOR using Clock Vectors (Classic-DPOR)}
 
 \begin{figure}
@@ -640,9 +704,7 @@ Way simplified... :
                add $p$ to $done$ \;
                \Let{$t = next(s,p)$} 
                 \Let{$E' = E.t$} 
-                \Let{$cu = max \{ C(i) \mid i \in 1.. | S |$ and $E_i$ dependent with $t \}$} 
-                \Let{$cu2 = cu [ p := | E' | ] $} 
-               \Let{$C' = C [p:= cu2, |E'| := cu2 ]$} 
+                update vector clocks \;
                 $Explore(E',C')$ \;
             }
         }
@@ -667,10 +729,6 @@ Differences:
 \end{enumerate}
 
 \end{frame}
-
-\section{Implemented Algorithms}
-
-\frame{\sectionpage}
 
 \begin{frame}{Nidhugg-DPOR}
     
@@ -734,101 +792,45 @@ be ignored and, thus, $r$ will be added as a branch.
     
 \end{frame}
 
-\begin{frame}{Naive-BPOR}
+
+
+\begin{frame}{Nidhugg-BPOR}
 
 \begin{figure}
-
-\scalebox{.7}{
+    
+\scalebox{0.9}{
 \begin{algorithm}[H]
     \SetKwInOut{Input}{input}
     \SetKwHangingKw{Let}{let}
     \SetKwProg{Fn}{Function}{}{}
-    \caption{Naive-BPOR}
-    \label{Vanilla}
+    \caption{Nidhugg-BPOR}
+    \label{Nidhugg BPOR}
     \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
     Explore($\langle \rangle$,$\emptyset$,$b$)\;
     \Fn{Explore($E$,$Sleep$,$b$)}{
-        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b)$ }{
-            $backtrack(E) :={p}$ \;
-            \While{$\exists p \in (backtrack(E) \backslash Sleep$ and $B_v(E.p) \leq b$}{
-                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p) $}{
-                    \Let{$E' = pre(E,e)$}
-                    \Let{$u = notdep(e,E).p$}
-                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
-                        add some $q' \in I_{[E']}(u) to backtrack(E') $ \;
-                    }
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    add non-conservative branches according to Persistent Sets \;
+                    add conservative branches according to Persistent Sets at the beginning of blocks \;
                 }
-                \Let{$Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $}
-                $Explore(E.p, Sleep, b)$ \;
-                add $p$ to $Sleep$ \;
-
-            }
-        }
-    }
-\end{algorithm}
-    }
-\end{figure}
-
-\end{frame}
-
-\begin{frame}{Example execution of Naive-BPOR}
-    
-A Naive-BPOR execution example and the problem with it.
-
-\trace{../img/w2rvbound.pdf}{Naive-BPOR for bound=$0$}
-
-\end{frame}
-
-
-\begin{frame}{Classic-BPOR}
-    
-\begin{figure}
-\scalebox{0.6}{
-\begin{algorithm}[H]
-    \SetKwInOut{Input}{input}
-    \SetKwHangingKw{Let}{let}
-    \SetKwProg{Fn}{Function}{}{}
-    \caption{BPOR}
-    \label{BPOR}
-    \SetKwInput{Initialization}{Explore($ \emptyset $)}
-    \Fn{Explore($E$)}{
-        \Let{$s := last(E)$}
-        \For{all process $p$}{
-            \For{all process $q \neq p$}{
-            \If{$\exists i = max(\{ i \in dom(E) \mid E_i$ is dependent and may be co-enabled with $next(s,p)$ and $ E_i.tid = q \} $}{
-                \uIf{$p \in enabled(pre(E,i)))$}{
-                    add $p$ to $backtrack(pre(E,i))$ \;
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
                 }
-                \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
-                \uIf{$j = max(\{ j \in dom(E) \mid j = 0 $ or $ S_{j-1}.tid \neq S_j.tid $ and $ j<i \})$}{
-                    \uIf{$p \in enabled(pre(E,i)))$}{
-                        add $p$ to $backtrack(pre(E,i))$ \;
-                    }
-                    \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
-                }
-            }
-            }
-        }
-        \If{$p \in enabled(s)$}{
-            add $p$ to $backtrack(s)$ \;
-        }
-        \Else{
-            add any $u \in enabled(s)$ to $backtrack(s)$ \;
-        }
-        \Let{$visited = \emptyset $}
-        \While{$ \exists u \in (enabled(s) \cap backtrack(s) \backslash visited) $}{
-            add $u$ to $visited$ \;
-            \uIf{$(B_v(S.next(s, u)) \leq c)$}{
-                Explore($S.next(s, u)$) \;
             }
         }
     }
 \end{algorithm}
 }
 \end{figure}
-
+    
 \end{frame}
 
+\iffalse
 \begin{frame}{Nidhugg-BPOR}
 
 \begin{figure}
@@ -883,24 +885,26 @@ A Naive-BPOR execution example and the problem with it.
 \end{figure}
     
 \end{frame}
+\fi
 
 
-\begin{frame}{The main question}
-Can we use source sets instead of persistent sets in order implement BPOR?
+\begin{frame}{Source-BPOR: The main question}
+Can we use source sets instead of Persistent Sets in order to implement BPOR?
 \end{frame}
 
-\begin{frame}{First approach}
+\begin{frame}{Source-BPOR: First approach}
 We should use Source Sets for both conservative and non-conservative branches.
 
 \trace{../img/w2rsourceconservative.pdf}{Following source sets for conservative branches}
     
 \end{frame}
 
-\begin{frame}{A Correct Approach}
+\begin{frame}{Source-BPOR: A Correct Approach}
     
-We should use Source Sets for non-conservative branches and persistent sets for conservative branches.
+We should use Source Sets for non-conservative branches and Persistent Sets for conservative branches.
 \end{frame}
 
+\iffalse
 \begin{frame}{Source-BPOR}
 
 \begin{figure}
@@ -950,7 +954,43 @@ We should use Source Sets for non-conservative branches and persistent sets for 
 \end{figure}
 
 \end{frame}
+\fi
 
+\begin{frame}{Source-BPOR}
+
+\begin{figure}
+\scalebox{0.9}{
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    \SetKwProg{Fn}{Function}{}{}
+    \caption{Source-BPOR}
+    \label{SBPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    add non-conservative backtracks according to Source Sets \;
+                    add conservative backtracks according to Persistent Sets at the beginning of blocks \;
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
+                }
+            }
+        }
+    }
+\end{algorithm}
+}
+\end{figure}
+
+\end{frame}
 \begin{frame}{Nidhugg-BPOR vs Source-BPOR}
 Similarities:
 \begin{itemize}
@@ -959,14 +999,14 @@ Similarities:
 
 Differences:
 \begin{itemize}
-    \item Source-BPOR relies on Source Sets for the addition of non-conservative branches while Nidhugg-BPOR relies on persistent sets.
+    \item Source-BPOR relies on Source Sets for the addition of non-conservative branches while Nidhugg-BPOR relies on Persistent Sets.
 \end{itemize}
 
     
 \end{frame}
 
 
-\begin{frame}{Conservative Branches}
+\begin{frame}{Challenges with Conservative Branches}
 The usage of conservative branches leads to explosion of the state space:
     
 \trace{../img/w3rbpor.pdf}{writer-3-readers explosion}
@@ -974,7 +1014,7 @@ The usage of conservative branches leads to explosion of the state space:
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}{Challenges with Conservative Branches}
 Sleep Sets are no longer that useful:
     
 \trace{../img/sleepsetproblem.pdf}{Sleep set contradiction}
@@ -984,7 +1024,8 @@ Sleep Sets are no longer that useful:
 
 \begin{frame}{Concluding Remarks}
     
-The Preformance - Soundness Tradeoff
+The Performance - Soundness Tradeoff: Some algorithms are faster but compromise the soundness of the exploration while
+others are slower but sound as well.
 
 \end{frame}
 
@@ -1002,12 +1043,14 @@ for programs written in languages such as C or C++.
 
 \end{frame}
 
+\iffalse
 \begin{frame}{Modifications in Nidhugg}
 The implementation mainly is focused, as expected,  on see\_events() and add\_branches()
 \end{frame}
+\fi
 
 \section{Evaluation}
-\frame{\sectionpage}
+%% \frame{\sectionpage}
 
 \begin{frame}{Nidhugg-DPOR Evaluation}
 Evaluation of Nidhugg-DPOR on Synthetic Tests
@@ -1047,7 +1090,7 @@ Let's increase the bound...
 \begin{frame}{Evalution of BPOR on RCU}
 What did we achieve?
 
-\bigtabular{../tables/dporvsbporpriority.tex}{Comparison between DPOR and BPOR with the bug}
+\bigtabular{../tables/dporvsbporpriority.tex}{Comparison between DPOR and BPOR}
 
 \end{frame}
 
@@ -1060,13 +1103,13 @@ What did we achieve?
 \end{frame}
 
 \begin{frame}{Equivalence of Source-BPOR with Nidhugg-BPOR}
-    Equivalence Case2:
+    Equivalence Case 2:
    \trace{../img/equivalence_case2.pdf}{Source-BPOR and Nidhugg-BPOR equivalence Case 2}
     
 \end{frame}
 
 \section{Further Discussion}
-\frame{\sectionpage}
+%% \frame{\sectionpage}
 
 \begin{frame}{Motivation}
 Some preemption-switches can be easily avoided. For example:
@@ -1180,10 +1223,177 @@ Conclusion:
     \item It provides an upper bound for the number of traces explored in BPOR no matter the bound. In fact the number
     of traces explored by Lazy-BPOR at worst case equal to the number of traces explored by the unbounded DPOR. This is
     true since no conservative branches are added.
-    \item The most important is that provides a reduction of the preemption-bounded search to a well known graph problem where many heuristics can
+    \item The most important is that it provides a reduction of the preemption-bounded search to a well known graph problem where many heuristics can
     be applied in order to expedite the calculation of the minimum hamiltonian path.
 \end{itemize}
     
 \end{frame}
 
+\begin{frame}{Bibliography}
+    \begin{itemize}
+        \item Abdulla P, Aronis S., Jonsson B., Sagonas K. (2014) Optimal Dynamic Partial Order Reduction
+        \item Coons K., Musuvathi M, McKinley K., (2013) Bounded Partial-Order Reduction 
+        \item Kokologiannakis M, Sagonas K., (2017) Stateless Model Checking of the Linux Kernel’s Hierarchical Read-Copy-Update (Tree RCU)
+        \item Thomson P., Donaldson A., Betts A., (2016) Testing Using Controlled Schedulers: An Empirical Study
+        \item Flanagan C., Godefroid P. (2005) Dynamic Partial-Order Reduction for Model Checking Software 
+    \end{itemize}
+    
+\end{frame}
+
+\begin{frame}
+    Thank you for your attention!
+\end{frame}
+
+\begin{frame}{Nidhugg-BPOR (Detailed)}
+
+\begin{figure}
+    
+\scalebox{0.6}{
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    \SetKwProg{Fn}{Function}{}{}
+    \caption{Nidhugg-BPOR}
+    \label{Nidhugg BPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E'}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                             add some $q' \in I_{[E']}(u)$ to $backtrack(E') $ \;}
+                        }
+                    \Let{$E''= pre\_block(e,E)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E''}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                            add some $c(q') \in I_{[E'']}(u)$ to $backtrack(E'') $ \;
+                        }
+                    } 
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
+                }
+            }
+        }
+    }
+\end{algorithm}
+}
+\end{figure}
+    
+\end{frame}
+
+\begin{frame}{Source-BPOR (Detailed)}
+
+\begin{figure}
+\scalebox{0.6}{
+
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    \SetKwProg{Fn}{Function}{}{}
+    \caption{Source-BPOR}
+    \label{SBPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
+                        add some $q' \in I_{[E']}(u) \text{ to } backtrack(E') $ \;
+                    }
+                    \Let{$E''= pre\_block(e,E)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E''}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                            add some $c(q') \in I_{[E'']}(u)$ to $backtrack(E'') $ \;
+                        }
+                    } 
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
+                }
+            }
+        }
+    }
+\end{algorithm}
+}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Classic-BPOR}
+    
+\begin{figure}
+\scalebox{0.6}{
+\begin{algorithm}[H]
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    \SetKwProg{Fn}{Function}{}{}
+    \caption{BPOR}
+    \label{BPOR}
+    \SetKwInput{Initialization}{Explore($ \emptyset $)}
+    \Fn{Explore($E$)}{
+        \Let{$s := last(E)$}
+        \For{all process $p$}{
+            \For{all process $q \neq p$}{
+            \If{$\exists i = max(\{ i \in dom(E) \mid E_i$ is dependent and may be co-enabled with $next(s,p)$ and $ E_i.tid = q \} $}{
+                \uIf{$p \in enabled(pre(E,i)))$}{
+                    add $p$ to $backtrack(pre(E,i))$ \;
+                }
+                \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
+                \uIf{$j = max(\{ j \in dom(E) \mid j = 0 $ or $ S_{j-1}.tid \neq S_j.tid $ and $ j<i \})$}{
+                    \uIf{$p \in enabled(pre(E,i)))$}{
+                        add $p$ to $backtrack(pre(E,i))$ \;
+                    }
+                    \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
+                }
+            }
+            }
+        }
+        \If{$p \in enabled(s)$}{
+            add $p$ to $backtrack(s)$ \;
+        }
+        \Else{
+            add any $u \in enabled(s)$ to $backtrack(s)$ \;
+        }
+        \Let{$visited = \emptyset $}
+        \While{$ \exists u \in (enabled(s) \cap backtrack(s) \backslash visited) $}{
+            add $u$ to $visited$ \;
+            \uIf{$(B_v(S.next(s, u)) \leq c)$}{
+                Explore($S.next(s, u)$) \;
+            }
+        }
+    }
+\end{algorithm}
+}
+\end{figure}
+
+\end{frame}
 \end{document} 

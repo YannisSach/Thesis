@@ -1,9 +1,9 @@
 \chapter{Background}
-\label{Chapter 2}
+\label{sec:background}
 
 \section{Concurrent Programming}
 
-Concurrent computing, which is implemented by concurrent programming paradigm, is a form of computing in which several 
+Concurrent computing, which is implemented by the concurrent programming paradigm, is a form of computing in which several 
 computations are executed during overlapping time 
 periods—concurrently—instead of sequentially (one completing before the next starts). 
 This is a property of a system—this may be an individual program, a computer, or a network—and there is a separate execution point 
@@ -30,11 +30,12 @@ At this point, it is important to introduce the notion of concurrency error and 
     Concurrency error is an error caused by the scheduler's non-determinism.
 \end{definition}
 
-An example of a program containing a concurrency error is shown in the Listing \ref{Example of concurrency error}. In this program variable $x$ equals 1 in the beginning of the program. However,
+An example of a program containing a concurrency error is shown in Listing \ref{Example of concurrency error}. In this program, variable $x$ equals 1 in the beginning of the program. However,
 if thread $zero$ is scheduled before $divider$ a division by zero will take place. On the other hand, a division by $x$ cannot be considered a concurrency error in other cases
 such as the one shown in Listing \ref{Example of non-concurrency error} where a division by zero occurs without the scheduler's intervention.
-
+%
 \Code{./code/zero.c}{Example of non-concurrency error}
+%
 \Code{./code/zeroconc.c}{Example of concurrency error}
 
 \section{Testing, Model Checking, and Verification}

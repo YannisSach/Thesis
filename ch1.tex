@@ -1,57 +1,56 @@
-\chapter{Introduction}
+ c\chapter{Introduction}
 
 Moore's Law, named after Intel's co-founder Gordon Moore, states that the number of transistors that can be placed on an integrated circuit doubles
-roughly every two years. For decades, chipmakers have succeeded in shrinking chip geometries, allowing Moore's Law to remain on track and consumers to 
-get their hands on even more powerful laptops, tablets, and smartphones. Software developers could just lay back and wait for the Moore's Law to take effect.
+roughly every two years. For decades, chipmakers have succeeded in shrinking chip geometries, allowing Moore's Law to remain on track and consumers to
+get their hands on even more powerful laptops, tablets, and smartphones. Software developers could just lay back and wait for Moore's Law to take effect.
 However, constraints such as heat, clock speeds have largely stood still, and the incremental increase of the performance of each individual 
-processor core impede the further acceleration of software execution. In order for developers to compensate with the demand of efficient software, programming paradigms such
-as concurrent programming have become a necessity. However, new challenges arise from concurrent programming since it is harder and more
-error-prone than its sequential counterpart. When programming with multiple execution threads many errors may occur due to the fact the many execution threads 
+processor core impedes the further acceleration of software execution. In order for developers to compensate with the demand for efficient software, programming paradigms such
+as concurrent programming have become a necessity. However, new challenges arise from concurrent programming, since this type of programming is harder and more
+error-prone than its sequential counterpart. When programming with multiple processes/threads many errors may occur due to the fact that the threads
 may access and edit the shared memory or require to execute lines of code excluding other threads.
 
 More specifically, the typical problems with concurrency can be outlined as follows:
-\begin{itemize}
-\item Race condition: A strange interleaving of processes has an unintended effect.
-\item Deadlock: Two or more processes stop and wait for each other.
-\item Livelock: Two or more processes keep executing without making any progress.
-\item Resource starvation: Two or more processes are stuck in circular waiting for the resources
-\end{itemize}
-
-These problems are usually Heisenbugs \cite{Musu08} – they can alter their behavior or completely
-disappear when one tries to isolate them – since they go hand in hand with the order of
+\begin{description}
+\item[Race conditions] A strange interleaving of processes has an unintended effect.
+\item[Deadlocks] Two or more processes stop and wait for each other.
+\item[Livelocks] Two or more processes keep executing without making any progress.
+\item[Resource starvations] Two or more processes are stuck in circular waiting for the resources.
+\end{description}
+What's worse is that these problems are usually Heisenbugs~\cite{Musu08}; i.e., they can alter their behavior or completely
+disappear when one tries to isolate them, since they go hand in hand with the order of
 execution of the processes involved.
 
 \section{Testing and Verification of Concurrent Programs}
 
-Testing and verifying the correctness of a concurrent program can be proved a demanding task. 
-A technique used for the systematic exploration of a program's state space is model checking \cite{WikipediaModelChecking}.
+Testing and verifying the correctness of a concurrent program is a demanding task. 
+A technique for the systematic exploration of a program's state space is model checking~\cite{WikipediaModelChecking}.
 Model checking is a method for formally verifying concurrent systems through specifications about the system expressed as 
-temporal logic formulas and efficient algorithms that can traverse the model defined by the system and check whether
+temporal logic formulas and then employing efficient algorithms that can traverse the model defined by the system and check whether
 the specifications hold. The major problem model checking tools have to face is the combinatorial explosion of the state space since
 a vast number of global states have to be captured and stored. Many techniques have been proposed in order to tackle this problem.
-Stateless model checking, for example, avoids storing global states. This technique has been implemented in tools such as Verisoft \cite{SMC,Gode05}, 
-CHESS \cite{Musu08}, Concuerror \cite{Chri13}, Nidhugg \cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015} and \cite{RCMC}. The observation that two 
+Stateless model checking, for example, avoids storing global states. This technique has been implemented in tools such as Verisoft~\cite{SMC,Gode05}, 
+CHESS~\cite{Musu08}, Concuerror~\cite{Chri13}, Nidhugg~\cite{AbdullaAronisAtigJonssonLeonardssonSagonasSMC2015} and RCMC~\cite{RCMC}. The observation that two 
 interleavings are equivalent if one can be obtained from the other by swapping adjacent, independent execution steps is the core of the partial
 order reduction \cite{Valmari1991, Peled1993, Godefroid1996,POR,JACM} techniques used by many of these tools. Dynamic Partial Order Reduction (DPOR) techniques
-capture dependencies between operations of concurrent threads while the program is running \cite{FlanaganDPOR,JACM}. The exploration begins with an arbitrary interleaving whose steps are then
+capture dependencies between operations of concurrent threads while the program is running~\cite{FlanaganDPOR,JACM}. The exploration begins with an arbitrary interleaving whose steps are then
 used to identify operations and points where alternative interleavings need to
-be explored in order to capture all program behaviors. Another approach is the bounded model checking \cite{BoundedModelChecking} where the finite state
+be explored in order to capture all program behaviors. Another approach is bounded model checking \cite{BoundedModelChecking} where the finite state
 machine is unrolled for a fixed number of steps and the specifications are checked within these steps. Bounded model checking can be combined with the partial
-order reduction for modeling executions \cite{PORinBMC} and was effectively implemented in tools such as CBMC \cite{CBMC},Nidhugg \cite{AbdullaAronisJohnssonSagonasDPOR2014, RCMC}.
-Unfortunately all these techniques still have to deal with the problem of the state space explosion. In order to deal with this problem further
-bounding of the exploration is required. Many different bounding techniques have been examined \cite{Thomson} such as preemption bounding, delay
-bounding, a controlled random scheduler, and probabilistic concurrency testing (PCT).
+order reduction for modeling executions, and has been effectively implemented in tools such as CBMC~\cite{CBMC}, Nidhugg~\cite{AbdullaAronisJohnssonSagonasDPOR2014} and RCMC~\cite{RCMC}.
+Unfortunately, all these techniques still have to deal with the problem of the state space explosion. In order to deal with this problem further
+bounding of the exploration is required. Many different bounding techniques have been examined \cite{Thomson}, such as preemption bounding, delay bounding, a controlled random scheduler, and probabilistic concurrency testing (PCT).
 
 \section{Aim of this Thesis}
 
-The purpose of this thesis is to: 
+The goals of this thesis are to: 
 \begin{itemize}
-   \item Implement a preemption bounding technique \cite{BPOR} for Nidhugg. 
-   \item Examine whether the techniques introduced in \cite{AbdullaAronisJohnssonSagonasDPOR2014} for optimal unbounded dynamic partial order reduction can
-   be used for the implementation of bounded partial order reduction.
-   \item Confirm or disapprove the capability of bounded dynamic partial order reduction to track errors faster than unbounded partial order reduction.
-   \item Examine whether the empirical observation that most concurrency errors can manifest themselves in a small number of preemptions is correct \cite{Musu07}.
-   \item Explore alternative algorithms that can perform bounded partial order reduction.
+\item Implement a preemption bounding technique for DPOR~\cite{BPOR} in the Nidhugg tool. 
+\item Examine whether the Source-DPOR and Optimal-DPOR techniques~\cite{AbdullaAronisJohnssonSagonasDPOR2014} can
+  be enhanced to support an efficient implementation of bounded partial order reduction,
+  preferably one that gives some sort of guarantees.
+\item Confirm or disapprove the ability of bounded dynamic partial order reduction to locate errors faster than unbounded partial order reduction.
+\item Examine whether the empirical observation that most concurrency errors can manifest themselves in a small number of preemptions~\cite{Musu07} is correct.
+\item Explore alternative algorithms that can perform preemption-bounded partial order reduction.
 \end{itemize}
 
 \iffalse
@@ -64,10 +63,10 @@ Moreover, the possible application of various optimizations used for unbounded D
 \fi
 
 \section{Overview}
-In Chapter \ref{Chapter 2} the theoretical background utilized in Nidhugg for both unbounded and bounded DPOR is given.
-In Chapters \ref{unbounded} \ref{bounded} the unbounded DPOR and bounded DPOR algorithms implemented and evaluated are
-described in further detail. In Chapter \ref{implementations} the technical details of the implementations are
+In Chapter \ref{sec:background} we review the theoretical background for both unbounded and bounded DPOR.
+In Chapters \ref{unbounded} and \ref{bounded} the unbounded DPOR and bounded DPOR algorithms implemented and evaluated are
+described in further detail. In Chapter~\ref{implementations} the technical details of the implementations are
 discussed. The evaluation of the each algorithm is given in Chapter \ref{Chapter 4} where the algorithms are tested
-using both synthetic tests and real-world software (RCU). In Chapter \ref{Chapter 5} we present and evaluate an
-alternative approach to the bounding problem. Finally, in Chapter \ref{Chapter 6} we summarize the previous chapters and
-the conclusions we drew from this thesis, and present some possible extensions to our work.
+using both synthetic tests and a code base of significant size (RCU) which is part of the Linux kernel. In Chapter \ref{Chapter 5} we present and evaluate an
+alternative approach to the bounding problem.
+Finally, in Chapter \ref{Chapter 6} we summarize the previous chapters, draw some conclusions, and present some possible extensions to our work.

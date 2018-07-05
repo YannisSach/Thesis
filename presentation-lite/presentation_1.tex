@@ -296,10 +296,9 @@
 \section{Background Knowledge}
 %% \frame{\sectionpage}
 
-\begin{frame}{Concurrent Computing and Problems}
-
-Concurrent Computing: Concurrent computing is a form of computing in which several computations are executed during
-overlapping time periods-concurrently-instead of sequentially (one completing before the next starts).\\
+\begin{frame}{Concurrent Programming}
+\emph{Concurrent Computing} is a form of computing in which several computations are executed during
+overlapping time periods concurrently, instead of sequentially (one completing before the next starts).
 
 Potential problems include:
 \pause
@@ -445,7 +444,7 @@ space reduction.
     
 \begin{definition}[Persistent Sets]
 Let $s$ be a state, and let $W \subseteq E(s)$ be a set
-of execution sequences from $s$. A set $T$ of transitions is a persistent set for $W$
+of execution sequences from $s$. A set $T$ of transitions is a Persistent Set for $W$
 after $s$ if for each prefix $w$ of some sequence in $W$, which contains no occurrence
 of a transition in $T$,  we have $E \vdash t \diamondsuit w$ for each $t \in T$.
 \end{definition}
@@ -454,7 +453,7 @@ of a transition in $T$,  we have $E \vdash t \diamondsuit w$ for each $t \in T$.
 \begin{frame}{Sufficient Sets: Persistent Sets}
 A simple example:
     
-\trace{../img/persistent.pdf}{Construction of persistent sets}
+\trace{../img/persistent.pdf}{Construction of Persistent Sets}
     
 \end{frame}
 
@@ -777,7 +776,7 @@ point. Since Nidhugg-DPOR ignores weak initials it will branch both processes.
 In Source-DPOR only one of the two processes should be branched since they share the same initials. 
 However, in Nidhugg-DPOR this is not true since the $CI$ set does not contain steps from the other process.
 
-\trace{../img/nidhuggpersistent1.pdf}{Construction of persistent sets in Nidhugg when there is a write process}
+\trace{../img/nidhuggpersistent1.pdf}{Construction of Persistent Sets in Nidhugg when there is a write process}
 
 \end{frame}
 
@@ -788,7 +787,7 @@ considered as it does not happen before the second read operation and as result 
 $backtrack$.  We notice that by calculating the $CI$ set when the race between $p$ and $r$ is detected $q$ process will
 be ignored and, thus, $r$ will be added as a branch.
 
-\trace{../img/nidhuggpersistent.pdf}{Construction of persistent sets in Nidhugg when both are read processes}
+\trace{../img/nidhuggpersistent.pdf}{Construction of Persistent Sets in Nidhugg when both are read processes}
     
 \end{frame}
 

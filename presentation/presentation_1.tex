@@ -239,7 +239,7 @@
 
 \title[Short title]{Bounding Techniques for Dynamic Partial Order Reduction} % The short title appears at the bottom of every slide, the full title is only on the title page
 
-\author{Σαχίνογλου Γιάννης} % Your name
+\author{Γιάννης Σαχίνογλου} % Your name
 \institute[NTUA] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
 {
 ΣΗΜΜΥ - ΕΜΠ \\ % Your institution for the title page
@@ -277,10 +277,10 @@
 \section{Background Knowledge}
 
 \subsection{Computational Model}
-\begin{frame}{Concurrent Computing and Problems}
+\begin{frame}{Concurrent Programming}
 
-Concurrent Computing: Concurrent computing is a form of computing in which several computations are executed during
-overlapping time periods-concurrently-instead of sequentially (one completing before the next starts).
+\emph{Concurrent Computing} is a form of computing in which several computations are executed during
+overlapping time periods concurrently, instead of sequentially (one completing before the next starts).
 
 Potential problems include:
 \begin{itemize}
@@ -684,15 +684,15 @@ $\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
 \begin{frame}{Source-DPOR vs Classic-DPOR}
 Similarities:
 \begin{enumerate}
-    \item Consist of the same phases i.e., race detection and exploration
-    \item Both rely on Vector Clocks.
+  \item Consist of the same phases, i.e., race detection and exploration
+  \item Both rely on Vector Clocks.
 \end{enumerate}
 
 Differences:
 
 \begin{enumerate}
-    \item Classic-DPOR ``eager'' i.e., adds more dependencies before scheduling.
-    \item Source-DPOR ``lazy'' i.e., adds branches after scheduling and thus avoids redundant additions.
+  \item Classic-DPOR ``eager'' i.e., adds more dependencies before scheduling.
+  \item Source-DPOR ``lazy'' i.e., adds branches after scheduling and thus avoids redundant additions.
 \end{enumerate}
 
 \end{frame}

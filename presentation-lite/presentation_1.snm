@@ -4,7 +4,7 @@
 \beamer@slide {Examples of Interleavings}{18}
 \beamer@slide {GeneralDPOR}{25}
 \beamer@slide {Source}{26}
-\beamer@slide {Construction of persistent sets}{29}
+\beamer@slide {Construction of Persistent Sets}{29}
 \beamer@slide {Construction of Source Sets}{32}
 \beamer@slide {Example of Sleep Set Optimization}{34}
 \beamer@slide {Example of Blocks and Bound Persistent Sets}{39}
@@ -13,8 +13,8 @@
 \beamer@slide {Naive-BPOR for bound=$0$}{46}
 \beamer@slide {DPORV}{47}
 \beamer@slide {NDPOR}{49}
-\beamer@slide {Construction of persistent sets in Nidhugg when there is a write process}{50}
-\beamer@slide {Construction of persistent sets in Nidhugg when both are read processes}{51}
+\beamer@slide {Construction of Persistent Sets in Nidhugg when there is a write process}{50}
+\beamer@slide {Construction of Persistent Sets in Nidhugg when both are read processes}{51}
 \beamer@slide {Nidhugg BPOR}{52}
 \beamer@slide {Following source sets for conservative branches}{54}
 \beamer@slide {SBPOR}{56}

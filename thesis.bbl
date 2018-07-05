@@ -18,9 +18,13 @@ Parosh~Aziz Abdulla, Stavros Aronis, Mohamed~Faouzi Atig, Bengt Jonsson, Carl
 
 \nbibitem[Abdu17a]{AbdM17}{}{}{}
 Parosh Abdulla, Stavros Aronis, Bengt Jonsson and Konstantinos Sagonas,
-\newblock {\em Comparing Source Sets and Persistent Sets for Partial Order
-  Reduction}, pp.\ 516--536,
-\newblock Springer International Publishing, Cham, 2017.
+\newblock ``Comparing Source Sets and Persistent Sets for Partial Order
+  Reduction'',
+\newblock in Luca Aceto, Giorgio Bacci, Giovanni Bacci, Anna
+  Ing{\'o}lfsd{\'o}ttir, Axel Legay and Radu Mardare, editors, {\em Models,
+  Algorithms, Logics and Tools: Essays Dedicated to Kim Guldstrand Larsen on
+  the Occasion of His 60th Birthday}, pp.\ 516--536, Cham, 2017, Springer
+  International Publishing.
 
 \nbibitem[Abdu17b]{JACM}{}{}{}
 Parosh~Aziz Abdulla, Stavros Aronis, Bengt Jonsson and Konstantinos Sagonas,
@@ -83,10 +87,12 @@ Edmund Clarke, Daniel Kroening and Flavio Lerda,
   Systems}, pp.\ 168--176, Springer, 2004.
 
 \nbibitem[Coon13]{BPOR}{}{}{}
-Katherine~E. Coons, Madan Musuvathi and Kathryn~S McKinley,
+Katherine~E. Coons, Madan Musuvathi and Kathryn~S. McKinley,
 \newblock ``Bounded Partial-Order Reduction'',
-\newblock ACM SIGPLAN Conference on Object-Oriented Programming, Systems,
-  Languages, and Applications (OOPSLA), October 2013.
+\newblock in {\em Proceedings of the 2013 {ACM} {SIGPLAN} International
+  Conference on Object Oriented Programming Systems Languages {\&}
+  Applications}, OOPSLA 2013, pp.\ 833--848, New York, NY, USA, October 2013,
+  ACM.
 
 \nbibitem[Desn09]{MathieuDesnoyersPhD}{}{}{}
 Mathieu Desnoyers,
@@ -119,10 +125,12 @@ Abhinav Duggal,
 \newblock {\em Stopping Data Races Using Redflag},
 \newblock Ph.D.\ thesis, Stony Brook University, 2010.
 
-\nbibitem[Emmi10]{Delay11}{}{}{}
-Michael Emmi, Shaz Qadeer and Zvonimir Rakamaric,
-\newblock ``Delay-Bounded Scheduling'',
-\newblock Technical report, September 2010.
+\nbibitem[Emmi11]{DelayBounded@POPL-11}{}{}{}
+Michael Emmi, Shaz Qadeer and Zvonimir Rakamari\'{c},
+\newblock ``Delay-bounded Scheduling'',
+\newblock in {\em Proceedings of the 38th Annual ACM SIGPLAN-SIGACT Symposium
+  on Principles of Programming Languages}, POPL '11, pp.\ 411--422, New York,
+  NY, USA, 2011, ACM.
 
 \nbibitem[Flan05]{FlanaganDPOR}{}{}{}
 Cormac Flanagan and Patrice Godefroid,
@@ -211,10 +219,11 @@ R.~Kurshan, V.~Levin, M.~Minea, D.~Peled and H.~Yenig{\"u}n,
   Construction and Analysis of Systems}, pp.\ 345--357, Berlin, Heidelberg,
   1998, Springer Berlin Heidelberg.
 
-\nbibitem[Lamp78]{Lamp}{}{}{}
+\nbibitem[Lamp78]{Lamport@CACM-89}{}{}{}
 Leslie Lamport,
 \newblock ``Time, Clocks and the Ordering of Events in a Distributed System'',
-\newblock pp.\ 558--565, July 1978.
+\newblock {\em Communications of the ACM}, vol.~21, no.~7, pp.\ 558--565, July
+  1978.
 
 \nbibitem[Linu]{LinuxKernel}{}{}{}
 ``The Linux kernel''.

@@ -248,109 +248,106 @@ $s$, αλλά μικρότερα επαρκή σύνολα επιτρέπουν 
 Σε αυτή τη διπλωματική εστιάζουμε στα επίμονα σύνολα (persistent sets) και στα πηγαία σύνολα (source sets).
 
 
-\section{Persistent Sets}
+\section{Επίμονα Σύνολα}
 
-A persistent set in a state $s$ is a sufficient set of transitions to
-explore from $s$ while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
-sets explores a persistent set of transitions from each state $s$ where $enabled(s) \neq \emptyset$ and prunes enabled transitions that
-are not persistent in s.
-In a more formal way:\\
-
-\begin{definition}{(Persistent Sets)}
-Let $s$ be a state, and let $W \subseteq E(s)$ be a set
-of execution sequences from $s$. A set $T$ of transitions is a persistent set for $W$
-after $s$ if for each prefix $w$ of some sequence in $W$, which contains no occurrence
-of a transition in $T$,  we have $E \vdash t \diamondsuit w$ for each $t \in T$.
+\begin{definition}{(Επίμονα Σύνολα - Persistent Sets)}
+Έστω $s$ ένα state, και έτσω $W \subseteq E(s)$ ένα σύνολο από ακολουθίες εκτέλεσης από το 
+$s$. Ένα σύνολο $T$ μεταβάσεων είναι επίμονο σύνολο για το $W$
+μετά το $s$ αν για κάθε πρόθεμα του $w$ από κάποιες ακολουθίες στο $W$, οι οποίες δεν πειρέχουν εμφανίσεις από μεταβάσεις στο 
+$T$,  έχουμε ότι $E \vdash t \diamondsuit w$ για κάθε $t \in T$.
 \end{definition}
 
-The above definition can be described as follows: If $t \in T$ and there is another thread $t'$ that can be executed until a command which
-is in a race with $t$, then $t'$ belongs in the persistent set.
+Ο παραπάνω ορισμό μπορεί να περιγραφέι και ώς εξής: Αν $t \in T$ και δεν υπάρχει άλλο thread $t'$ το οποίο μπορεί να εκτελεσθεί μέχρι μια εντολή η οποία βρίσκεται σε συναγωνισμό
+με το $t$, τότε το $t'$ ανήκει στο επίμονο σύνολο.
 
-Notice that the definition of persistent sets suggests a way to construct them.
+Πρέπει να σημειώσουμε ότι αυτός ορισμός προτείναι και ένα τρόπο κατασκευής του.
 
-In Figure \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
-In the first, let a concurrent program contain 3 threads $p$, $q$, and $r$. Thread $p$ changes the value of the variable (writer) and the other ($q$ and $r$) just read this variable (readers).
-Let $p.q.q.r.r$ be an interleaving. According to the definition of the persistent sets, $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
-of the first command of the interleaving. In Figure \ref{Construction of persistent sets} we notice that both $r$ and $q$ threads are added to the persistent set of the first
-command of the trace since both conflict with the write operation. 
-In the second example, let $p$ and $r$  be a readers and $q$ be a writer. We notice that both $r$ and $q$ are added. However, there is no conflict between $p$ and $r$ since both $p$ and $r$
-just read the variable $x$. The reason why the thread $r$ is added is the conflict that will be produced by the $q$'s write operation.
+Στο Figure \ref{Construction of persistent sets} παρουσιάζονται δύο διαφορετικά παραδείγματα κατασκευής επίμονων συνόλων. Συμβολίζουμε το επίμονο σύνολο από διακλαδώσεις που μπορεί 
+να πάρει η εκτέλεση με $BR{}$.
+Στο πϱώτο παράδειγμα, έστω ένα concurrent program που περιέχει 3 threads $p$, $q$, και $r$. Το thread $p$ μεταβάλλει την τιμή της μεταβλητής(writer) και τα άλλα ($q$ και $r$) απλά διαβάζουν την τιμή αυτών των μεταβλητών (readers).
+Έστω $p.q.q.r.r$ ένα interleaving. Σύμφωνα με τον ορισμό των επίμονων συνόλων, τα $q$ και $r$ συναγωνίζονται με το $p$, επομένως, τα $q$ και $r$ πρέπει να ανήκουν και αυτά
+στο επίμονο σύνολο.
+Στο Figure \ref{Construction of persistent sets} παρατηρούμε ότι και το $r$ και το $q$ thread προστίθενται στο επίμονο σύνολο της πρώτης εντολής καθώς και τα δύο έχουν conflict 
+με το write operation.
+Στο δεύτερο παράδειγμα, έστω τα $p$ και $r$ είναι αναγνώστες και $q$ είναι εγγραφέας. Παρατηρούμε ότι και το $r$ και το $q$ προστίθενται. Παρολ᾽ αυτά δεν υπάρχει conflict μεταξύ των 
+$p$ και $r$ καθώς και τα δύο είναι αναγνώστες της μεταβλητής 
+$x$. Ο λόγος είναι ότι το thread $r$ έχει conflict που προκύπτει από την έγγραφή που θα εκτελέσει το $q$.
 
 \trace{persistent.pdf}{Construction of persistent sets}
 
-\section{Source Sets}
+\section{Πηγαία Σύνολα - Source Sets}
 
-Before defining source sets, we have to give some more useful definitions.
+Πριν δώσουμε των ορισμό των πηγαίων συνόλων (source sets), πρέπει να δώσουμε κάποιους άλλους χρήσιμους ορισμούς.
 
 \begin{definition}{($dom(E)$)}
-    The set of events-transitions happening during the scheduling of $E$.
+    Το σύνολο των μεταβάσεων που συμβαίνει σε μια δρομολόγηση του $E$.
 \end{definition}
 
-\begin{definition}{(Initials after an execution sequence $E.w$, $I_{[E]}(w)$)}
-For an execution sequence $E.w$, let $I_{[E]}(w)$ denote the set of
-processes that perform events $e$ in $dom_{[E]}(w)$ that have no
-“happens-before” predecessors in $dom_{[E]}(w)$. More formally,
-$p \in I_{[E]}(w)$ if $p \in w$ and there is no other event $e \in dom_{[E]}(w)$ with
+\begin{definition}{(Initials μιας ακολουθίας εκτέλεσης $E.w$, $I_{[E]}(w)$)}
+Για μια ακολουθία εκτέλεσής $E.w$, έστω ότι το $I_{[E]}(w)$ συμβολίζει το σύνολων των διεργασιών που προκαλούν ένα γεγονός 
+$e$ στο $dom_{[E]}(w)$ τα οποία δεν έχουν
+“happens-before” πρόγονο στο $dom_{[E]}(w)$. Πιο τυπικά,
+$p \in I_{[E]}(w)$ αν $p \in w$ και δεν υπάρχει άλλο γεγονός $e \in dom_{[E]}(w)$ για το οποίο ισχύει
 $e \rightarrow_{E.w} next_{[E]}(p)$.
 \end{definition}
 
-By relaxing the definition of Initials we can get the definition of Weak Initials, $WI$.
+Χαλαρώνοντας τον ορισμό για τα Initials παίρνουμε τον ορισμό των Weak Initials, $WI$.
 
-\begin{definition}{(Weak Initials after an execution sequence $E.w$, $WI_{[E]}(w)$)}
-For an execution sequence $E.w$, let $WI_{[E]}(w)$ denote the union of $I_{[E]}(w)$ and the set of
-processes that perform events $p$ such that $p \in enabled(s_{[E]}) $.
+\begin{definition}{(Weak Initials μετά από μια ακολουθία εκτέλεσης $E.w$, $WI_{[E]}(w)$)}
+Για μια ακολουθία εκτέλεσης $E.w$, έστω ότι $WI_{[E]}(w)$ είναι η ένωση των $I_{[E]}(w)$ με το σύνολο των διεργασιών που μπορούν να εκτελέσουν μια εντολή δηλαδή
+αν $p \in enabled(s_{[E]}) $.
 \end{definition}
 
-The point of these concepts is that for an execution sequence $E.w$:
+Το νόημα αυτών των δύο εννοιών για μια ακολουία $E.w$ είναι το εξής:
 \begin{itemize}
-    \item  $p \in I_{[E]}(w)$ iff there is a sequence $w'$ such that $E.w \simeq E.p.w'$, and
-    \item  $p \in WI_{[E]}(w)$ iff there are sequences $w'$ and $v$ such that $E.w.v \simeq E.p.w'$.
+    \item  $p \in I_{[E]}(w)$ ανν υπάρχει μια ακολουθία $w'$ τέτοια ώστε $E.w \simeq E.p.w'$, και
+    \item  $p \in WI_{[E]}(w)$ ανν υπάρχει μια ακολουθία $w'$ και $v$ τέτοια ώστε $E.w.v \simeq E.p.w'$.
 \end{itemize}
 
-\begin{definition}{(Source Sets)}
-Let $E$ be an execution sequence,
-and let $W$ be a set of sequences, such that $E.w$ is an execution
-sequence for each $w \in W$. A set $T$ of processes is a source set for
-$W$ after $E$ if for each $w \in W$ we have $WI_{[E]}(w) \cap P  = \emptyset$.
+\begin{definition}{(Πηγαία Σύνολα - Source Sets)}
+Έστω $E$ μια ακολουθία εκτέλεσης,
+και έστω $W$ ένα σύνολο από ακολουθίες, τέτοιο ώστε $E.w$ είναι μια ακολουθία
+για κάθε $w \in W$. Το σύνολο $T$ των διεργασιών είναι πηγαίο σύνολο του 
+$W$ μετά το $E$ αν για κάθε $w \in W$ έχουμε ότι $WI_{[E]}(w) \cap P  = \emptyset$.
 \end{definition}
 
-A source set is a set of threads that guarantee that the whole state space will be explored. 
-Notice that their is no requirement related to the races of the events.
-What the above definition implies is that source can be considered every set of threads that contains these threads 
-that are able to cover the whole state-space.
-In fact, it suggests a property for the sufficient sets to hold.
+Το πηγαίο σύνολο είναι ένα σύνολο από threads το οποίο μας εγγυάται ότι όλος ο χώρος καταστάσεων θα εξερευνηθεί.
+Είναι σημαντικό να παρατηρήσουμε ότι τα πηγαία σύνολα δε συνδέονται με συναγωνισμό μεταξύ γεγονότων
+Αυτό που υπονοεί ο ορισμός είναι ότι πηγαίο σύνολο πρέπει να θεωρείαι κάθε σύνολο από νήματα που περιέχει αυτά τα threads
+που μπορούν να καλύψουν όλο το χώρο καταστάσεων
+Στην πραγματικότητα ο ορισμός δίνει μια ιδιότητα για τα επαρκή σύνολα.
 
-\section{Sleep Sets}
+\section{Κοιμώμενα Σύνολα - Sleep Sets}
 
-Another technique complementary to the persistent or source sets aiming to reduce the number of interleavings is the sleep set technique.
-Sleep sets prohibit visited transitions from executing again
-until the search explores a dependent transition. Assume that
-the search explores transition $t$ from state $s$, backtracks $t$,
-then explores $t_0$ from $s$ instead. Unless the search explores
-a transition that is dependent with $t$, no states are reachable
-via $t_0$ that were not already reachable via $t$ from s. Thus, $t$
-“sleeps” unless a dependent transition is explored.
+Μια ακόμα τεχνική συμπληρωματική με τα επίμονα και τα πηγαία σύνολα που στοχεύει να μειώσει την εξερεύνηση περιττών interleavings είναι η τεχνική των κοιμώμενων συνόλων (Sleep Sets)
+Τα sleep sets εμποδίζουν μια είδη χρησιμοποιημένη μετάβαση να ξαναχρησιμοποιηθεί μέχρι η εξερεύνηση να φτάσει σε μια μετάβαση που έχει εξάρτηση από τη μετάβαση που βρίσκεται
+ήδη στο sleep set.
+Ας υποθέσουμε ότι η εξερεύνηση χρησιμοποιεί μια μετάβαση 
+$t$ από ένα state $s$, προσθέτει στο backtrack $t$,
+και στη συνέχεια εξευρευνά το  $t_0$ από $s$. Μέχρι η αναζήτηση συναντήσει μια μετάβαση που είναι που είναι σε συναγωνισμό με το 
+$t$, κανένα state δεν είναι προσβάσιμο μέσω του
+$t_0$ που δεν θα ήταν ήδη προσβάσιμες μέσω του $t$ από το s. Επομένως, το $t$
+“κοιμάται” μέχρι μια μετάβαση με συναγωνισμό εξερευνηθεί.
 
-A short example on sleep sets is the following:
-Let the concurrent program of one writer (w1) and two readers (r1,r2).
-let w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) and r2 <0.2>: (local operations), r(x).
+Ένα μικρό παράδειγμα είναι αυτό που ακολουθεί:
+Έστω ένα concurrent πρόγραμμα που αποτελείται από έναν εγγραφέα (w1) και δύο αναγνώστες (r1,r2).
+Έστω w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) και r2 <0.2>: (local operations), r(x).
 
-The resulted traces are demonstrated in the Listing \ref{Sleep set example}. Notice that whenever a process executes a command 
-which is in race with some command of another process and the latter process is ``sleeping'', it wakes up. 
-As we can infer from the execution of the DPOR algorithm the interleaving which started from r2 was blocked since it would lead to an interleaving which
-has already been explored. Notice that this is due to the fact that r1 cannot ``wake up'' since its first transition (local operations) does not conflict with any other transition
-in the program. 
+Το trace που παίρνουμε σαν αποτέλεσμα φαίνεται στο Listing \ref{Sleep set example}. Ας σημειωθεί ότι όποτε μια διεργασία εκτελεί μια εντολή
+η οποία βρίσκεται σε συναγωνισμό με μια εντολή απο άλλη διεργασία η οποία ``κοιμάται'', ξυπνάει. 
+Όπως μπορούμε να συμπεράνουμε από την εκτέλεση του DPOR το interleaving που ξεκίνησε από το r2 μπλόκαρε καθώς θα οδηγούσε σε ένα interleaving το οποίο έχουμε ήδη εξερευνήσει.
+Ας σημειώσουμε ότι λόγω του ότι το r1 δεν ``ξυπνάει'' καθώς η πρώτη μετάβαση (local operations) δεν έχει conflict με κάποια άλλη μετάβαση.
 
-It can be proved \cite{Godefroid1996} that sleeps will eventually block all the redundant interleavings and thus the only interleavings that will be explored till their end (where all threads that could be executed, have been executed).
-As a result an optimal algorithm should be able to not consider these interleavings whatsoever.
+Αποδεικνύεται \cite{Godefroid1996} ότι τα sleep sets μπορούν να μπλοκάρουν κάθε περιττή μετάβαση και επομένως μονο κατάλληλα interleavings θα εξερευνηθούν μέχρι το τέλος.
+
 
 \Output{./code/sleep_sets.out}{Sleep set example}
 
-\section{Comparing Persistent Sets with Source Sets}
+\section{Σύγκριση Persistent Sets με Source Sets}
 
-Note that the definition of source sets is much more relaxed than the definition of the persistent sets. 
-This relaxation enables the source sets to be much more efficient than the persistent sets. In Figure \ref{Non-minimal persistent sets}
-an example is given were source sets and persistent sets differ.
+Ας σημειωθεί ότι ο ορισμός των source sets είναι πολύ πιο χαλαρός από τον αντίστοιχ των persistent sets. 
+Αυτή η χαλάρωση επιτρέπει στα source sets να είναι πολύ πιο αποδοτικά από τα persistent sets. Στο Figure \ref{Non-minimal persistent sets}
+ένα παράδειγμαα δίνεται που δείχνει τη διαφορά των δύο.
 
 \begin{figure*}
     \begin{lstlisting}[frame=none,numbers=none]
@@ -384,56 +381,48 @@ an example is given were source sets and persistent sets differ.
       \label{Non-minimal persistent sets}
   \end{figure*}
 
-From the example, it is clear that the reason why source sets are an improvement over persistent sets is the fact that minimum source sets can eliminate
-sleep set blocked traces i.e., traces that would eventually be blocked by the sleep sets. An algorithm that would only calculate minimal source sets would be optimal \cite{AbdullaAronisJohnssonSagonasDPOR2014}, hence
-would never explore two equivalent interleavings.
+Από το παράδειγμα, είναι σαφές ότι ο λόγος που τα source sets είναι καλύτερα από τα persistent sets είναι το γεγονό ότι τα minimum source μπορούν να εξαλείψουν τελείως
+sleep set blocked traces δηλαδή traces που θα μπλοκάρονταν από τα sleep sets. Ένας αλγόριθμος που θα μπορούσε να υπολογίσει minimal source sets θα ήταν βέλτιστος \cite{AbdullaAronisJohnssonSagonasDPOR2014}, και επομένως δε θα εξερευνούσε ποτέ περιττά interleavings.
 
-It is obvious that a single transition cannot be a source set. For
-instance, the set $\{ p_1 \}$ does not contain the initials of execution $q_1.q_2.p_1.r_1.r_2$,
-since q2 and p1 perform conflicting accesses. On the other hand, any subset
-containing two enabled transitions is a source set. To see this, let us choose
-$\{p_1, q_1 \}$ as the source set. Obviously, $\{p1, q1 \}$ contains an initial of any execution
-that starts with either $p_1$ or $q_1$. Any execution sequence which starts with $r_1$ is
-equivalent to an execution obtained by moving the first step of either $p_1$ or $q_1$ to
-the beginning:
+Είναι προφανές ότι μια μόνο μετάβαση δεν μπορει να είναι source set. Για παράδειγμα,
+το σύνολο $\{ p_1 \}$ δεν περιέχει initials της εκτέλεσης $q_1.q_2.p_1.r_1.r_2$,
+καθώς τα q2 και p1 εκτελούν conflicting accesses. Από την άλλη μεριά, κάθε υποσύνολο
+που περιέχει δύο enabled μεταβάσεις είναι source set. Για να το δούμε αυτό ας διαλέξουμε το
+$\{p_1, q_1 \}$ ως source set. Προφανώς, το $\{p1, q1 \}$ περιέχει ένα initial για κάθε εκτέλεση
+που ξεκινά είτε με το $p_1$ ή το $q_1$. Κάθε εκτέλεση που ξεκινά με το $r_1$ είναι 
+ισοδύναμη με την εκτέλεση που παίρνουμε αν θέσουμε ώς πρώτο βήμα είτε το $p_1$ ή το $q_1$:
+
 \begin{itemize}
-\item If $q_1$ occurs before $r_2$, then $q_1$ is an initial, since it does not conflict with
-any other transition.
-\item If $q_1$ occurs after $r_2$, then $p_1$ is independent of all steps, so $p_1$ is an initial.
-We claim that $\{p_1, q_1 \}$ cannot be a persistent set. The reason is that the execution
-sequence $\{r_1.r_2 \}$ does not contain any transition in the persistent set, but its second
-step is dependent with $q_1$. By symmetry, it follows that no other two-transition
-set can be a persistent set.
+\item Αν το $q_1$ συμβεί πριν το $r_2$, τότε το $q_1$ είναι initial, καθώς δεν έχει conflict
+με κάποια άλλη μετάβαση.
+\item Αν το $q_1$ συμβαίνει πριν το $r_2$, τότε το $p_1$ είναι ανεξάρτητο από όλα τα βήματα και $p_1$ είναι initial.
+Ισχυριζόμαστε ότι το $\{p_1, q_1 \}$ δεν μπορεί να είναι persistent set. Ο λόγος είναι ότι η εκτέλεση $\{r_1.r_2 \}$ δεν περιέχει καμία μετάβαση που να είναι
+στο persistent set, αλλά το βήμα είναι εξαρτόμενο από το $q_1$. 
 \end{itemize}
 
-In other words, persistent sets have the unpleasant property that adding a process
-may disturb the persistent set so that even more process may have to be added.
-This property is relevant in the context of DPOR, where the first member of the
-persistent set is often chosen rather arbitrarily (it is the next process in the first
-exploration after $E$), and where the persistent set is expanded by need.
+Με άλλα λόγια, τα persistent sets έχουν τη δυσάρεστη ιδιότητα όταν προσθέτουμε μία διεργασία στο
+persistent set να προστίθενται επιπλέον διεργασίες.
 
-Continuing the comparison between source sets and persistent sets, we first
-note some rather direct properties, including the following.
+Συνεχίζοντας τη σύγκρισή μεταξύ source sets και persistent sets, 
+πρέπει να σημειώσουμε δύο ιδιότητες.
 
 \begin{itemize}
-\item Any persistent set is a source set.
-\item Any one-process source set is a persistent set.
+\item Κάθε persistent set είναι source set.
+\item Κάθε one-process source είναι persistent set.
 \end{itemize}
 
 
-\section{Bounded Search and Preemption Bounding}
+\section{Bounded Search και Preemption Bounding}
 
-Bounded search explores only executions that do not exceed
-a bound \cite{BPOR,Thomson}. The bound may be any property of a
-sequence of transitions. A bound evaluation function $B_v(E)$
-computes the bounded value for a sequence of transitions $E$.
-A bound evaluation function $B_v$ and bound $c$ are inputs to
-bounded search. Bounded search may not visit all relevant
-reachable states; it visits only those that are reachable within
-the bound. If a search explores all relevant states reachable
-within the bound, then it provides bounded coverage.
+Η περιορισμένη αναζήτηση - bounded search εξερευνά μόνο εκτελέσεις που δεν ξεπερνούν κάποιο όριο \cite{BPOR,Thomson}. 
+Το όριο μπορεί να είναι μια ιδιότητα της ακολουθίας.
+Μια συνάρτηση υπολογισμού του ορίου $B_v(E)$
+δίνει μια τιμή σε μια ακολουθία $E$.
+Η συνάρτηση υπολογισμού $B_v$ και το όριο $c$ είναι είσοδη στην περιορισμένη αναζήτηση.
+Προφανώς το bounded search μπορεί να μην έχει πρόσβαση σε όλα τα προσβάσιμα states της unbounded αναζήτησης.
+Αντίθετα επισκέπτεται μόνο states που είναι προσβάσιμα μέσα στο bound.
 
-An algorithm that could describe a bounded search would be the following:
+Ένας αλγόριθμος που περιγράφει το bounded search θα ήταν ο ακόλουθος:
 
 \begin{algorithm}[H]
     \caption{Bounded-DPOR}
@@ -449,16 +438,16 @@ An algorithm that could describe a bounded search would be the following:
     }
 \end{algorithm}
 
-\noindent The only difference between the unbounded and the bounded version of the algorithm is the if-statement on line 4 which allows for an interleaving to be explored
-only if the bound has not been exceeded.
+\noindent Η μόνη διαφορά μεταξύ unbounded και bounded εκδοχής είναι το if-statement στη γραμμή 4 που επιτρέπει την εξερεύνηση interleaving μόνο αν το bound δεν έχει 
+ξεπεραστεί.
 
-What is needed next is an appropriate definition of the function $B_v$ that calculates a value that the bounded-DPOR tries to keep bounded, 
-and the sufficient set. 
+Το μόνο που μένει είναι ο ορισμός μια κατάλληλης $B_v$ που υπολογίζει την τιμή που ο bounded-DPOR προσπαθεί να κρατήσει κάτω από ένα όριο καθώς και το 
+sufficient set.
 
-In this thesis, we mainly focus on preemption-bounded search. 
+Σε αυτή τη διπλωματική μας απασχολεί το preemption-bounded search.
 
-Preemption-bounded search limits the number of preemptive context switches that occur in an execution \cite{Musu07}. The 
-preemption bound is defined recursively as follows.
+Το preemption-bounded search περιορίζει τον αριθμό των preemptive context switches που συμβαίνουν σε μια εκτέλεση \cite{Musu07}. Το
+preemption bound δίνεται ανααδρομικά από τον ακόλουθο τύπο. 
 
 \begin{definition}{(Preemption bound)}
 \\
@@ -471,15 +460,14 @@ $P_b(E.t) =
 $\\
 \end{definition}
 
-The previous definition describes what a preemptive context switch is. A preemptive context switch happens when the previously running thread could execute
-its next step but it does not due to the scheduling of another thread. Hence, a preemptive switch will increase the preemption bound.
+Ο ορισμός περιγράφει τί είναι ένα preemptive context switch. Preemptive context switch έχουμε όταν ένα thread που έτρεχε σταματήσει για να εκτελεστεί ένα άλλο
 
 \section{Preemption Bounded Persistent Sets}
 
-A set that has been proposed as a sufficient for preemption bounded search is the preemption bounded persistent set \cite{BPOR}.
+Ένα σύνολο που έχει προταθεί ως sufficient για preemption bounded search είναι το preemption bounded persistent set \cite{BPOR}.
 
-An important observation is that the execution of a thread until it gets blocked or terminates will not increase
-the bound count.
+Μια σημαντική παρατήρηση που πρέπει να κάνουμε είναι ότι ένα thread που μπλοκάρει είν τερματίζει δε θα αυξήσει το  count.
+
 \begin{definition}{($ext(s,t)$)}
     Given a state $s = final(E)$ and a transition $t \in enabled(s)$,
     $ext(s,t)$ returns the unique sequence of transitions $\beta$ from $s$
@@ -490,16 +478,15 @@ the bound count.
     \end{enumerate}
 \end{definition}
 
-Next, we need to define preemption bounded persistent sets. We denote with $A_G(P_b,c)$ the generic 
-bounded state space with bound function $P_b$ and bound $c$. $last(a)$ denotes the last execution step of
-an execution sequence $a$
+Στη συνέχει ορίζουμε τα preemption bounded persistent sets. Συμβολίζουμε με $A_G(P_b,c)$ Το generic 
+bounded state space την  bound function με $P_b$ και το bound με $c$. Το $last(a)$ συμβολίζει το τελευταίο βήμα εκτέλεσης της ακολουθίας $a$.
 
 \begin{definition}{(Preemption bounded persistent set)}
 
-A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(e)$
-is preemption-bound persistent in $s$ iff for all nonempty
-sequences $a$ of transitions from $s$ in $A_G(P_b,c)$ such that
-$\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
+Ένα σύνολο $T \subseteq \mathcal{T}$ από δυνατές μεταβάσεις στο state $s=final(e)$
+είναι preemption-bound persistent στο $s$ ανν για κάθε μη κενή ακολουθία
+$a$ απο μεταβάσεις από $s$ στο $A_G(P_b,c)$ τέτοιο ώστε 
+$\forall i \in dom(a), a_i \notin T$ για κάθε $t \in T$ ,
 
 \begin{enumerate}
 \item $Pb(E.t) \leq Pb(E.a_1)$
@@ -509,19 +496,18 @@ $\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
 
 \end{definition}
 
-When dealing with preemption bounded DPOR it is useful to introduce the idea of blocks in an execution sequence.
+Όταν έχουμε να κάνουμε με preemption bounded DPOR είναι χρήσιμο να εισάγουμε την έννοια του block μιας ακολουθίας.
 
-\begin{definition}{(Block of execution sequence)}
-    Block in an execution sequence is the maximal subsequence of execution steps that consists of execution steps of the same thread.
+\begin{definition}{(Block μια ακολουθίας εκτέλεσης)}
+    Block μιας ακολουθίας εκτέλεσης είναι κάθε κομματι της ακολουθίας που αποτελείται από εκτελέσεις του ίδου thread.
 \end{definition}
 
-In the Figure \ref{Example of blocks} there are three blocks. The first block is coloured with yellow, the second with green and the third with blue.
+Στο Figure \ref{Example of blocks} υπάρχουν τρία blocks. Το πρώτο block είναι το κίτρινο, το δεύτερο το πράσινο και το τρίτο το μπλέ.
 
 \trace{blocks.pdf}{Example of blocks}
 
-Let $P$ be persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
-threads that would be added in a block that would be created when $p$ was scheduled. These threads are called conservative threads and their 
-goal is to allow the coverage of interleavings that would not exceed the bound. Notice that an interleaving can be both conservative and non-conservative.
-Preemption bounded persistent sets extend a persistent set by adding all the threads that will create a new block
-after the block that will be created by the persistent set.
+Έστω $P$ ένα persistent set. Preemption bounded persistent set είναι ένα σύνολο που περιέχει όλα τα $p \in P$ με την προσθήκε όλων των
+threads που θα προστιθεντο στο block που θα δημιουργούνταν όταν το $p$ δρομολογούνταν. Αυτές οι διακλαδώσεις ονομάζοντια συντηρητικές (conservative) και ο στόχος τους είναι 
+να επιτρέψουν την ανακάλυψη interleaving που δεν ξεπερνούν το bound. Σημειώστε ότι μια διακλάδωση μπορεί να είναι και conservative και non-conservative.
+Τα preemption bounded persistent sets επεκτείνουν τα persistent set βαζοντας όλα τα threads που θα δημιουργήσουν καινουρια block στη συνέχεια.
 

@@ -1,0 +1,527 @@
+\chapter{Θεωρητικό Υπόβαθρο}
+\label{sec:background}
+
+\section{Ταυτόχρονος Προγραμματισμός}
+
+Ο ταυτόχρονος υπολογοσιμός που υλοποιείται με το πρότυπο του ταυτόχρονου προγραμματισμού είναι μια μορφή υπολογισμού όπου ξεχωριστές υπολογιστικές μονάδες εκτελούν υπολογισμούς
+σε επικαλυπτόμενα χρονικά διαστήματα αντί ν ατου εκτελούν ακολουθιακά (ένας υπολογισμός τερματιζεί πριν να αρχίσει ένας άλλος).
+Το προηγοόυμεν μπορεί να είναι μια ιδιότητα ενός συστήματος, ενός προγράμματος, ενός υπολογιστή ή ακόμα κι ενός δικτύου. 
+Σε ένα concurrent σύστημα ένας υπολογισμός μπορεί να προχωρήσει χωρίς να περιμένει κάποιον προηγούμενο να ολοκληρωθεί. 
+Η βασική πρόκληση στο σχεδιασμό ενός τέτοιου συστήματος είναι το  concurrency control: δήλαδη η διασφάληση της σωστής αλληλουχίας των υπολογισμών, η αλληλεπίδραση
+ή η επικοινωνία μεταξύ των διαφορετικών υπολογιστικών μονάδων και ο συντονισμός στην πρόσβαση σε πόρους που μοιράζονται μεταξύ των διαφόρων υπολογισμών.
+Στα πιθανά προβλήματα περιλαμβάνονται τα race conditions, deadlocks, livelocks και resource starvation.
+Ο δρομολογιτής είναι συνήθως υπεύθυνος για την εκετέλεση ένος νήματος. Λόγω του μη ντετερμινισμού ο προγραμματιστής δεν μπορεί πάντοτε να είναι σε θέση να γνωρίζει ποιο νήμα
+θα δρομολογηθεί στη συνέχεια.
+
+Μια σημαντική ιδέα στον ταυτόχρονο προγραμματισμμό είναι η ιδέα του συνόλου των interleaving δηλαδή του συνόλου όλων την δυνατών εκτελέσεων που μπορεί να ακολουθήσει ένα πρόγραμμα.
+Διαισθητικά, αν φανταστούμε μια διεργασία (πιθανότατα απειρή) ώς μια ακολουθία απο statetements (που μπορεί να έχουν προκύψει από την ``ξεδίπλωση᾽᾽ βρόχων ή  loop unfolding),
+τοτε το σύνολο όλων των δυνατών interleaving των διεργασιών αποτελείται από όλες της δυνατές ακολουθίες από αυτά τα statements.
+
+Όπως μπορούμε να συμπεράνουμε η αποσφαλμάτωση (debugging) τέτοιων προγραμμάτων μπορεί να γίνει πάρα πολύ δύσκολη. Η πρόκληση προκύπτει κυρίως από το γεγονός ότι δεν είναι πάντα
+ξεκάθαρο ποιο νήμα ή διεργασία θα εκτελεστεί. Επιπλέον τα σφάλματα δεν εμφανίζονται πάντα κατα τη διάρκει του debugging καθώς μόνο ένας πολύ μικρός αριθμός από interleavings μπορεί
+να οδηγεί στην εκδήλωση του σφάλματαος.
+
+\section{Σφάλματα στο Μοντέλο του Ταυτοχρονισμού (Concurrency Errors)}
+Σε αυτό το σημείο είναι σημαντικό να εισάγουμε την έννοια του concurrency error και να εξηγήσουμε πως αυτό διαφέρει από τα υπόλοιπα σφάλματα.
+
+\begin{definition}{(Concurrency Error)}
+   Ένα concurrency error είναι ένα σφάλμα που προκύπτει από τον μη ντετερμινισμό του δρομολογητή. 
+\end{definition}
+
+Ένα παράδειγμα προγράμματος που περιέχει concurrency error δίνεται στο Listing \ref{Example of concurrency error}. 
+Σε αυτό το πρόγραμμα η μεταβλητή $x$ ισούται με 1 στην αρχή της εκτέλεσης του προγράμματος. Παρολ᾽ αυτά, αν το thread $zero$ δρομολογηθεί πριν το thread $divider$ 
+μια διαίρεση με το μηδέν θα λάβει χώρα. Από την άλλη μεριά μια απλή διαίρεση με το 0 δεν μπορεί να θεωρηθεί concurrency error σε μια περίπτωση όπως φαίνεται στο 
+Listing \ref{Example of non-concurrency error} όπου η διαίρεση με το μηδέν θα γίνει χωρίς την παρέμβαση του δρομολογητή.
+%
+\Code{./code/zero.c}{Example of non-concurrency error}
+%
+\Code{./code/zeroconc.c}{Example of concurrency error}
+
+\section{Δοκιμή, Model Checking και Επαλήθευση}
+
+To Dynamic software model checking είναι μια μορφή συστηματικού testing που είναι εφαρμόσιμο σε βιομηχανικού μεγέθους λογισμικό.
+Πολλά εργαλεία έχουν αναπτυχθεί τις τελευταίες δεκαετίες που χρησιμοποιούν αυτή την τεχνική με στόχο concurrent και data-driven software. 
+Το model checking είναι πιο απαιτητικό υπολογιστικά από το παραδοσιακό software testing καθώς προσφέρει μεγαλύτερη 
+κάλυψη (coverage) του προγράμματος. Παρολ᾽ αυτά είναι φθηνότερος από γενικότερες μορφές επαληθευσης όπως το interactive theorem
+proving, το οποίο προσφέρει πολύ μεγαλύτερες εγγυήσεις.
+Επομένως, το  dynamic software model checking προσφέρει μια ελκυστική πρακτική που μπορεί να συγκεράσει ως ένα βαθμό το testing και formal verification. 
+
+Το γράφημα που δίνεται στο  Figure \ref{Comparing Testing, Model Checking and Verification} \cite{TestingvsVerification} παρουσιάζει με πολύ σωστό τρόπο
+τις διαφορές μεταξύ testing, model checking και verification.
+
+\trace{testmodver.png}{Comparing Testing, Model Checking and Verification}
+
+\section{Stateless Model Checking και Partial Order Reduction}
+
+Προκειμένου να βρούμε σφάλματα σε  concurrent προγράμματα, πρέπει να ελέγξουμε όλα τα δυνατά interleaving, (όλους τους δυνατούς τρόπους που ένα πρόγραμμα μπορεί να εκτελεστεί)
+που το πρόγραμμα μπορεί να παράξει. Συνήθως αυτά τα λάθη προκύπτον υπό συγκεκριμένες συνϑήκες τις οποίες ο προγραμματιστής δεν έλαβε υποψιν, κάνοντας τον εντοπισμό και
+διόρθωσή τους πολύ δύσκολες.
+Το Stateless model checking βασίζεται στην ιδέα της οδήγησης του προγράμματος σε όλα τα δυνατά interleavings. Δυστυχώς αυτή η προσέγγιση υποφέρει από το state explosion,
+δηλαδή ο αριθμός όλων των δυνατών interleavings αυξάνει εκθετικά σε σύγκριση με το μέγεθος του προγράμματος και τον αριθμό τον νημάτων ή διεργασιών.
+Πολλές προσεγγίσεις έχουν προταθεί προκειμένου να λύσουνν το συγκεκριμένο πρόβλημα όπως το partial order reduction \cite{Godefroid1996} και οι τεχνικές περιορισμού-οριοθέτησης
+(bounding techniques) \cite{BPOR}. 
+
+Το Partial order reduction στοχεύει την μείωση του αριθμου των interleavings που εξερευνώνται με την εξάλειψη ισοδύναμων interleavings.
+Κάθε interleaving μπορεί να παρουσιαστεί σαν ένα ίχνος (trace).
+Αυτά τα ισοδύναμα ίχνη παράγονται από την αντιστροφή ανεξάρτητων γεγονότων τα οποία δεν επηρεάζουν το αποτέλεσμα του προγράμματος. Για παράδειγαμ η δρομολογήση δύο νημάτων τα οποία
+διαβάζουν μια τοπική μεταβλητή (local variable) μπορεί να αντιστραφεί καθώς το αποτέλεσμα αυτών των ενεργειών δεν επηρεάζεται από τη σειρά που αυτές θα γίνουν.
+Υπάρχουν δύο τρόπου με του οποίους μπορούμε να κάνουμε partial order reduction. Ο πρώτος είναι το 
+static partial order reduction \cite{Static1997} όπου η εξαρτήσεις μεταξύ των νημάτνω εντοπίζονται πρην την εκτέλεση του concurrent προγράμματος. 
+Η δεύτερη προσέγγιση είναι το  Dynamic partial order reduction (DPOR) \cite{FlanaganDPOR} το οποίο παρατηρεί τις εξαρτήσεις του προγράμματος κατά την εκτλέση του.
+
+Για μεγάλα προγράμματα ο DPOR διαρκεί περισσότερ από όσο θα ήταν επιθυμητό. Σε αυτές τις περιπτώσεις τεχνικές περιορισμού μπορεί να φανούν χρήσιμες. 
+Οι τεχνικές περιορισμού σε αντίθεση με τον DPOR, αντιμετωπίζουν το πρόβλημα του state space explosion με το να μην ελέγχουν δρομολογήσεις που ξεπερνούν ένα όριο \cite{Thomson}.
+Έχουν προταθεί πολλές τέτοιες τεχνικές όπως το preemption bounded exploration \cite{BPOR} ή το delay bounded exploration \cite{DelayBounded@POPL-11}. 
+Όλες αυτές οι τεχνικές βασίζονται στην ιδέα ότι τα περισσότερα σφάλματαα μπορούν να εντοπιστούν ακόμα και με ένα μικρό όριο κάνοντας τον εντοπισμό των σφαλμάτων πολύ πιο γρήγορο.
+
+Σε ότι αφορά αυτές τις τεχνικές, νέες προκλήσεις δημιουργούναι \cite{BPOR} καθώς εισάγονται περισσότερες εξαρτήσεις, που σχετίζονται με το όριο.
+Πολλά περιττά traces πρέπει να εξερευνηθούν προκειμένου να σεβαστούμε το όριο δεδομένου ότι οι αλγόριθμοι δεν είναι σε θέση να γνωρίζουν αν ισοδύναμα traces  που αντιστοιχούν 
+σε μεγαλύτερο bound έχουν ήδη ελεγχθεί.
+
+Είναι σημαντικό να σημειωθεί ότι οι bounded techniques μπορούν να θεωρηθούν ως testing, με την έννοια ότι ελέγχουν μόνο ένα υποσύνολο του χώρου καταστάσεων αλλά και ως 
+verification, με την έννοια ότ μπορούν επιβεβαιώσουν την απουσία σφαλμάτων για δεδομένο όριο.
+
+\section{Διανυσματικά ρολόγια}
+
+Ένα διανυσματικό ρολόι είναι ένας αλγόριθμος που προσδίδει μερική διάταξη σε κατανεμμημένα ή ταυτόχρονα συστήματα και εντοπίζει παραβιάσεις αιτιότητας (causality violations).
+Ακριβώς όπως και στις χρονοσφραγίδες του Lamport (Lamport's timestamps) \cite{Lamport@CACM-89}, διαδιεργασιακά μηνύματα περιλαμβάμνουν πληροφορίες για την πρόοδο του λογικού ρολογιού
+μιας διεργασίας.
+Το διανυσματικό ρολό ενός συστήματος μεf $N$ διεργασίες έιναι ένα διάνυσμα από $N$ λογικά ρολόγια, ένα ρολόι ανά διεργασία.
+Οι κανόνες με τους οποίους ενημερώνονται τα ρολογία δίνονται παρακάτω:
+
+\begin{enumerate}
+    \item Κάθε διεργασία που εκτελεί μια δική της εντολή αυξάνει το λογικό ρολόι της κατά ένα.
+    \item Κάθε φορά που μια διεργασία λαμβάνει ένα μήνυμα ή εκτελεί μια ενέργεια σε μια μοιραζόμενη μεταβλήτη, αυξάνει το ρολόι της κατά ένα και ενημερώνει κάθε πεδίο του διανύσματς παίρνοντας το μέγιστο από τις τιμές από το δικό της διάνυσμα και τη μέγιστη τιμή από όλες τις διεργασίες που μοιράζονται αυτή τη μεταβλητή.
+\end{enumerate}
+
+Ένα παράδειγμα εκτέλεσης του αλγορίθμου δίνεται στο Figure \ref{Clock example} όπου δίνονται και ο πηγαίος κώδικας αλλά και το υπό εξερεύνηση ίχνος.
+Μπορούμε εύκολα να διαπιστώσουμε ότι σε κάθε έντολή του thread <0> (main thread) το ρολόι του main thread αυξάνεται. Όταν το thread <0.0> ξεκινάει να εκτελείται το ρολόι του για το thread <0> είναι 8 καθώς εκείνη τη στιγμή δημιουργήθηκε από το main thread.
+Όταν η τιμή του y διαβάζεται το ρολόι για το <0> αυξάνεται ξανά ώστε να αντιστοιχεί με το γεγονός y=1. Στη συνέχει το πρώτο νήμα δρομολογείται ξανά και το ρολόι του για το <0.0> είναι 7
+καθώς η εντολή \verb|pthread_join()| εκτελείται.
+
+
+\Side{./code/clocks.c}{Vector Clock example}{./code/clocks.out}{Vector Clock output}{Clock example}
+
+Κάθε αλγόριθμος που παρουσιάζεται σε αυτή τη θέση βασίζεαται στα διανυσματικά ρολόγια. 
+
+
+\section{Notation}
+
+Πριν προχωρήσουμε βαθύτερα στο dynamic partial order reduction είναι πολύ σημαντικό να εξηγήσουμε τη σημειογραφία που θα χρησιμοποιήσουμε.
+Μια ακολουθία εκτέλεσης $E$ ενός συστήματος που αποτελείται από περατό αριθμό βημάτων των διεργασιών του εκτελείται από την αρχική κατάσταση 
+$s_0$. Δεδομένου ότι κάθε βήμα είναι ντερμινιστικό, μια ακολουθία εκτελέσεων $E$ χαρακτιρίζεται κατά μοναδικό τρόπο απο την ακολουθία των διεργασίων που εκτελούν εντολές στο $E$.
+Για παράδειγμα, το $p.p.q$ συμβολίζει την εκτέλεση της ακολουθίας όπου το $p$ εκτελεί δύο βήματα, ακολουθούμενο από ένα βήμα του $q$.
+Αυτή η ακολουθία από βήματα στο $E$ ορίζει μόναδικά και το global state του συστήματος μετά την εκτέλεση του $E$, που συμβολίζεται με $s_{[E]}$. 
+Για ένα state $s$, το $enabled(s)$ συμβολίζει το σύνολο των διεργασιών $p$ 
+που είναι ενεργές στο $s$ (για τις οποίες η εκτέλεση $p(s)$ ορίζεται). Χρησιμοποιούμε το $.$ για να συμβολίσουμε την ένωση (concatenation) ακολουθιών απο διεργασίες.
+Έτσι, αν η $p$ δεν είναι μπλοκαρισμένη μετά το $E$, τότε $E.p$ είναι μια ακολουθία εκτελέσεων.
+Ένα γεγονός στο $E$ είναι μια συγκεκριμένη εμφάνιση μια διεργασίες στο $E$.
+Χρησιμοποιούμε το $\langle p,i \rangle$ για να συμβολίζουμε το i-οστό γεγονός μιάς διεργασίας $p$ στην εκτέλεση $E$. 
+Με άλλα λόγια, το γεγονός $\langle p,i \rangle$ είναι το i-οστό βήμα τη διεργασίας $p$ στην εκτέλεση $E$. 
+Με το $dom(E)$ συμβολίζουμε το σύνολο των γεγονότων $\langle p,i \rangle$ τα οποία ανήκουν στο $E$, i.e., $\langle p,i \rangle \in dom(E)$ ανν $E$
+περιέχει τουλάχιστον $i$ βήματα του $p$. Θα χρήσιμποιούμε τα $e,e',...$ , για αναφερόμαστε σε διάφορα γεγονότα. 
+Το $proc(e)$ συμβολίζει τη διερτασία $p$ ενός γεγονότος $e = \langle p, i \rangle$.
+Αν $E.w$ είναι μια εκτέλεση, που προέκυψε από τη συνένωση του $E$ και του
+$w$, τότε το $dom_{[E]}(w)$ θα είναι $dom(E.w) \ dom(E)$, δηλαδή τα γεγονότα στο
+$E.w$ τα οποία ανήκουν στο $w$. Μια ειδική περίπτωση είναι η εξής: χρησιμοποιούμε το  $next_{[E]}(p)$ για να συμβολίσουμε το
+$dom_{[E]}(p)$.
+Το $<_E$ συμβολίζει τη συνολική διάταξη μεταξύ των γεγονότων του $E$, δηλαδή, το
+$e <_E e'$ συμβολίζει ότι το  $e$ συμβαίνει πριν από το $e'$ στο $E$. Τέλος
+χρησιμοποιούμε το $E'\leq E$ για να συμβολίσουμε ότι η ακολουθία $E'$ είναι
+πρόθεμα της ακολουθίας $E$.
+
+\section{Event Dependencies}
+
+Μια από τις πιο σημαντικές έννοιες όταν χρησιμοποιούμε έναν αλγόριθμο που κάνει αναζήτηση σε όλο τον χώρο καταστάσεων των διαφόρων δρομολογήσεων είναι η σχέση
+happens-before σε μια ακολουθία εκτέλεσης. Συνήθως αυτή η σχέση συμβολίζεται με $\rightarrow$. Για παράδειγμα η σχέση $\rightarrow$ 
+για δύο γεγονότα $e,e'$ στο $dom(E)$ είναι αληθής τότε το γεγονός $e$ συμβαίνει πριν το $e'$. Αυτή η σχέση συνήθως εμφανίζεται στην ανατλλαγή μηνυμάτνων όταν το  $e$ 
+είναι η μετάδοση μηνύματος και το $e'$ είναι το γεγονός της λήψης του μηνύματος. Για παράδειγμα στο Nidhugg το $e \rightarrow e'$ δε θα ήταν αληθές αν τουλάχιστον ένα από τα δύο γεγονότα
+δεν ήταν write operation στην ίδια μοιραζόμενη μεταβλητή. Είναι λογικό κάθε DPOR αλγόριθμος να μπορεί να προσδώσει τέτοιες happens-before σχέσεις. 
+Πρακτικά η happens-before ανάθεση υλοποιείται με τη χρήση vector clocks.
+
+\begin{definition}{(happens-before ανάθεση)}
+    Μια happens-before ανάθεση, η οποία αναθέτει μια μοναδική σχέση
+    happens-before $\rightarrow E$ σε κάθε ακολουθία εκτέλεσης
+    $E$, είναι έγκυρη αν ικανοποιεί τις ακόλουθες ιδιότητες για κάθε $E$.
+    \begin{enumerate}
+        \item Το $\rightarrow_{E}$ είναι μια μερική διάταξη στο $dom(E)$, που περιλαμβάνεται στο $<_E$. Με άλλα λόγια κάθε δρομολόγηση είναι μέρος μια μερικής διάταξης που μπορεί να παράξει το πρόγραμμα.
+        \item Τα βήματα εκτέλεση κάθε διεργασίας είναι πλήρως διατεταγμένα, δηλαδή
+        $\langle p,i \rangle \rightarrow_E \langle p,i+1 \rangle$ όποτε ισχύει $\langle p, i+1 \rangle \in dom(E)$.
+        \item Αν $E'$ είναι πρόθεμα του $E$ τότε $\rightarrow_E$ και $\rightarrow_{E'}$ είναι ίδια στο $dom(E')$.
+        \item Κάθε γραμμικοποίηση (linearization) $E'$ of $\rightarrow_E$ στο $dom(E)$ είναι μια ακολουθία εκτέλεσης ακριβώς ίδια με τη “happens-before” σχέση.
+$\rightarrow_{E'}$ as $\rightarrow_E$. Αυτό σημαίνει ότι η σχέση $\rightarrow_E$ επάγει ένα σύνολο
+από ισοδύναμες ακολουθίες εκτέλεσης, όλες με την ίδια “happens-before” σχέση. 
+Το $E \simeq E'$ συμβολίζει ότι τα $E$ και $E'$ είναιe
+γραμμικοποιήσεις της ίδιας “happens-before” σχέσης, και το $[E] \simeq$ 
+συμβολίζει την ισοδυναμία στην περίπτωση του E.
+    \item Αν $E \simeq E'$ τότε $s_{[E]} = s_{[E']}$ (δύο ισοδύναμα traces θα οδηγήσουν στο ίδιο state).
+    \item Για μια ακολουθία $E, E'$ και $w$, ώστε η $E.w$  είναι μια ακολουθία εκτέλεσης, έχουμε ότι $E \simeq E'$  ανν $E.w \simeq' E'.w$.
+    \end{enumerate}
+\end{definition}
+
+\section{Ανεξαρτηστία και Ανταγωνισμός}
+
+Μπορούμε πλέον να ορίσουμε την ανεξαρτησία μεταξύ υπολογισμών. Αν
+$E.p$ και $E.w$ είναι δύο ακολουθίες εκτέλεσης, τότε το $E \models p\diamondsuit w$ συμβολίζει
+ότι το $E.p.w$ είναι μια ακολουθία εκτέλεσης τέτοια ώστε $next_{[E]}(p) \not \rightarrow_{E.p.w} e$
+για κάθε $e \in dom([E.p])(w)$. Με άλλα λόγια, το $E \models p \diamondsuit w$ δηλώνει ότι
+το επόμενο γεγονό του $p$ δε θα “συμβεί πριν” από κάποιο άλλο στο $w$
+στην ακολουθία εκτέλεσης $E.p.w$. Διαισθητικά, αυτό σημαίνει ότι το $p$ είναι
+ανεξάρτητο από το $w$ μετά το $E$. Στην ειδική περίπτωση όπου το  $w$ περιέχει
+μόνο μια διεργασία $q$, τότε το $E \models p \diamondsuit q$ συμβολίζει ότι τα επόμεντα βήματα των 
+$p$ και $q$ είναι ανεξάρτητα μετά το $E$. Το $E'\models p \diamondsuit w$ συμβολίζει ότι το 
+$E \not \models p \diamondsuit w$ δεν ισχύει.
+
+Για μια ακολουθία $w$ με $p \in w$, let $w \backslash p$ συμβολίζουμε την ακολουθία
+$w$ με την πρώτη εμφάνσιση του $p$ να έχει αφαιρεθεί, και το $w \uparrow p$ συμβολίζει
+το πρόθεμα του $w$ μέρχι αλλά χωρίς να συμπεριλαμβάνει την πρώτη εμφάνιση του $p$. Για
+μια ακολουθία εκτέλεσης $E$ και ένα γεγονός $e \in  dom(E)$, έστω ότι το $pre(E,e)$
+συμβολίζει το πρόθεμα του $E$ μέχρι αλλά χωρίς να συμπεριλαμβάνει το $e$. Για μια
+ακολουθία εκτέλεσης $E$ και ένα γεγονός $e \in E$, το $notdep(e, E)$ είναι η
+υπακολουθία του $E$ που αποτελείται από τα γεγονότα που συμβαίνουν μετά το $e$ αλλά δε 
+“συμβαίνουν μετά” το $e$ (δηλαδή τα γεγονότα  $e'$ που συμβαίνουν μετά το $e$ για τα οποία ισχύει
+$e \not \rightarrow_E e'$).
+
+
+Μια κεντρική έννοια στους περισσότερους DPOR αλγορίθμου είναι αυτή του ανταγωνισμού.
+Διαισθητικά, δύο γεγονότα $e$ και $e'$ σε μια ακολουθία εκτέλεσης $E$, όπου το
+$e$ συμβαίνει πριν το $e'$ στο $E$, συναγωνίζοναι αν
+\begin{itemize}
+\item Το $e$ συμβαίνει πριν το $e'$ στο  $E$, και
+\item τα $e$ και $e'$ είναι ταυτόχρονα, δηλαδή υπάρχει μια ισοδύναμη ακολουθία εκτέλεσης 
+$E' \simeq E$ στην οποία τα $e$ και $e'$ είναι γειτονικά.
+\end{itemize}
+Τυπικά, έστω ότι τα $e \lessdot_E e'$ συμβολίζουν ότι  $proc(e) \not = proc(e')$, ότι $e \rightarrow_E e'$,
+και ότι δεν υπάρχει γεγονός  $e'' \in dom(E)$, διαφορετικό από τα $e'$ και $e$,
+τέτοιο ώστε $e \rightarrow_E e'' \rightarrow_E e'$.
+
+Όποτεδήποτε ο DPOR εντοπίζει συναγωνισμό, ελέγχει αν τα γεγονότα που συναγωνίζονται μπορούν να εκτελεστούν σε αντίστροφη σειρά.
+Δεδομένου ότι τα γεγονότα συνδέονται με σχέσεις happens-before, μπορεί να οδηγηθούμε σε διαφορετικά
+global state: έτσι ο αλγόριθμος πρέπει να προσπαθήσει να εξερευνήσει την αντίστοιχη ακολουθία εκτέλεσης
+Έστω ότι το $e \lesssim_E e'$ συμβολίζει ότι
+$e \lessdot_E e'$, και ότι ο συναγωνισμός μπορεί να αντιστραφεί. Τυπικά, αν $E' \lesssim E$
+και το $e$ συμβαίναι ακριβώς πριν το $e'$ στο $E'$, τότε η $proc(e')$ δεν ήταν μπλοκαρισμένη
+πριν την εμφάνιση του $e$.
+
+
+\section{Dynamic Partial Order Reduction}
+
+Πριν εξηγήσουμε τον DPOR αλγόριθμο είναι σημαντικό να όρισουμε τα επαρκή σύνολα (sufficient sets).
+
+\begin{definition}{(Επαρκές Σύνολο)}
+Ένα σύνολο από μεταβάσεις είναι επαρκές σύνολο στην κατάσταση $s$ αν κάθε σχετική κατάσταση που είναι προσβάσιμη μέσω μιας δυνατής μεταβάσης από το
+$s$ είναι προσβάσιμη και από το $s$ μέσω τουλάχιστον μίας μετάβασης στο επαρκές σύνολο.
+Μια αναζήτηση χρειάαζεται να εξερευνήσεις μόνο μεταβάσεις που ανήκουν στο επαρκές σύνολο από το 
+$s$ επείδή όλα τα σχετικά states θα εξακολουθήσουν να είναιn
+προσβάσιμα. Το σύνολο που περιέχει όλα τα ενεργά threads είναι τετριμένα επαρκές στο 
+$s$, αλλά μικρότερα επαρκή σύνολα επιτρέπουν μεγαλύτερο περιορισμό του χώρου καταστάσεων.
+\end{definition}
+
+Πολλές τεχνικές έχουν προταθεί για την υλοποίηση ενός DPOR αλγορίθμου. Αυτό που έχουν όλες οι τεχνικές κοινό είναι η παρακάτω μορφή.
+
+\ref{GeneralDPOR}.
+\SetKwProg{Fn}{Function}{}{}
+
+\SetKwHangingKw{Let}{let}
+\begin{algorithm}[H]
+    \caption{General form of DPOR}
+    \label{GeneralDPOR}
+    Explore($\emptyset$)\;
+    \Fn{Explore($E$)}{
+     \Let{$T = Sufficient\_set(final(E)$)}
+     \For{all $t \in T$}{
+        Explore($E.t$) \;
+    }
+    }
+\end{algorithm}
+
+όπου το $final(E)$ αντιπροσωπεύει την κατάσταση που θα φτάσουμε ότι η ακολουθία $E$ εκτελεστεί.
+
+Ο αλγόριμος περιγράφει μια DFS αναζήτηση στο χώρο καταστάσεων όλων των πιθανών interleavings.
+Όπως μπορούμε να υποθέσουμε το πιο σημαντικό κομμάτι του αλγορίθμου είναι ο υπολογισμός του συνόλου $T$.
+
+Μια προφανής ιδιότητα που πρέπει να ισχύει είναι ότι Sufficient\_set$(final(E)) \subseteq enabled(E)$.
+
+Διαισθητικά τα $enabled(s)$ αντιπροσωπεύουνν τα νήματα εκείνα που δεν είναι μπλοκαρισμένα και η εκτέλεση τους δεν έχει ολοκληρωθεί.
+
+Στη βιβλιογραφία πολλά είδη επαρκών συνόλων μπορούν να βρεθούν \cite{Godefroid1996}. 
+Σε αυτή τη διπλωματική εστιάζουμε στα επίμονα σύνολα (persistent sets) και στα πηγαία σύνολα (source sets).
+
+
+\section{Persistent Sets}
+
+A persistent set in a state $s$ is a sufficient set of transitions to
+explore from $s$ while maintaining local state reachability for acyclic state spaces \cite{God97}. A selective search using persistent
+sets explores a persistent set of transitions from each state $s$ where $enabled(s) \neq \emptyset$ and prunes enabled transitions that
+are not persistent in s.
+In a more formal way:\\
+
+\begin{definition}{(Persistent Sets)}
+Let $s$ be a state, and let $W \subseteq E(s)$ be a set
+of execution sequences from $s$. A set $T$ of transitions is a persistent set for $W$
+after $s$ if for each prefix $w$ of some sequence in $W$, which contains no occurrence
+of a transition in $T$,  we have $E \vdash t \diamondsuit w$ for each $t \in T$.
+\end{definition}
+
+The above definition can be described as follows: If $t \in T$ and there is another thread $t'$ that can be executed until a command which
+is in a race with $t$, then $t'$ belongs in the persistent set.
+
+Notice that the definition of persistent sets suggests a way to construct them.
+
+In Figure \ref{Construction of persistent sets} two different examples of persistent set construction are given. We denote the persistent set of branches the execution will take with $BR{}$.
+In the first, let a concurrent program contain 3 threads $p$, $q$, and $r$. Thread $p$ changes the value of the variable (writer) and the other ($q$ and $r$) just read this variable (readers).
+Let $p.q.q.r.r$ be an interleaving. According to the definition of the persistent sets, $q$ and $r$ are in a race with $p$, thus, $q$ and $r$ must also be on the persistent set
+of the first command of the interleaving. In Figure \ref{Construction of persistent sets} we notice that both $r$ and $q$ threads are added to the persistent set of the first
+command of the trace since both conflict with the write operation. 
+In the second example, let $p$ and $r$  be a readers and $q$ be a writer. We notice that both $r$ and $q$ are added. However, there is no conflict between $p$ and $r$ since both $p$ and $r$
+just read the variable $x$. The reason why the thread $r$ is added is the conflict that will be produced by the $q$'s write operation.
+
+\trace{persistent.pdf}{Construction of persistent sets}
+
+\section{Source Sets}
+
+Before defining source sets, we have to give some more useful definitions.
+
+\begin{definition}{($dom(E)$)}
+    The set of events-transitions happening during the scheduling of $E$.
+\end{definition}
+
+\begin{definition}{(Initials after an execution sequence $E.w$, $I_{[E]}(w)$)}
+For an execution sequence $E.w$, let $I_{[E]}(w)$ denote the set of
+processes that perform events $e$ in $dom_{[E]}(w)$ that have no
+“happens-before” predecessors in $dom_{[E]}(w)$. More formally,
+$p \in I_{[E]}(w)$ if $p \in w$ and there is no other event $e \in dom_{[E]}(w)$ with
+$e \rightarrow_{E.w} next_{[E]}(p)$.
+\end{definition}
+
+By relaxing the definition of Initials we can get the definition of Weak Initials, $WI$.
+
+\begin{definition}{(Weak Initials after an execution sequence $E.w$, $WI_{[E]}(w)$)}
+For an execution sequence $E.w$, let $WI_{[E]}(w)$ denote the union of $I_{[E]}(w)$ and the set of
+processes that perform events $p$ such that $p \in enabled(s_{[E]}) $.
+\end{definition}
+
+The point of these concepts is that for an execution sequence $E.w$:
+\begin{itemize}
+    \item  $p \in I_{[E]}(w)$ iff there is a sequence $w'$ such that $E.w \simeq E.p.w'$, and
+    \item  $p \in WI_{[E]}(w)$ iff there are sequences $w'$ and $v$ such that $E.w.v \simeq E.p.w'$.
+\end{itemize}
+
+\begin{definition}{(Source Sets)}
+Let $E$ be an execution sequence,
+and let $W$ be a set of sequences, such that $E.w$ is an execution
+sequence for each $w \in W$. A set $T$ of processes is a source set for
+$W$ after $E$ if for each $w \in W$ we have $WI_{[E]}(w) \cap P  = \emptyset$.
+\end{definition}
+
+A source set is a set of threads that guarantee that the whole state space will be explored. 
+Notice that their is no requirement related to the races of the events.
+What the above definition implies is that source can be considered every set of threads that contains these threads 
+that are able to cover the whole state-space.
+In fact, it suggests a property for the sufficient sets to hold.
+
+\section{Sleep Sets}
+
+Another technique complementary to the persistent or source sets aiming to reduce the number of interleavings is the sleep set technique.
+Sleep sets prohibit visited transitions from executing again
+until the search explores a dependent transition. Assume that
+the search explores transition $t$ from state $s$, backtracks $t$,
+then explores $t_0$ from $s$ instead. Unless the search explores
+a transition that is dependent with $t$, no states are reachable
+via $t_0$ that were not already reachable via $t$ from s. Thus, $t$
+“sleeps” unless a dependent transition is explored.
+
+A short example on sleep sets is the following:
+Let the concurrent program of one writer (w1) and two readers (r1,r2).
+let w1 <0.0>: w(x) r1 <0.1>: (local operations), r(x) and r2 <0.2>: (local operations), r(x).
+
+The resulted traces are demonstrated in the Listing \ref{Sleep set example}. Notice that whenever a process executes a command 
+which is in race with some command of another process and the latter process is ``sleeping'', it wakes up. 
+As we can infer from the execution of the DPOR algorithm the interleaving which started from r2 was blocked since it would lead to an interleaving which
+has already been explored. Notice that this is due to the fact that r1 cannot ``wake up'' since its first transition (local operations) does not conflict with any other transition
+in the program. 
+
+It can be proved \cite{Godefroid1996} that sleeps will eventually block all the redundant interleavings and thus the only interleavings that will be explored till their end (where all threads that could be executed, have been executed).
+As a result an optimal algorithm should be able to not consider these interleavings whatsoever.
+
+\Output{./code/sleep_sets.out}{Sleep set example}
+
+\section{Comparing Persistent Sets with Source Sets}
+
+Note that the definition of source sets is much more relaxed than the definition of the persistent sets. 
+This relaxation enables the source sets to be much more efficient than the persistent sets. In Figure \ref{Non-minimal persistent sets}
+an example is given were source sets and persistent sets differ.
+
+\begin{figure*}
+    \begin{lstlisting}[frame=none,numbers=none]
+        Initially: x = y = z = 0 
+    \end{lstlisting}
+    \begin{minipage}{0.3\textwidth}
+      \begin{lstlisting}[frame=none, numbers=none]
+        p:
+        m := x; (p1)
+        if (m = 0) then
+            z := 1; (p2)
+      \end{lstlisting}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+        \begin{lstlisting}[frame=none, numbers=none]
+            q:
+            n := y; (q1)
+            if (n = 0) then
+                x := 1; (q2)
+        \end{lstlisting}
+      \end{minipage}
+      \begin{minipage}{0.3\textwidth}
+        \begin{lstlisting}[frame=none, numbers=none]
+            r:
+            o := z; (r1)
+            if (o = 0) then
+                y := 1; (r2)
+        \end{lstlisting}
+      \end{minipage}
+      \caption{Program with non-minimal persistent sets}
+      \label{Non-minimal persistent sets}
+  \end{figure*}
+
+From the example, it is clear that the reason why source sets are an improvement over persistent sets is the fact that minimum source sets can eliminate
+sleep set blocked traces i.e., traces that would eventually be blocked by the sleep sets. An algorithm that would only calculate minimal source sets would be optimal \cite{AbdullaAronisJohnssonSagonasDPOR2014}, hence
+would never explore two equivalent interleavings.
+
+It is obvious that a single transition cannot be a source set. For
+instance, the set $\{ p_1 \}$ does not contain the initials of execution $q_1.q_2.p_1.r_1.r_2$,
+since q2 and p1 perform conflicting accesses. On the other hand, any subset
+containing two enabled transitions is a source set. To see this, let us choose
+$\{p_1, q_1 \}$ as the source set. Obviously, $\{p1, q1 \}$ contains an initial of any execution
+that starts with either $p_1$ or $q_1$. Any execution sequence which starts with $r_1$ is
+equivalent to an execution obtained by moving the first step of either $p_1$ or $q_1$ to
+the beginning:
+\begin{itemize}
+\item If $q_1$ occurs before $r_2$, then $q_1$ is an initial, since it does not conflict with
+any other transition.
+\item If $q_1$ occurs after $r_2$, then $p_1$ is independent of all steps, so $p_1$ is an initial.
+We claim that $\{p_1, q_1 \}$ cannot be a persistent set. The reason is that the execution
+sequence $\{r_1.r_2 \}$ does not contain any transition in the persistent set, but its second
+step is dependent with $q_1$. By symmetry, it follows that no other two-transition
+set can be a persistent set.
+\end{itemize}
+
+In other words, persistent sets have the unpleasant property that adding a process
+may disturb the persistent set so that even more process may have to be added.
+This property is relevant in the context of DPOR, where the first member of the
+persistent set is often chosen rather arbitrarily (it is the next process in the first
+exploration after $E$), and where the persistent set is expanded by need.
+
+Continuing the comparison between source sets and persistent sets, we first
+note some rather direct properties, including the following.
+
+\begin{itemize}
+\item Any persistent set is a source set.
+\item Any one-process source set is a persistent set.
+\end{itemize}
+
+
+\section{Bounded Search and Preemption Bounding}
+
+Bounded search explores only executions that do not exceed
+a bound \cite{BPOR,Thomson}. The bound may be any property of a
+sequence of transitions. A bound evaluation function $B_v(E)$
+computes the bounded value for a sequence of transitions $E$.
+A bound evaluation function $B_v$ and bound $c$ are inputs to
+bounded search. Bounded search may not visit all relevant
+reachable states; it visits only those that are reachable within
+the bound. If a search explores all relevant states reachable
+within the bound, then it provides bounded coverage.
+
+An algorithm that could describe a bounded search would be the following:
+
+\begin{algorithm}[H]
+    \caption{Bounded-DPOR}
+    \KwResult{Explore the whole statespace}
+    Explore($\emptyset$)\;
+    \Fn{Explore($E$)}{
+        T = Sufficient\_set($final(E)$)
+     \For{all $t \in T$}{
+         \If{$B_v(E.t) \leq c$}{
+            Explore($E.t$)
+         }
+        }
+    }
+\end{algorithm}
+
+\noindent The only difference between the unbounded and the bounded version of the algorithm is the if-statement on line 4 which allows for an interleaving to be explored
+only if the bound has not been exceeded.
+
+What is needed next is an appropriate definition of the function $B_v$ that calculates a value that the bounded-DPOR tries to keep bounded, 
+and the sufficient set. 
+
+In this thesis, we mainly focus on preemption-bounded search. 
+
+Preemption-bounded search limits the number of preemptive context switches that occur in an execution \cite{Musu07}. The 
+preemption bound is defined recursively as follows.
+
+\begin{definition}{(Preemption bound)}
+\\
+$P_b(\emptyset) = 0$ \\
+$P_b(E.t) = 
+ \begin{cases} 
+    P_b(E) + 1 & \text{ if } t.tid = last(E).tid \text{ and } last(E).tid \in enabled(final(E)) \\
+    P_b(E) & \text{ otherwise }
+ \end{cases}
+$\\
+\end{definition}
+
+The previous definition describes what a preemptive context switch is. A preemptive context switch happens when the previously running thread could execute
+its next step but it does not due to the scheduling of another thread. Hence, a preemptive switch will increase the preemption bound.
+
+\section{Preemption Bounded Persistent Sets}
+
+A set that has been proposed as a sufficient for preemption bounded search is the preemption bounded persistent set \cite{BPOR}.
+
+An important observation is that the execution of a thread until it gets blocked or terminates will not increase
+the bound count.
+\begin{definition}{($ext(s,t)$)}
+    Given a state $s = final(E)$ and a transition $t \in enabled(s)$,
+    $ext(s,t)$ returns the unique sequence of transitions $\beta$ from $s$
+    such that
+    \begin{enumerate}
+        \item $\forall i \in dom(\beta): \beta_i.tid = t.tid$
+        \item $t.tid \notin enabled(final(E.\beta))$
+    \end{enumerate}
+\end{definition}
+
+Next, we need to define preemption bounded persistent sets. We denote with $A_G(P_b,c)$ the generic 
+bounded state space with bound function $P_b$ and bound $c$. $last(a)$ denotes the last execution step of
+an execution sequence $a$
+
+\begin{definition}{(Preemption bounded persistent set)}
+
+A set $T \subseteq \mathcal{T}$ of transitions enabled in a state $s=final(e)$
+is preemption-bound persistent in $s$ iff for all nonempty
+sequences $a$ of transitions from $s$ in $A_G(P_b,c)$ such that
+$\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
+
+\begin{enumerate}
+\item $Pb(E.t) \leq Pb(E.a_1)$
+\item if $Pb(E.t)<Pb(E.a_{1}) ,$ then $t \leftrightarrow last(a)$ and $t \leftrightarrow  next(final(E.a), last(a).tid)$
+\item if $Pb(E.t)=Pb(E.a_{1}),$ then $ext(s,t) \leftrightarrow last(a)$ and $ext(s,t) \leftrightarrow next(final(E.a), last(a).tid)$
+\end{enumerate}
+
+\end{definition}
+
+When dealing with preemption bounded DPOR it is useful to introduce the idea of blocks in an execution sequence.
+
+\begin{definition}{(Block of execution sequence)}
+    Block in an execution sequence is the maximal subsequence of execution steps that consists of execution steps of the same thread.
+\end{definition}
+
+In the Figure \ref{Example of blocks} there are three blocks. The first block is coloured with yellow, the second with green and the third with blue.
+
+\trace{blocks.pdf}{Example of blocks}
+
+Let $P$ be persistent set. A preemption bounded persistent set is a set that contains all $p \in P$ with the addition of all the 
+threads that would be added in a block that would be created when $p$ was scheduled. These threads are called conservative threads and their 
+goal is to allow the coverage of interleavings that would not exceed the bound. Notice that an interleaving can be both conservative and non-conservative.
+Preemption bounded persistent sets extend a persistent set by adding all the threads that will create a new block
+after the block that will be created by the persistent set.
+

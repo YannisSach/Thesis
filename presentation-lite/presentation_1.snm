@@ -11,31 +11,31 @@
 \beamer@slide {Nidhugg's Flow Chart}{42}
 \beamer@slide {Vanilla}{48}
 \beamer@slide {Naive-BPOR for bound=$0$}{49}
-\beamer@slide {NDPOR}{50}
-\beamer@slide {Construction of Persistent Sets in Nidhugg when there is a write process}{51}
-\beamer@slide {Construction of Persistent Sets in Nidhugg when both are read processes}{52}
-\beamer@slide {Nidhugg BPOR}{53}
-\beamer@slide {Following source sets for conservative branches}{55}
-\beamer@slide {SBPOR}{57}
-\beamer@slide {writer-3-readers explosion}{59}
-\beamer@slide {Sleep set contradiction}{60}
-\beamer@slide {writer-N-readers}{63}
-\beamer@slide {Source-DPOR vs Nidhugg-DPOR for Synthetic tests}{64}
-\beamer@slide {writer-N-readers bounded}{65}
-\beamer@slide {Traces for various bound limits}{66}
-\beamer@slide {RCU results for bound $b=1$}{67}
-\beamer@slide {RCU results for bound $b=4$}{68}
-\beamer@slide {Comparison between DPOR and BPOR}{69}
-\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 1}{70}
-\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 2}{71}
-\beamer@slide {An example of avoidable preemption-switch}{73}
-\beamer@slide {NBBPOR}{74}
-\beamer@slide {Graph example}{75}
-\beamer@slide {Lazy-BPOR}{76}
-\beamer@slide {writer-N-readers bounded by the first estimation algorithm}{77}
-\beamer@slide {Traces for the first estimation algorithm for various bound limits}{78}
-\beamer@slide {Comparison between BPOR and Lazy-BPOR}{79}
-\beamer@slide {Comparison between BPOR and Lazy-BPOR}{80}
-\beamer@slide {Nidhugg BPOR}{86}
-\beamer@slide {SBPOR}{87}
-\beamer@slide {BPOR}{88}
+\beamer@slide {NDPOR}{53}
+\beamer@slide {Construction of Persistent Sets in Nidhugg when there is a write process}{54}
+\beamer@slide {Construction of Persistent Sets in Nidhugg when both are read processes}{55}
+\beamer@slide {Nidhugg BPOR}{56}
+\beamer@slide {Following source sets for conservative branches}{58}
+\beamer@slide {SBPOR}{60}
+\beamer@slide {writer-3-readers explosion}{62}
+\beamer@slide {Sleep set contradiction}{63}
+\beamer@slide {writer-N-readers}{67}
+\beamer@slide {Source-DPOR vs Nidhugg-DPOR for Synthetic tests}{68}
+\beamer@slide {writer-N-readers bounded}{69}
+\beamer@slide {Traces for various bound limits}{70}
+\beamer@slide {RCU results for bound $b=1$}{71}
+\beamer@slide {RCU results for bound $b=4$}{72}
+\beamer@slide {Comparison between DPOR and BPOR}{73}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 1}{74}
+\beamer@slide {Source-BPOR and Nidhugg-BPOR equivalence Case 2}{75}
+\beamer@slide {An example of avoidable preemption-switch}{77}
+\beamer@slide {NBBPOR}{78}
+\beamer@slide {Graph example}{79}
+\beamer@slide {Lazy-BPOR}{80}
+\beamer@slide {writer-N-readers bounded}{81}
+\beamer@slide {Traces for various bound limits}{82}
+\beamer@slide {Comparison between BPOR and Lazy-BPOR}{83}
+\beamer@slide {Comparison between BPOR and Lazy-BPOR}{84}
+\beamer@slide {Nidhugg BPOR}{98}
+\beamer@slide {SBPOR}{99}
+\beamer@slide {BPOR}{100}

@@ -1,0 +1,227 @@
+\chapter{Evaluation of Implemented Algorithms}
+\label{Chapter 4}
+
+In this chapter, the performance of each implemented technique will be discussed. Firstly, the performance of
+Nidhugg-DPOR is demonstrated in order to validate that its performance, indeed differs from Source-DPOR. The evaluation
+takes place in two parts. In the first part, short synthetic programs are used, while in the second part real world
+software is tested. Synthetic programs can be found in the appendix section. One area where Nidhugg is tested is the
+verification of the Read Copy Update technique of the Linux kernel.
+
+
+\section{Synthetic Tests}
+There are many tests provided from various sources. Most of these testcases are not complicated at all since their
+purpose is to demonstrate the performance difference of the Source-DPOR and Nidhugg-DPOR.
+
+\begin{itemize}
+\item The writer-N-readers test: In this test N threads read (readers) the same global variable and one thread (writer)
+writes that variable. It is important to notice that in this case there are some other local operations taking place
+before the read of the variable. As a result we must expect different results between source sets and persistent sets.
+
+\item Account: This test is a small bank account simulation which uses mutex locks to prevent simultaneous operations on
+the account. There are three possible operations: The deposit operation increases the balance by an amount. The withdraw
+operation decreases the balance by a certain amount. The check\_result operation confirms $\text{final\_balance} ==
+\text{initial\_balance} + \text{deposit} - \text{withdraw}$ and can only happen after both deposit and withdraw are
+completed.
+
+\item Micro: In this test three threads are spawned that perform the \verb|x++| operation twice. The \verb|x++|
+operation consists of two operations a read operation and a write operation.
+
+\item Last-zero test:The program consists of N+1 threads which operate on an array of N+1 elements which are all
+initially zero. In this program, thread 0 searches the array for the zero element with the highest index, while the
+other N threads read one of the array elements and update the next one. The final state of the program is uniquely
+defined by the values of i and array[1..N]. Last-zero does not produce more traces when DPOR is used for reasons that
+will be explained later. However a modification of the .ll file can expose the difference.
+
+\item Indexer.c: This benchmark uses a compare-and-swap(CAS) primitive instruction to check whether a specific entry in
+a matrix is 0 and set it to a new value. 
+
+\item Indexermod.c: In this benchmark all the threads traverse and try to write the matrix at the same order and as a
+result many conflicts emerge.
+
+
+\end{itemize}
+
+\section{RCU}
+
+Read-Copy-Update (RCU) is a synchronization mechanism, which was invented by McKenney and Slingwine \cite{McKenney98},
+based on mutual exclusion. It was added to the Linux kernel in October of 2002. RCU achieves scalability improvements by
+allowing reads to occur concurrently with updates. In contrast with conventional locking primitives that ensure mutual
+exclusion among concurrent threads regardless of whether they be readers or updaters, or with reader-writer locks that
+allow concurrent reads but not in the presence of updates, RCU supports concurrency between a single updater and
+multiple readers. 
+
+DPOR was used as an approach to systematically test the code of the main flavor of RCU used in the Linux kernel (Tree
+RCU) for concurrency errors, under sequential consistency. The modeling allows Nidhugg, a stateless model checking tool,
+to reproduce, within seconds, safety and liveness bugs that have been reported for RCU \cite{Spin}.
+
+RCU provides an ideal testcase to evaluate the various DPOR and Bounded DPOR algorithms since it is:
+\begin{itemize}
+\item It is a real world software and not just a synthetic test.
+\item The number of traces (different schedulings) is large enough to demonstrate the differences in the performance.
+\item Previous work \cite{Spin} enables us to evaluate the correctness of each algorithm's implementation.
+\end{itemize}
+
+
+\section{Evaluation of Unbounded Algorithms}
+As it was established in the chapter \ref{unbounded} the implementation of the persistent sets is crucial since they are
+utilized in every bounding technique. In this section we demonstrate performance differences between Source-DPOR and
+Nidhugg-DPOR in both synthetic tests and RCU.
+
+\subsection{Evaluation of Persistent sets on Synthetic tests}
+The results are presented with two different ways. The writer-N-readers testcase result is given with a graph, in Figure
+\ref{writer-N-readers}, in order to demonstrate the escalation of the state space as well as the greater impact the
+source-DPOR has. The rest of the results are given in Table \ref{Source-DPOR vs Nidhugg-DPOR for synthetic tests} so they can be
+easily compared. We deliberately do not show the duration of the execution since for most testcases the number of traces
+explored is really small. The execution of the synthetic test cases delineated that Source-DPOR indeed performs better
+than Nidhugg-DPOR. As it was expected Source-DPOR explores less traces than the Nidhugg-DPOR. It is important to notice
+that this difference is caused by the sleep set blocked traces that are produced by the DPOR algorithm that are omitted
+by the source DPOR. The reduction in the number of traces explored is not the same of all the testcases. For example in
+some testcases there is a significant decrease of the explored traces while in others the reduction is not so great. It
+varies due to the
+
+\graph{img/wNr.png}{writer-N-readers}
+
+\smalltabular{"tables/synthetic_unbounded.tex"}{Source-DPOR vs Nidhugg-DPOR for synthetic tests}
+
+\subsection{Evaluation of Persistent sets on RCU}
+We noticed that there is no difference between Source sets and persistent sets thus no results are presented since they
+coincide with \cite{Spin}. The reason why the results of Nidhugg-DPOR and Source-DPOR are the same may be due to the operations
+that take place which not allow for the optimization of the Source-DPOR to be effective. Another reason is the LLVM IR
+which is used by Nidhugg and will be explained in the next section.
+
+\section{Comparison with Concuerror results}
+The are many cases where Concuerror's Source-DPOR explores less traces than Classic-DPOR while Nidhugg's Source-DPOR
+does not explore less traces than Nidhugg-DPOR. Moreover. Nidhugg-DPOR implementation seems to explore less number of
+traces than Concuerror's Classic-DPOR \cite{AbdullaAronisJohnssonSagonasDPOR2014} which, in many cases, equals with the
+numbers of traces explored by Source-DPOR. Here we present the reasons that justify this behavior. 
+
+\begin{itemize}
+  \item The implementation of the persistent set calculation: In Concuerror this calclation is more relaxed than the in
+  Nidhugg as a result Nidhugg calculates sometimes smaller persistent sets. In Figure \ref{Lastzero Concuerror} the
+  example of lastzero testcase in Concuerror is given when a larger persistent set is calculated. In fact, the process
+  $q$ should never have been added to the persistent set since it does not conflict with any other process.
+
+  \item The number of traces explored is closely related by scheduling of the events: Let a program consist of a process
+  which writes on variable $x$ and two process that read variable $x$. In Figure \ref{Scheduling Effect
+  reader-writer-reader} the exploration is demonstrated when one reader is scheduled first. We notice that exactly 4
+  traces are explored. On the other hand, provided that the writer was scheduled first \ref{Scheduling Effect
+  writer-reader-reader} 5 traces with one sleep set blocked traces would have been explored.
+
+\end{itemize}
+
+\tracelong{lastzero.pdf}{Lastzero Concuerror}
+
+\trace{schedulingrwr.pdf}{Scheduling Effect reader-writer-reader}
+\trace{schedulingwrr.pdf}{Scheduling Effect writer-reader-reader}
+
+
+\section{Evaluation of Bounding Techniques}
+The evaluation of the bounding techniques takes into account two aspects. The number of traces explored and the
+soundness. The former is closely related with the amount of time required for a bug to be found or the whole state space
+to be explored. The second is important because it demonstrates the tradeoff between time and accuracy of the results
+discussed in chapter \ref{bounded}. It is intelligible that a faster algorithm may compromise the soundness of the state
+space.
+
+\subsection{Evaluation of Bounding Techniques on Synthetic tests}
+
+The results for the testcases are demonstrated in this section. Again they are presented in two different ways.
+
+\graph{img/wNrB.png}{writer-N-readers bounded}
+\smalltabular{"tables/bounded.tex"}{Traces for various bound limits}
+
+As it was expected the Naive-BPOR explores significantly less traces than the Nidhugg-BPOR and the Source-DPOR. However,
+as it was previously discussed, the whole state space is not explored. The number of traces explored by the sound
+algorithms is significantly greater and it caused by the many conservative branches that are added in order to achieve
+soundness. Surprisingly, there is no difference between the other two bounding techniques. An explanation is given
+later.
+
+\subsection{Evaluation of Bounding Techniques on RCU}
+The results of the various implementetions of BPOR are given here. Notice that since the Source-DPOR did not resulted
+less traces than the DPOR we could not expect from the Source-BPOR and Nidhugg-BPOR to differentiate. Moreover tests did not
+reveal any difference. For these reasons only the performance of Naive-BPOR and Nidhugg-BPOR is examined. In each table the
+results with a given bound are demonstrated. Specifically the exploration time and the number of traces are shown.
+Moreover there is a cell indicating whether the assertion was found (We note F for found and NF for not found).
+
+
+\bigtabular{"tables/nobound.tex"}{RCU results without bound}
+\bigtabular{"tables/naivevsbpor0.tex"}{RCU results for bound $b=0$}
+\bigtabular{"tables/naivevsbpor1.tex"}{RCU results for bound $b=1$}
+\bigtabular{"tables/naivevsbpor2.tex"}{RCU results for bound $b=2$}
+\bigtabular{"tables/naivevsbpor3.tex"}{RCU results for bound $b=3$}
+\bigtabular{"tables/naivevsbpor4.tex"}{RCU results for bound $b=4$}
+\bigtabular{"tables/dporvsbpor.tex"}{Comparison between DPOR and BPOR}
+
+
+We notice that some assertions are found significantly faster. The most spectacular result is the
+\verb|-DFORCE_FAILURE_3| which is found in only 6 seconds for bound $b=3$ whereas it requires 464.77 seconds in the
+unbounded version. Moreover we notice for bound $b=4$ all the errors that are found in the unbounded version are found. As
+a result the empirical observation that errors occur in low bound count seems to be confirmed. However, we have to
+underline that these are contrived errors aiming to verify the correctness of the rcu and as a result they cannot be
+regarded as substantial evidences. As it is expected for larger bounds ($b=4$) the number of traces grows exponentially.
+An other impressive result is that when the bound grows larger the errors takes longer to be found. If we take a look at
+\verb|-DFORCE_FAILURE_3| again we notice that the error takes significantly longer to be tracked even through it exposed
+for the first time at bound $b=2$. For $b=4$ the exploration will was stopped since it exceeded 100,000 traces. On the other
+hand many assertions are found faster with source-DPOR.
+
+\subsection{A known bug}
+As it was discussed in previous section, the scheduling priorities of Nidhugg should be changed in order for the running
+thread to be prioritize since it does not increase the bound count. However this alternation in the priority causes
+Nidhugg to explore many more traces in unbounded search for an unknown reason. In order to deal with this problem
+alternation in priority occurs only when bound is applied. As a result the comparison between DPOR and BPOR is biased.
+Looking at table \ref{Comparison between DPOR and BPOR with the bug} we can clearly see that the minimum traces required
+for BPOR to track the bug for the first time are always less than DPOR
+
+\bigtabular{"tables/dporvsbporpriority.tex"}{Comparison between DPOR and BPOR with the bug}
+
+\section{Equivalence between Classic-BPOR and Source-BPOR (Correctness of Source-BPOR)}
+Surprisingly the results of Classic-BPOR and Source-BPOR always coincide. However, further investigation of this
+behavior can reveal that these two techniques are actually equivalent. 
+
+It can be proved that a branch which was rejected by the Source-DPOR but accepted by the Classic-BPOR algorithm as a
+non-conservative one will be added as conservative by the source-bpor algorithm.
+
+Let us assume a branch of the thread $b$ that is added as a non-conservative by the BPOR algorithm. Let $T$ be the
+persistent set at that point.
+
+By the definition of persistent-sets this means that there is a $t \in T$ which
+conflicts with an execution step of $b$. 
+
+This non-conservative branch is rejected by the Source-BPOR. We know that there must be a trace such that thread $b$
+ occurs before $t$. Since $b$ was rejected there must be another branch $s$ which shares the same initials with $b$, 
+  
+When $s$ is scheduled another block will be created.
+ 
+\begin{itemize}
+
+\item Case 1: $s$ has an execution step which conflicts with $b$. Hence, there must be a trace where $b$ happens before
+some step of $s$ and $s$ happens before $t$. Since $b$ happens-before some execution step of $s$ but share the same
+initials with $s$, $b$ must be added as a conservative branch at the point where it was rejected at the initially. As
+shown in the Figure \ref{Source-BPOR and Nidhugg-BPOR equivalence Case 1}, the branch which seems to be initially
+rejected, will finally be added by the Source-BPOR and as a result belongs to the source-set. 
+\trace{equivalence_case1w.pdf}{Source-BPOR and Nidhugg-BPOR equivalence Case 1}
+   
+\item Case 2: $s$ doesn’t conflict with $b$ (both $b$ and $s$ are read operations). There must $b$ a trace s.b.t (where
+   s,b,t is the execution of all the steps of s,b,t). Since $t$ conflicts with an execution step of $s$ the first step
+   of $b$ is an initial for $t$ and it will be added both as non-conservative branch and as conservative at the
+   beginning of the block where it was rejected by the Source-DPOR. For Figure \ref{Source-BPOR and Nidhugg-BPOR
+   equivalence Case 2}, both $s$ and $b$ belong to the persistent set. However, the $b$ thread will be rejected since it
+   shares the same initials with the $s$ thread. However it will be added as a conservative set. Notice that it would be
+   added as a non-conservative as well but we have already shown that when both conservative and non-conservative
+   branches of the same thread are added we must keep the conservative one.
+
+   \trace{equivalence_case2.pdf}{Source-BPOR and Nidhugg-BPOR equivalence Case 2}
+
+\end{itemize}
+   
+A more intuitive explanation of the equivalence of the two techniques would be based on the following two observation:
+\begin{itemize}
+  \item Let $B_v$ be a function that calculates the bound count then $B_v(pre(E,e)) \leq B_v(E)$ for every $e \in E$.
+  \item The points in the trace where the bound count increases are those where branches are added.
+\end{itemize}
+
+As a result a Classic-BPOR algorithm would have to add conservative branches at points where the bound increases. The
+non-conservative branches that would have been rejected by the Source-DPOR are added as conservative ones to since the
+lead to already explored traces but with a smaller bound count.
+
+We have proved that Source-BPOR is sound since the traces explored by the Classic-BPOR are subset of the traces explored
+by the Source-BPOR.

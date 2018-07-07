@@ -344,7 +344,7 @@ Potential problems include:
 
 \begin{itemize}[<+->]
 
-\item We need to preform Systematic Model Checking.
+\item We need to preform Systematic Concurrency Testing - Stateless Model Checking.
 \item Partial Order Reduction aims to reduce the number of interleavings explored by eliminating the exploration of equivalent
 interleavings.
 \item Dynamic Partial Order Reduction: record conflicts during runtime and add appropriate rescheduling points.
@@ -557,7 +557,7 @@ Given a bound evaluation function $B_v$ and a bound $c$:
 \SetKwProg{Fn}{Function}{}{}
 \begin{algorithm}[H]
     \caption{Bounded-DPOR}
-    \KwResult{Explore the whole statespace}
+    \KwResult{Explore the whole statespace within the bound}
     Explore($\emptyset$)\;
     \Fn{Explore($E$)}{
 
@@ -599,7 +599,7 @@ $\forall i \in dom(a), a_i \notin T$ for all $t \in T$ ,
 Simplified version:
 
 \begin{itemize}[<+->]
-   \item Add conservative branches at the beginning of the block.
+   \item Add conservative branches at the beginning of the previous block.
    \item But what's a block?
 \end{itemize}
    \pause
@@ -615,7 +615,7 @@ Simplified version:
 and relaxed memory consistency in concurrent programs. It works on the
 level of LLVM internal representation, which means that it can be used
 for programs written in languages such as C or C++.
-\item Nidhugg relies on Source-Sets.
+\item Nidhugg relies on Source Sets.
     \end{itemize}
 
 \end{frame}
@@ -743,6 +743,15 @@ Differences:
 
 \end{frame}
 \fi
+
+\begin{frame}{Looking for Soundness...}
+    \begin{itemize}[<+->]
+        \item We need to explore the whole state space within the bound.
+        \item We should use Preemption Bounded Persistent Sets.
+        \item We must first implement Persistent Sets or Classic-DPOR.
+    \end{itemize}
+    
+\end{frame}
 
 \begin{frame}{Nidhugg-DPOR}
 \framesubtitle{Requirement for BPOR}
@@ -991,8 +1000,8 @@ We should use Source Sets for non-conservative branches and Persistent Sets for 
             backtrack(E) $:={p}$ \;
             \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
                 \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
-                    add non-conservative backtracks according to Source Sets \;
-                    add conservative backtracks according to Persistent Sets at the beginning of blocks \;
+                    add non-conservative branches according to Source Sets \;
+                    add conservative branches according to Persistent Sets at the beginning of blocks \;
                 }
                 \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
                 $Explore(E.p, Sleep)$ \;
@@ -1054,6 +1063,9 @@ The implementation mainly is focused, as expected,  on see\_events() and add\_br
 
 \section{Evaluation}
 %% \frame{\sectionpage}
+\begin{frame}{Machine}
+    INTEL i5 6200U with 8GB RAM on Ubuntu 16.04.
+\end{frame}
 
 \begin{frame}{Nidhugg-DPOR Evaluation}
 Evaluation of Nidhugg-DPOR on Synthetic Tests
@@ -1205,13 +1217,13 @@ What if calculate something more than the preemption-bound?
 \begin{frame}{Evaluation of Lazy-BPOR}
 Evaluation on Synthetic Tests:
 
-\graph{../img/wNrLB.png}{writer-N-readers bounded by the first estimation algorithm}
+\graph{../img/wNrLB.png}{writer-N-readers bounded}
     
 \end{frame}
 
 \begin{frame}{Evaluation of Lazy-BPOR}
 Evaluation on Synthetic Tests:
-\smalltabular{../tables/lazy1_bounded.tex}{Traces for the first estimation algorithm for various bound limits}
+\smalltabular{../tables/lazy1_bounded.tex}{Traces for various bound limits}
 \end{frame}
 
 \iffalse
@@ -1249,6 +1261,34 @@ Conclusion:
     \item The most important is that it provides a reduction of the preemption-bounded search to a well known graph problem where many heuristics can
     be applied in order to expedite the calculation of the minimum hamiltonian path.
 \end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Recap}
+We implemented:
+\begin{itemize}[<+->]
+    \item Classic-DPOR (Nidhugg-DPOR), 
+    \item Naive-BPOR, 
+    \item Classic-BPOR (Nidhugg-BPOR)
+\end{itemize}
+
+\pause
+
+We showed that:
+\begin{itemize}[<+->]
+    \item Preemption Bounded Search does not work well with Source Sets.
+    \item The use of Source Sets does not improve the performance of BPOR.
+    \item We can avoid the conservative branch addition while still being sound.
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Future Work}
+    \begin{itemize}
+        \item Explore other bounding techniques for BPOR.
+        \item Investigate how Optimal-DPOR (Wakeup Trees) can improve the BPOR.
+        \item Explore potential of heuristics for Lazy-BPOR.
+    \end{itemize}
     
 \end{frame}
 

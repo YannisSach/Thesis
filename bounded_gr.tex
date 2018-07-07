@@ -1,0 +1,319 @@
+\chapter{Bounding Techniques for DPOR}
+\label{bounded}
+
+In this chapter Bounding Techniques for DPOR are discussed as well as the challenges emerging from these techniques.
+The challenges of bounding the DPOR have already been discussed.
+
+%% Challenges discussion can not be placed before the presentation of the algorithms since it is closely related to the algorithms themselves
+%% and not the Bounding of DPOR. Provided that other algorithms were suggested, different challenges may had been arisen. 
+
+\section{Naive-BPOR}
+
+The first bounded technique to be presented is the Naive-BPOR (Algorithm \ref{Vanilla}). The purpose of the algorithm is to block traces that exceed the bound
+limit. 
+
+\begin{algorithm}
+    \caption{Naive-BPOR}
+    \label{Vanilla}
+    \SetKwInOut{Input}{input}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in (enabled(s_{[E]}) \backslash Sleep)$ such that $B_v(E.p) \leq b)$ }{
+            $backtrack(E) :={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep$ and $B_v(E.p) \leq b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p) $}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
+                        add some $q' \in I_{[E']}(u) to backtrack(E') $ \;
+                    }
+                }
+                \Let{$Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \} $}
+                $Explore(E.p, Sleep, b)$ \;
+                add $p$ to $Sleep$ \;
+
+            }
+        }
+    }
+\end{algorithm}
+
+The Algorithm \ref{Vanilla} is almost the same with Source-DPOR(Algorithm \ref{Source}). The only additions made are
+related to the thread scheduling. When a a step of a process $p$ added to $E$ result the trace $E.p : B_v(E.p) > b$ then
+this process is not allowed to be scheduled. This algorithm is not sound i.e., it does not examine every trace that
+compensates with the bound
+
+Let the writer-2-readers example with $b=0$. An example of exploration for bound $b=0$ is given in Figure \ref{Naive-BPOR for bound=$0$}. 
+
+\label{Vanilla0}    
+\trace{w2rvbound.pdf}{Naive-BPOR for bound=$0$}
+
+As we can see there are 4 traces that do not exceed the bound. These are:
+$p.q.q.r.r$, $q.q.p.r.r$, $r.r.p.q.q$, $q.q.r.r.p$.
+However the Naive-BPOR is not able to explore them all; $r.r.p.q.q$ is not explored.
+As it was shown in the comparison of persistent and source sets, $r$ is never registered as the first event of the trace
+since this will lead to a sleep set blocked trace. The branch that would lead to an equivalent trace to $r.r.p.q.q$ is rejected
+since it would have higher bound count. Interestingly enough a Naive-BPOR based on persistent sets would explore a larger state-space since
+it would have explored would probably have explored the trace $r.r.p.q.q$.
+
+\section{BPOR}
+
+The next step is to implement a sound preemption bounded algorithm (BPOR) \cite{BPOR}. This algorithm would rely on
+persistent sets. Since we have correctly implemented persistent sets for Nidhugg-DPOR we can easily implement a BPOR
+algorithm. The novelty of the BPOR is the introduction of conservative branches. These are branches that are introduced
+in order to guarantee the exploration of the whole state space. It is common for a trace to exceed the bound limit
+whereas there is an equivalent trace which does not. The conservative branches are used for this purpose.
+
+To make this idea more clear we introduce the notion of Trace block.
+\begin{definition}{(Trace block)}
+For a trace $T$ a sequence $B$ of consecutive events is a trace block iff all events happen in the same thread i.e. all
+the events have the same thread id.
+\end{definition}
+
+The idea behind conservative branches is quit simple. When a branch is added a conservative branch is added at the
+beginning of the corresponding block. Usually concurrent events take place inside a block. As a result when a branch is
+taken then the preemption count will most probably increased. However, had this branch been added at the beginning of
+the block the preemption count would not have been increased. BPOR is presented in detail in Algorithm \ref{BPOR}. The
+BPOR algorithm differs from Classic-DPOR in the double nested loop which is introduced in line 3. This inner loop is
+introduced in order for the BPOR to compensate with the defintion of the preemption-bounded persistent sets which was
+introduced in Chapter 2. Moreover, as in Naive-BPOR, the exploration is also be terminated if a trace exceeds the bound
+limit.
+
+\begin{algorithm}
+    \caption{BPOR}
+    \label{BPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwInput{Initialization}{Explore($ \emptyset $)}
+    \SetKwHangingKw{Let}{let}
+    \Fn{Explore($E$)}{
+        \Let{$s := last(E)$}
+        \For{all process $p$}{
+            \For{all process $q \neq p$}{
+            \If{$\exists i = max(\{ i \in dom(E) \mid E_i$ is dependent and may be co-enabled with $next(s,p)$ and $ E_i.tid = q \} $}{
+                \uIf{$p \in enabled(pre(E,i)))$}{
+                    add $p$ to $backtrack(pre(E,i))$ \;
+                }
+                \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
+                \uIf{$j = max(\{ j \in dom(E) \mid j = 0 $ or $ S_{j-1}.tid \neq S_j.tid $ and $ j<i \})$}{
+                    \uIf{$p \in enabled(pre(E,i)))$}{
+                        add $p$ to $backtrack(pre(E,i))$ \;
+                    }
+                    \Else{add $enabled(pre(E,i))$ to $backtrack(pre(E,i))$ \;}
+                }
+            }
+            }
+        }
+        \If{$p \in enabled(s)$}{
+            add $p$ to $backtrack(s)$ \;
+        }
+        \Else{
+            add any $u \in enabled(s)$ to $backtrack(s)$ \;
+        }
+        \Let{$visited = \emptyset $}
+        \While{$ \exists u \in (enabled(s) \cap backtrack(s) \backslash visited) $}{
+            add $u$ to $visited$ \;
+            \uIf{$(B_v(S.next(s, u)) \leq c)$}{
+                Explore($S.next(s, u)$) \;
+            }
+        }
+    }
+\end{algorithm}
+
+\section{Nidhugg-BPOR}
+
+In order to take advantage of Nidhuggs's infrastructure, a modification of this algorithm is used.
+The algorithm is presented in Algorithm \ref{Nidhugg BPOR}.
+
+\begin{algorithm}
+    \caption{Nidhugg-BPOR}
+    \label{Nidhugg BPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E'}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                             add some $q' \in I_{[E']}(u)$ to $backtrack(E') $ \;}
+                        }
+                    \Let{$E''= pre\_block(e,E)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E''}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                            add some $c(q') \in I_{[E'']}(u)$ to $backtrack(E'') $ \;
+                        }
+                    } 
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
+                }
+            }
+        }
+    }
+\end{algorithm}
+
+Notice that persistent sets are calculated for both the conservative and the non-conservative branches.
+
+A critical challenge arises when a DPOR algorithm is used in tandem with sleep sets. This stems from the fact that
+conservative branches are not added due to a concurrent event. By observing the sleep set algorithm we notice that if we
+follow the same strategy as with non-conservative branches many traces will end up being blocked.
+
+Let us take the writer-2readers example as shown in Figure \ref{Usage of non-conservative branches}.
+
+\trace{w2rpersistent.pdf}{Usage of non-conservative branches}
+
+We notice that the last trace is sleep set blocked while it should be examined. The algorithm is unaware that the
+process $r$ should be removed from the sleep set since there is no or will ever be found any conflict with the first
+command of the thread which is related with a non shared variable. In order to deal with this problem, when a
+conservative branch is chosen then it should not be added to the sleep set. However there must be a set recording all
+the branches that were added at this certain point of the trace so no thread is added twice. Without this set the
+exploration would continue indefinitely. The solution is based on the notion of the conservative sets where every thread
+that was added to the branch is recorded. 
+
+Intuitively the algorithm is the same with the Nidhugg-DPOR with the addition of the conservative branches. 
+The algorithm is based on the idea of the conservative sets where every thread that was added to the branch is recorded.  
+However many challenges arise which are discussed in the implementation section.
+
+\tracelong{w2rbpor.pdf}{Example of BPOR execution}
+
+\section{Source-BPOR}
+
+Having discussed BPOR algorithm and Nidhugg-BPOR, the next step is to try combine source sets with the algorithm. The
+first observation we have to make is that source sets and thus the algorithm for creating these sets is not suitable for
+adding conservative branches. A quick explanation is given in the next writer-2-readers example even though the problem
+will be further discussed later. Let us assume that we have followed the source set algorithm for adding conservative
+sets. The results are shown at Figure \ref{Following source sets for conservative branches}.
+
+\trace{w2rsourceconservative.pdf}{Following source sets for conservative branches}
+
+It is clear that some traces are not explored. Specifically, the trace which start with r has been rejected. The reason
+is that it shares the same initials with r1 even at the beginning of that block. As a result the algorithm must create
+to persistent sets when conservative threads are added. 
+
+Having made the preceding observations the algorithm used for Source-BPOR is shown in Algorithm \ref{SBPOR}.
+
+\begin{algorithm}
+    \caption{Source-BPOR}
+    \label{SBPOR}
+    \SetKwInOut{Input}{input}
+    \SetKwHangingKw{Let}{let}
+    Explore($\langle \rangle$,$\emptyset$,$b$)\;
+    \Fn{Explore($E$,$Sleep$,$b$)}{
+        \If{$\exists p \in ((enabled(s_{[E]}) \backslash Sleep)$ and $B_v(E.p) <=b$}{
+            backtrack(E) $:={p}$ \;
+            \While{$\exists p \in (backtrack(E) \backslash Sleep $ and $B_v(E.p) <=b$}{
+                \ForEach{$e \in dom(E)$ such that $e \lesssim_{E.p} next_{[E]}(p)$}{
+                    \Let{$E' = pre(E,e)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \If{$I_{E'}(u) \cap backtrack(E') = \emptyset$}{
+                        add some $q' \in I_{[E']}(u) \text{ to } backtrack(E') $ \;
+                    }
+                    \Let{$E''= pre\_block(e,E)$}
+                    \Let{$u = notdep(e,E).p$}
+                    \Let{$CI = \{ i \in I_{E''}(u) \mid i \rightarrow p \}$}
+                    \If{$CI \cap backtrack(E') = \emptyset$}{
+                        \If{$CI \neq \emptyset$}{
+                            add some $q' \in CI$ to $backtrack(E') $ \;
+                        }
+                        \Else{
+                            add some $c(q') \in I_{[E'']}(u)$ to $backtrack(E'') $ \;
+                        }
+                    } 
+                }
+                \Let{ $Sleep' := \{q \in Sleep \mid E \models p \diamondsuit q \}$ } 
+                $Explore(E.p, Sleep)$ \;
+                \If{$p$ is not conservative}{
+                    add $p$ to $Sleep$ \;
+                }
+            }
+        }
+    }
+\end{algorithm}
+
+We can notice that the Algorithm \ref{SBPOR} works as Source-DPOR (Alg. \ref{Source}) for non-conservative traces and as
+BPOR (Alg. \ref{Nidhugg BPOR}) for conservative traces.
+
+\section{Challenges Arising from the addition of conservative branches}
+%% I still believe that this discussion should be placed after results have been presented.
+
+\subsection{Conservative Branches}
+In a previous section we saw that conservative sets cannot utilize the sleep set optimization. This is due
+to the fact that these branches are not produced by conflicts and as a result it is impossible to ``wake up'' another
+process whose next step may be a local operation. The problem is getting even more complex considering that when a
+conservative branch is added the algorithm ``forgets'' what was previously in this place. This lack of memory leads to an
+explosion of the state space. This explosion is greater than the explosion happening when exploring the complete state
+space. In order to explain this better an example involving a writer and three readers is given in Figure \ref{writer-3-readers
+explosion}. Specifically, the writer process just writes a value on a variable x while the reader processes read this variable
+after reading another variable unique for each process which can be regarded as a local operation.
+
+\trace{w3rbpor.pdf}{writer-3-readers explosion}
+
+As we can infer from the example there are more states to be explored than the expected ones. The expected number of
+traces would be $8$ but $4!$ are explored. Notice that every reader is backtracked in the first command since it
+conflicts with $w(x)$. These branches should be blocked by the sleep sets in the unbounded search. However, these
+branches are also conservative ones. There are extra traces such as the $r2.r1.w$ trace which explores the already
+explored $r1.r2.w$ trace. The algorithm is not aware when adding the conservative trace whether an equivalent trace will
+be explored. The situation is worse when more readers are to read the same global variable. The total traces explored
+for a big bound approach the $N!$ where $N$ the total number of threads. We can easily notice that execution seems to be
+aware of the previous executions since sleep sets cannot be used. This happens due to the redundant inversions of the
+reading operations. 
+
+\subsection{Sleep Sets}
+The results of the various bounding algorithms suggest that the number of sleep set blocked traces is really small
+compared to the number of the explored traces. This is due to the conservative branches. It was made clear that when
+both a conservative and a non-conservative branch of the same thread is added then the conservative branch prevails.
+This trace would be redundant in an unbounded version of the algorithm but it is not in a bounded version since the
+non-conservative branch may had been rejected. Moreover, even if both threads had been accepted by the algorithm there
+may be a later scheduling which may be rejected when the trace was caused by the non-conservative branch and be accepted
+by the equivalent trace caused by the conservative branch. 
+
+Another ``problem'' with the sleep sets is that are ``in favor'' of the branches that increase the bound count while
+they block traces with lower bound count. In Figure \ref{Sleep set contradiction} it is shown that the branch which
+would not have caused a increase of the bound is rejected.
+
+\trace{sleepsetproblem.pdf}{Sleep set contradiction}
+
+This behavior is quite reasonable if we consider the depth-first nature of the algorithm. As it was demonstrated in the
+first chapter, the DPOR algorithm performs a DFS-search. As a result it takes the branches which are located lower in
+the traces where the bound count is higher since more preemptive switches have taken place. The purpose of the sleep
+sets is to block redundant traces, i.e. traces that have already been explored. As a result the equivalent traces with
+lower bound count will be rejected. A method that would explore the state space in breadth first way would be unfeasible
+since it would entail a huge memory overhead which stems from the storage of the traces that have not be completely
+explored. 
+
+\iffalse
+\subsection{Source Sets - Optimal DPOR}
+The source set technique which can lead many times to optimal coverage of the state space manages avoid the exploration
+of redundant sets. However as it was discussed in the previous section it avoids the scheduling of the traces.
+Unfortunately it cannot be used in the when conservative branches are added since these branches are not related to the
+sleep sets. As a result the conservative branches alone will never lead to sleep set blocked traces.
+
+However, in many test cases there are some sleep set blocked traces which are caused by conditional reads and writes.
+When a technique which does not utilize the sleep sets is to be used these traces would have been easily eliminated.
+Unfortunately, it was experimentally shown that explored traces outnumber the sleepset blocked traces and, consequently,
+the implementation of such an algorithm would have a minor impact.
+
+Moreover, we have shown that even if we maintain the source-set optimization for the non-conservative branches the
+results will be equivalent with using persistent sets. The idea of keeping the rejected traces from Source-DPOR that
+would have been added from DPOR (with persistent sets) was rejected since it harms the soundness of the algorithm.
+\fi
+
+\subsection {The Performance - Soundness Tradeoff}
+
+From the previous discussion it is clear that all the bounding algorithms have to deal with a tradeoff. Some algorithms may be faster but
+explore a smaller amount of traces, without even covering the full state space within the bound (Algorithm \ref{Vanilla}), 
+whereas others explore the whole state space (Algorithm \ref{Nidhugg BPOR}) within the bound but require more time.

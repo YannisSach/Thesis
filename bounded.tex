@@ -202,7 +202,7 @@ sets. The results are shown at Figure \ref{Following source sets for conservativ
 
 It is clear that some traces are not explored. Specifically, the trace which start with r has been rejected. The reason
 is that it shares the same initials with r1 even at the beginning of that block. As a result the algorithm must create
-to persistent sets when conservative threads are added. 
+to persistent sets when conservative branches are added. 
 
 Having made the preceding observations the algorithm used for Source-BPOR is shown in Algorithm \ref{SBPOR}.
 
@@ -244,8 +244,8 @@ Having made the preceding observations the algorithm used for Source-BPOR is sho
     }
 \end{algorithm}
 
-We can notice that the Algorithm \ref{SBPOR} works as Source-DPOR (Alg. \ref{Source}) for non-conservative traces and as
-BPOR (Alg. \ref{Nidhugg BPOR}) for conservative traces.
+We can notice that the Algorithm \ref{SBPOR} works as Source-DPOR (Alg. \ref{Source}) for non-conservative branches and as
+BPOR (Alg. \ref{Nidhugg BPOR}) for conservative branches .
 
 \section{Challenges Arising from the addition of conservative branches}
 %% I still believe that this discussion should be placed after results have been presented.

@@ -1,16 +1,16 @@
-\chapter{Bounding Techniques for DPOR}
+\chapter{Τεχνικές περιορισμού για DPOR}
 \label{bounded}
 
-In this chapter Bounding Techniques for DPOR are discussed as well as the challenges emerging from these techniques.
-The challenges of bounding the DPOR have already been discussed.
+Σε αυτό το κεφάλαιο Τεχνικές Περιοσμού (Bounding Techniques) για τον DPOR συζητόνται καθώς και προκλήσεις που δημιουργούνται από αυτές τις τεχνικές.
+Οι προκλήσεις που πρέπει να αντιμετωπίσουμε για να περιορίσουμε τον DPOR έχουν ήδη συζητηθεί.
 
 %% Challenges discussion can not be placed before the presentation of the algorithms since it is closely related to the algorithms themselves
 %% and not the Bounding of DPOR. Provided that other algorithms were suggested, different challenges may had been arisen. 
 
 \section{Naive-BPOR}
 
-The first bounded technique to be presented is the Naive-BPOR (Algorithm \ref{Vanilla}). The purpose of the algorithm is to block traces that exceed the bound
-limit. 
+Οι πρώτη τεχνική περιορισμού που παρουσιάζεται είναι ο Naive-BPOR (Αλγόριθμος \ref{Vanilla}). Ο σκοπός αυτού του αλγορίθμου είναι να μπλοκάρει traces που ξεπερνούν κάποιο
+όριο.
 
 \begin{algorithm}
     \caption{Naive-BPOR}
@@ -37,46 +37,45 @@ limit.
     }
 \end{algorithm}
 
-The Algorithm \ref{Vanilla} is almost the same with Source-DPOR(Algorithm \ref{Source}). The only additions made are
-related to the thread scheduling. When a a step of a process $p$ added to $E$ result the trace $E.p : B_v(E.p) > b$ then
-this process is not allowed to be scheduled. This algorithm is not sound i.e., it does not examine every trace that
-compensates with the bound
+Ο Αλγόριθμος \ref{Vanilla} είναι σχεδόν πανομοιότυπος με τον  Source-DPOR(Algorithm \ref{Source}). Η μόνη διαφορά είναι η προσθήκη μια συνθήκης που συνδέεται με τη δρομολόγηση
+διεργασίων. Όταν ένα βήμα μιας διεργασίας $p$ προστίθεται στο $E$ με αποτέλεσμα το  trace $E.p : B_v(E.p) > b$ τότε η διεργασία δεν επιτρέπεται να δρομολογηθεί.
+Ο Αλγόριθμος δεν είναι sound δηλαδή, δεν εξετάζει όλα τα traces τα οποία ανήκουν έχουν bound count μικρότερο από μία τιμή.
 
-Let the writer-2-readers example with $b=0$. An example of exploration for bound $b=0$ is given in Figure \ref{Naive-BPOR for bound=$0$}. 
+Υποθέτουμε το παραάδειμα του ενός εγγραφέα και των δύο αναγνωστών για bound $b=0$. Ένα παράδειγμα αναζήτησης για bound $b=0$ δίνεται στο Figure \ref{Naive-BPOR for bound=$0$}. 
 
 \label{Vanilla0}    
 \trace{w2rvbound.pdf}{Naive-BPOR for bound=$0$}
 
-As we can see there are 4 traces that do not exceed the bound. These are:
+Όπως μπορούμε να παρατηρήσουμε υπάρχουν 4 traces τα οποία δεν ξεπερνούν το όριο. Αυτά είναι:
 $p.q.q.r.r$, $q.q.p.r.r$, $r.r.p.q.q$, $q.q.r.r.p$.
-However the Naive-BPOR is not able to explore them all; $r.r.p.q.q$ is not explored.
-As it was shown in the comparison of persistent and source sets, $r$ is never registered as the first event of the trace
-since this will lead to a sleep set blocked trace. The branch that would lead to an equivalent trace to $r.r.p.q.q$ is rejected
-since it would have higher bound count. Interestingly enough a Naive-BPOR based on persistent sets would explore a larger state-space since
-it would have explored would probably have explored the trace $r.r.p.q.q$.
+Παρολ᾽ αυτά ο Naive-BPOR δεν είναι σσε θέση να τα εξερευνήσει όλα; $r.r.p.q.q$ δεν εξερευνάται.
+Όπως δείξαμε στη σύγκριση μεταξύ  persistent και source sets, το $r$ δεν θα γίνει ποτέ το πρώτο γεγονός στο trace
+καθώς αυτό θα οδηγούσε σε sleep set blocked trace. Η διακλάδωση που θα οδηγούσε στο ισοδύναμο trace με το $r.r.p.q.q$ απορρίπτεται
+καθώς θα έχει μεγαλύτερο bound count από το ζητούμενο. Αξιοπρόσεκτο είναι ότι ένας Naive-BPOR που βασιζόταν σε persistent sets θα εξερευνούσε ένα μεγαλύτερο state-space
+και θα εξερευνούσε και το ζητούμενο trace $r.r.p.q.q$.
 
 \section{BPOR}
 
-The next step is to implement a sound preemption bounded algorithm (BPOR) \cite{BPOR}. This algorithm would rely on
-persistent sets. Since we have correctly implemented persistent sets for Nidhugg-DPOR we can easily implement a BPOR
-algorithm. The novelty of the BPOR is the introduction of conservative branches. These are branches that are introduced
-in order to guarantee the exploration of the whole state space. It is common for a trace to exceed the bound limit
-whereas there is an equivalent trace which does not. The conservative branches are used for this purpose.
+Το επόμενο βήμα είναι να υλοποιήσουμε έναν preemption bounded Αλγόριθμο (BPOR) \cite{BPOR}. Αυτός ο Αλγόριθμος θα βασίζεται στα
+persistent sets. Καθώς έχουμε ήδη ένα ορθά υλοποιημένο αλγόριθμο που χρησιμοποιεί persistent sets στον Nidhugg-DPOR μπορούμε εύκολα να υλοποιήσουμε έναν BPOR
+αλγόριθμο. Η καινοτμία του BPOR είναι η εισαγωγή συντηρητικών διακλαδώσεων. Αυτές είναι διακλαδώσει που εισάγονται προκειμένου να εγγυηθούν την εξερεύνηση όλου του
+state space.
+Είναι αρκετά συνηθισμένο ένα trace να ξεπερνάει το  bound limit
+αλλά ένα ισοδύναμό του να μην το ξεπερνάει. Οι συντηρητικές διακλαδώσεις χρησιμοποιούνται γι αυτό το σκοπό.
 
-To make this idea more clear we introduce the notion of Trace block.
+Για να κάνουμε την ιδέα πιο καθαρή εισάγουμε την έννοια Trace Block.
 \begin{definition}{(Trace block)}
-For a trace $T$ a sequence $B$ of consecutive events is a trace block iff all events happen in the same thread i.e. all
-the events have the same thread id.
+Για ένα trace $T$ η ακολουθία $B$ από συνεχόμενα γεγονότα είναι ένα Trace Block ανν όλα τα γεγονότα πραγματοποιούντια από την ίδια διεργασία δηλαδή,
+όλα τα γεγονότα έχουν το ίδιο thread id.
 \end{definition}
 
-The idea behind conservative branches is quit simple. When a branch is added a conservative branch is added at the
-beginning of the corresponding block. Usually concurrent events take place inside a block. As a result when a branch is
-taken then the preemption count will most probably increased. However, had this branch been added at the beginning of
-the block the preemption count would not have been increased. BPOR is presented in detail in Algorithm \ref{BPOR}. The
-BPOR algorithm differs from Classic-DPOR in the double nested loop which is introduced in line 3. This inner loop is
-introduced in order for the BPOR to compensate with the defintion of the preemption-bounded persistent sets which was
-introduced in Chapter 2. Moreover, as in Naive-BPOR, the exploration is also be terminated if a trace exceeds the bound
-limit.
+Η ιδέα πίσω από τις συντηρητικές διακλαδώσεις είναι αρκετά απλή. Μια συντηρητική διακλάδωση προστίθεται στην αρχή του αντίστοιχου
+Block όταν μια διακλάδωση δημιουργείται.
+Συνήθως τα ταυτόχρονα γεγονότα συμβαίνουν μέσα σε ένα block. Έτσι όταν επιλέγεται μια εναλλακτική διακλάδωση 
+το preemption count θα αυξηθεί. Αν η διακλάδωση αυτή είχε εξερευνηθεί από την αρχή του block το preemption count δε θα είχε αυξηθεί.
+Ο BPOR παρουσιάζεται με λεπτομέρια στον Αλγόριθμο \ref{BPOR}. Ο BPOR διαφέρει από τον Classic-BPOR στον διπλά εμφολευμένο βρόγχο που εισάγεται
+στη γραμμή 3. Ο εσωτερικός βρόγχος εισάγεται προκειμένου ο BPOR να υπακούει στον ορισμό των preemption-bounded persistent sets που εισάγαμε στο Κεφάλαιο 2
+Επιπλέον, όπως ισχύει και στον Naive-BPOR, η εξερεύνηση σταματάει όταν το trace ξεπερνάει το όριο που εμείς έχουμε θέσει.
 
 \begin{algorithm}
     \caption{BPOR}
@@ -120,8 +119,8 @@ limit.
 
 \section{Nidhugg-BPOR}
 
-In order to take advantage of Nidhuggs's infrastructure, a modification of this algorithm is used.
-The algorithm is presented in Algorithm \ref{Nidhugg BPOR}.
+Προκειμένου να εκμεταλλευτούμε την υποδομή του Nidhuggs, μια παραλλαγή του αλγορίθμου χρησιμοποιείται.
+Ο αλγόριθμος παρουσιάζεται εδώ \ref{Nidhugg BPOR}.
 
 \begin{algorithm}
     \caption{Nidhugg-BPOR}
@@ -166,45 +165,45 @@ The algorithm is presented in Algorithm \ref{Nidhugg BPOR}.
     }
 \end{algorithm}
 
-Notice that persistent sets are calculated for both the conservative and the non-conservative branches.
+Παρατηρούμε ότι τα persistent sets χρησιμοποιείται και για τα conservative και για τα non-conservative branches.
 
-A critical challenge arises when a DPOR algorithm is used in tandem with sleep sets. This stems from the fact that
-conservative branches are not added due to a concurrent event. By observing the sleep set algorithm we notice that if we
-follow the same strategy as with non-conservative branches many traces will end up being blocked.
+Μια σημαντική πρόκληση δημιουργείται όταν ο DPOR Αλγόριθμος χρησιμοποιείται μαζί με τα sleep sets. Αυτό προκύπται από το γεγονός ότι οι 
+οι συντηρητικές διακλαδώσεις δεν δημιουργούνται προκειμένουν αν επιλύσουν races. Στον Αλγόριθμο των sleep set παρατηρούμε ότι αν ακολουθήσουμε 
+την ίδια στρατηγική με τις μη συντηρητικές διακλαδώσεις πολλά traces θα είχαν μπλοκαριστεί.
 
-Let us take the writer-2readers example as shown in Figure \ref{Usage of non-conservative branches}.
+Ας πάρουμε και πάλι το παράδειγμα του εγγραφέα και των δύο αναγνωστών, όπως φαίνεται στο Figure \ref{Usage of non-conservative branches}.
 
 \trace{w2rpersistent.pdf}{Usage of non-conservative branches}
 
-We notice that the last trace is sleep set blocked while it should be examined. The algorithm is unaware that the
-process $r$ should be removed from the sleep set since there is no or will ever be found any conflict with the first
-command of the thread which is related with a non shared variable. In order to deal with this problem, when a
-conservative branch is chosen then it should not be added to the sleep set. However there must be a set recording all
-the branches that were added at this certain point of the trace so no thread is added twice. Without this set the
-exploration would continue indefinitely. The solution is based on the notion of the conservative sets where every thread
-that was added to the branch is recorded. 
+Παρατηρούμε ότι το τελευταίο trace θα μπολοκαριστεί από τα sleep set ενώ θα έπρεπε να εξεταστεί. Ο Αλγόριθμος δεν γνωρίζει ότι η διεργασία
+$r$ πρέπει να αφαιρεθεί από το sleep set καθώς δεν υπάρχει και δεν πρόκειται να υπάρξει ποτέ conflict με την πρώτη εντολή της διεργασίας καθώς 
+αυτή σχετίζεται με μια μη μοιραζόμενη μεταβλητή. Προκειμένου να αντιμετωπίσουμε αυτό το πρόβλημα επιλέχθηκε τα 
+conservative branch να μην προστίθενται στο sleep set. Παρολ᾽ αυτά πρέπει να είμαστε σε θέση να καταγράφουμε όλες τις διακλαδώσεις που προστίθενται σε
+ένα συγκεκριμένο σημείο προκειμένου καμία διακλάδωση να μην προστεθεί δύο φορές.
+Χωρίς αυτό το σύνολο που κάνει αυτή την καταγραφή η εκτέλεση δε θα τελείωνε.
+Η λύση είναι η εισαγωγή του συντηρητικού συνόλου (conservative sets) όπου καταγράφεται η προσθήκη των διακλαδώσεων.
 
-Intuitively the algorithm is the same with the Nidhugg-DPOR with the addition of the conservative branches. 
-The algorithm is based on the idea of the conservative sets where every thread that was added to the branch is recorded.  
-However many challenges arise which are discussed in the implementation section.
+Διαισθητικά, ο αλγόριθμος είναι ίδιος με τον Nidhugg-DPOR με την προσθήκη των συντηρητικών διακλαδώσεων.
+Ο Αλγόριθμος βασίζεται στην των conservative sets.
+Τα υπόλοιπα προβλήματα που αντιμετωπίστηκαν δίνονται στην ενότηταα σχετικά με την υλοποίηση.
 
 \tracelong{w2rbpor.pdf}{Example of BPOR execution}
 
 \section{Source-BPOR}
 
-Having discussed BPOR algorithm and Nidhugg-BPOR, the next step is to try combine source sets with the algorithm. The
-first observation we have to make is that source sets and thus the algorithm for creating these sets is not suitable for
-adding conservative branches. A quick explanation is given in the next writer-2-readers example even though the problem
-will be further discussed later. Let us assume that we have followed the source set algorithm for adding conservative
-sets. The results are shown at Figure \ref{Following source sets for conservative branches}.
+Έχοντας συζητήσει τον BPOR Αλγόριθμο και τον Nidhugg-BPOR, το επόμενο βήμα είναι να προσπαϑήσουμε να συνδιάσουμε τον αλγόριθμο με τα source sets.
+Η πρώτη παρατήρηση που πρέπει να κάνουμε είναι ότι τα source sets και επομένως ο αλγόριθμος που τα δημιουργεί δεν είναι κατάλληλα στην 
+προσθήκη συντηρητικών διακλαδώσεων. Μια γρήγορη επεξήγησ δίνεται στο επόμενο παράδειγμα με τον έναν εγγραφέα και τους δύο αναγνώστες.
+Ας υποθέσουμε έναν αλγόριθμο που χρησιμποιεί source sets για την προσθήκη συντηρητικών διακλαδώσεων.
+Το αποτέλεσμα φαίνεται στο Figure \ref{Following source sets for conservative branches}.
 
 \trace{w2rsourceconservative.pdf}{Following source sets for conservative branches}
 
-It is clear that some traces are not explored. Specifically, the trace which start with r has been rejected. The reason
-is that it shares the same initials with r1 even at the beginning of that block. As a result the algorithm must create
-to persistent sets when conservative threads are added. 
+Είναι σαφές ότι κάποια traces δεν εξερευνόνται. Συγκεκριμένα, το trace που ξεκινά με τη r θα απορριφθεί. Ο λόγος είναι ότι μοιράζεται τα ίδια
+initials με το r1 ακόμα και στην αρχή αυτού του block. Σαν αποτέλεσμα ο Αλγόριθμος πρέπει να δημιουργεί
+persistent sets όταν συντηρητικές διακλαδώσεις προστίθενται.
 
-Having made the preceding observations the algorithm used for Source-BPOR is shown in Algorithm \ref{SBPOR}.
+Έχοντας υπόψιν την προηγούμενη παρατήρηση ο Αλγόριθμος Source-BPOR δίνεται εδώ \ref{SBPOR}.
 
 \begin{algorithm}
     \caption{Source-BPOR}
@@ -244,56 +243,54 @@ Having made the preceding observations the algorithm used for Source-BPOR is sho
     }
 \end{algorithm}
 
-We can notice that the Algorithm \ref{SBPOR} works as Source-DPOR (Alg. \ref{Source}) for non-conservative traces and as
-BPOR (Alg. \ref{Nidhugg BPOR}) for conservative traces.
+Παρατηρούμε ότι ο Αλγόριθμος \ref{SBPOR} χρησιμποιεί Source-DPOR (Alg. \ref{Source}) για τη μη συντηρητικές διακλαδώσεις και τον 
+BPOR (Alg. \ref{Nidhugg BPOR}) για τις συντηρητικές διακλαδώσεις.
 
-\section{Challenges Arising from the addition of conservative branches}
+\section{Προκλήσεις από την προσθήκη Συντηρητικών Διακλαδώσεων}
 %% I still believe that this discussion should be placed after results have been presented.
 
-\subsection{Conservative Branches}
-In a previous section we saw that conservative sets cannot utilize the sleep set optimization. This is due
-to the fact that these branches are not produced by conflicts and as a result it is impossible to ``wake up'' another
-process whose next step may be a local operation. The problem is getting even more complex considering that when a
-conservative branch is added the algorithm ``forgets'' what was previously in this place. This lack of memory leads to an
-explosion of the state space. This explosion is greater than the explosion happening when exploring the complete state
-space. In order to explain this better an example involving a writer and three readers is given in Figure \ref{writer-3-readers
-explosion}. Specifically, the writer process just writes a value on a variable x while the reader processes read this variable
-after reading another variable unique for each process which can be regarded as a local operation.
+\subsection{Συντηρητικές Διακλαδώσεις}
+
+Στην προηγούμενη ενότηταη είδαμε ότι τα conservative sets δεν μπορούν να χρησιμποιήσουν τα sleep sets. Αυτό συμβαίνει 
+επειδή αυτές οι διακλαδώσεις δνε προκύπτουν από conflicts και σαν αποτέλεσμα είναι αδύνατο να ``wake up'' άλλες διεργασίες
+των οποίων τα επόμενα βήματα είναι τοπικές λειτουργίες. Το πρόβλημα γίνεται ακόμα πιο πολύπλοκο όταν σκεφτούμε ότι όταν προσθέτουμε
+συντηρητικές διακλαδώσεις ο αλγόριθμος ``ξενχά'' τί έχει λάβει χώρα προηγουμένως. Αυτή η έλλειψη μνήμης οδηγεί σε μια έκρηξη του 
+χώρου καταστάσεων. Αυτή η έκρηξη είναι ακόμα πιο έντονη και από την εξερεύνηση όλου του state space
+Προκειμένου να εξηγήοσυμε καλύτερα, ένα παράδειγμα που περιλαμβάνει έναν εγγραφέα και τρεις αναγνώστες δίνεται στο Figure \ref{writer-3-readers
+explosion}. Συγκεκριμένα, η διεργασία εγγραφέας που γράφει τη μεταβλητή x ενώ οι διεργασίες αναγνώστες διαβάζουν αυτή τη μεταβλητή
+αφού διαβάσουν μια άλλη μοναδική για την κάθε διεργασία μεταβλητή που μπορεί να θεωρηθεί τοπική λειτουργία.
 
 \trace{w3rbpor.pdf}{writer-3-readers explosion}
 
-As we can infer from the example there are more states to be explored than the expected ones. The expected number of
-traces would be $8$ but $4!$ are explored. Notice that every reader is backtracked in the first command since it
-conflicts with $w(x)$. These branches should be blocked by the sleep sets in the unbounded search. However, these
-branches are also conservative ones. There are extra traces such as the $r2.r1.w$ trace which explores the already
-explored $r1.r2.w$ trace. The algorithm is not aware when adding the conservative trace whether an equivalent trace will
-be explored. The situation is worse when more readers are to read the same global variable. The total traces explored
-for a big bound approach the $N!$ where $N$ the total number of threads. We can easily notice that execution seems to be
-aware of the previous executions since sleep sets cannot be used. This happens due to the redundant inversions of the
-reading operations. 
+Όπως μπορούμε να συμπεράνουμε από το παράδειγμα οι εξερευνημένες καταστάσεις είναι περισσότερες από τις αναμενόμενες. 
+Ο αναμενόμενος αριθμός θα έπρεπε να είναι $8$ αλλά στην πραγματικότητα είναι $4!$. Παρατηρούμε ότι κάθε εγγραφέας γίνεται baccktracked 
+στην πρώτηη εντολή καθώς έχει conflict με το $w(x)$. Αυτές οι διακλαδώσιιες θα πρέπει να γίνουν blocked απο την unbounded search. 
+Παρολ᾽ αυτά, αυτές οι διακλαδώσεις είναι συντηρητικές.
+Υπάρχουν  extra traces όπως το $r2.r1.w$ trace που ελέγχει ήδη το εξερευνημένο $r1.r2.w$ trace. 
+Ο Αλγόριθμος δεν είναι σε θέση να γνωρίζει όταν προσθέτει συντηρητικές διακλαδώσεις 
+αν ισοδύναμα traces έχουν ήδη εξερευνηθεί. Η κατάσταση γίνεται χειρότερ όταν ακόμα περισσότεροι εγγραφείς διαβάζουν
+την ίδια μοιραζόμενη μεταβλητή καθώς αν θέσουμε ένα μεγάλο όριο τότε ο αριθμός των traces προσεγγίζει την τιμή $N!$ 
+όπου $N$ ο συνολικός αριθμόες των διεργασιών. 
 
 \subsection{Sleep Sets}
-The results of the various bounding algorithms suggest that the number of sleep set blocked traces is really small
-compared to the number of the explored traces. This is due to the conservative branches. It was made clear that when
-both a conservative and a non-conservative branch of the same thread is added then the conservative branch prevails.
-This trace would be redundant in an unbounded version of the algorithm but it is not in a bounded version since the
-non-conservative branch may had been rejected. Moreover, even if both threads had been accepted by the algorithm there
-may be a later scheduling which may be rejected when the trace was caused by the non-conservative branch and be accepted
-by the equivalent trace caused by the conservative branch. 
+Τα αποτελέσματα των διαφόρων  bounding αλγορίθμων υπονοεί ότι ο αριθμός τον sleep set blocked traces είναι πολύ μικρός
+σε σχέση με τον αριθμό των εξερευνημένων traces. Αυτό προκύπτει από τα conservative branches. Έχουμε ήδη δείξει όταν μία διεργασία
+προστείθεται και ως συντηρητική διακλάδωση και ως μη συντηρητική διακλάδωση η συντηρητική φύση της διακλάδωσης υπερισχύει.
+Traces που θα θεωρούνταν περιττά στην ubounded εκδοχή του αλγορίθμου δεν είναι περιττά στην bounded εκδοχή καθώς οι μη 
+συντηρητικές διακλαδώσεις μπορεί να έχουν απορριφθεί.
 
-Another ``problem'' with the sleep sets is that are ``in favor'' of the branches that increase the bound count while
-they block traces with lower bound count. In Figure \ref{Sleep set contradiction} it is shown that the branch which
-would not have caused a increase of the bound is rejected.
+Ένα ακόμα  ``πρόβλημα'' με τα sleep sets είναι ότι  ``ευνοούν'' τις διακλαδώσεις που αυξάνουν το bound count ενώ μπλοκάρουν
+traces με μικρότερο bound count. Στο Figure \ref{Sleep set contradiction} φαίνεται πως μια διακλάδωση που δεν οδηγεί
+σε αύξηση του bound count απορρίπτεται.
 
 \trace{sleepsetproblem.pdf}{Sleep set contradiction}
 
-This behavior is quite reasonable if we consider the depth-first nature of the algorithm. As it was demonstrated in the
-first chapter, the DPOR algorithm performs a DFS-search. As a result it takes the branches which are located lower in
-the traces where the bound count is higher since more preemptive switches have taken place. The purpose of the sleep
-sets is to block redundant traces, i.e. traces that have already been explored. As a result the equivalent traces with
-lower bound count will be rejected. A method that would explore the state space in breadth first way would be unfeasible
-since it would entail a huge memory overhead which stems from the storage of the traces that have not be completely
-explored. 
+Αυτή η συμπεριφορά είνα αρκετά λογική αν αναλογιστούμε την depth-first φύση του αλγορίθμου.
+Αποτέλεσμα είναι να επιλέγει πρώτα διακλαδώσει που βρίσκονται χαμηλότερα στο trace 
+όπου το bound count είναι μεγαλύτερο καθώς περισσότερα preemptive switches έχουν συμβεί. Ο σκοπός των sleep
+sets είναι να μπλοκάρουν traces, δηλαδή traces που έχουν ήδη εξερευνηθεί. Έτσι traces με μικρότερο bound count απορρίπτονται
+Μια μέθοδος που θα εξερευνούσε το state space με έναν breadth first τρόπο ίσως δε θα ήταν εφικτή καθώς θα απαιτούσε
+πολλή μνήμη από ημιτελή traces.
 
 \iffalse
 \subsection{Source Sets - Optimal DPOR}
@@ -314,6 +311,6 @@ would have been added from DPOR (with persistent sets) was rejected since it har
 
 \subsection {The Performance - Soundness Tradeoff}
 
-From the previous discussion it is clear that all the bounding algorithms have to deal with a tradeoff. Some algorithms may be faster but
-explore a smaller amount of traces, without even covering the full state space within the bound (Algorithm \ref{Vanilla}), 
-whereas others explore the whole state space (Algorithm \ref{Nidhugg BPOR}) within the bound but require more time.
+Από την προηγούμενη συζήτηση είναι σαφέ ότι όλοι οι bounding algorithms έχουν να αντιμετωπίσουν ένα tradeoff. Κάποια αλγόριθμοι είναι γρηγορότεροι
+καθώς εξερευνούν ένα μικϱό κομμάτι του state space, χωρίς να καλύπτουν όλο το state space μέσα στο bound (Αλγόριθμος \ref{Vanilla}), 
+ενώ άλλοι εξερευνούν όλο το state space (Αλγόριθμος \ref{Nidhugg BPOR}) μέσα στο bound αλλά απαιτούν πιο πολλή ώρα.

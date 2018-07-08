@@ -1,111 +1,107 @@
-\chapter{Evaluation of Implemented Algorithms}
+\chapter{Αξιολόγηση των Υλοποιηθέντων Αλγορίθμων}
 \label{Chapter 4}
 
-In this chapter, the performance of each implemented technique will be discussed. Firstly, the performance of
-Nidhugg-DPOR is demonstrated in order to validate that its performance, indeed differs from Source-DPOR. The evaluation
-takes place in two parts. In the first part, short synthetic programs are used, while in the second part real world
-software is tested. Synthetic programs can be found in the appendix section. One area where Nidhugg is tested is the
-verification of the Read Copy Update technique of the Linux kernel.
-
+Σε αυτό το κεφάλαιο η επίδοση κάθε αλγορίθμου που υλοποιήθηκε αξιολογείται. Αρχικά μελετάμε την επίδοσου του 
+Nidhugg-DPOR προκειμένου να δείξουμε ότι και στην υλοποίηση μας πράγματι η επίδοσήτ του διαφέρει από αυτή του Source-DPOR. Η
+αξιολόγηση χωρίζεται σε δύο μέρη. Στο πρώοτ μέρος χρησιμοποιούνται μικϱά συνθετικά προγράμματα ενώ στο δεύτερο χρησιμοποιείται
+πραγματικό λογισμικό. Τα συνθετικά τεστ μπορούν να βρεθούν στο παράρτημα. 
 
 \section{Synthetic Tests}
-There are many tests provided from various sources. Most of these testcases are not complicated at all since their
-purpose is to demonstrate the performance difference of the Source-DPOR and Nidhugg-DPOR.
+Τα συνθετικά τεστ έχουν προέλθει από διάφρορες πηγές και δεν είναι ιδιαίτερε πολύπλοκα καθώς θέλουμε απλώς να μας δείξουν τις
+διαφορές στην επίδοση μεταξύ Source-DPOR και Nidhugg-DPOR.
 
 \begin{itemize}
-\item The writer-N-readers test: In this test N threads read (readers) the same global variable and one thread (writer)
-writes that variable. It is important to notice that in this case there are some other local operations taking place
-before the read of the variable. As a result we must expect different results between source sets and persistent sets.
+\item writer-N-readers: Σε αυτό το τεστ N threads διαβάζουν (readers) την ίδια global μεταβλητή και ένα thread (writer)
+γράφει σε αυτή τη μεταβλητή. Είναι σηματνικό να σημειώσουμε ότι πριν την ανάγνωση της μεταβλητής κάποιο local operation του thread λαμβάνει
+χώρα. Επομένως αναμένουμε σημαντική διαφορά στην επίδοση μεταξύ των source sets και persistent sets.
 
-\item Account: This test is a small bank account simulation which uses mutex locks to prevent simultaneous operations on
-the account. There are three possible operations: The deposit operation increases the balance by an amount. The withdraw
-operation decreases the balance by a certain amount. The check\_result operation confirms $\text{final\_balance} ==
-\text{initial\_balance} + \text{deposit} - \text{withdraw}$ and can only happen after both deposit and withdraw are
-completed.
+\item Account: Αυτό το τεστ αποτελεί μια προσομοίωση ενός τραπεζικού λογαρισαμού και χρησιμοποιεί locks για κάθε operation που συμβαίνει
+    στον λογαριασμό. Υπάρχουν τρείς δυνατές λειτουργίες: Να αυξήσουμε το απόθεμα του λογαριασμού κατά ένα ποσό. Να κάνουμε ανάληψη μειώνοντας
+    το απόθεμα με ένα συγκεριμένο ποσό. Να ελέγξουμε το αποτέλεσμα check\_result (έλεγχος αποτελέσματος) όπου επιβεβαιώνουμε ότι $\text{final\_balance} ==
+\text{initial\_balance} + \text{deposit} - \text{withdraw}$ και μπορεί να συμβεί μόνο αν η κατάθεση και η ανάληψη έχουν ολοκληρωθεί.
 
-\item Micro: In this test three threads are spawned that perform the \verb|x++| operation twice. The \verb|x++|
-operation consists of two operations a read operation and a write operation.
+\item Micro: Σε αυτό το τεστ τρία threads δημιουργούνται και εκτελούν δύο φορές την εντολή \verb|x++| δύο φορές. Η συγκεκριμένη εντολή \verb|x++|
+αποτελείται από δύο επιμέρους λειτουργίες μία ανάγωσης της τιμής της μεταβλητής και μία το γράψιμο της μεταβλήτης.
 
-\item Last-zero test:The program consists of N+1 threads which operate on an array of N+1 elements which are all
-initially zero. In this program, thread 0 searches the array for the zero element with the highest index, while the
-other N threads read one of the array elements and update the next one. The final state of the program is uniquely
-defined by the values of i and array[1..N]. Last-zero does not produce more traces when DPOR is used for reasons that
-will be explained later. However a modification of the .ll file can expose the difference.
+\item Last-zero test: Το πρόγραμμα αποτελείται από N+1 threads τα οποία εκτελούν λειτουργίες σε N+1 στοιχεία ενός πίνακα που αρχικά όλα είναι μηδενικά.
+Σε αυτό το πρόγραμμα το thread 0 αναζητά το μηδενικό στοιχείο του πίνακα με το μεγαλύτερο index ενώ τα άλλα N threads
+διαβάζουνε από τον πίνακα ένα στοιχείο και ενημερώνουν την τιμή του επόμενου. Η τελική κατάσταση του προγράμματος ορίζεται μοναδικά από τις που θα 
+έχει ο πίνακα. Το Last-zero δεν παράγει περισσότερα tracce από τον DPOR για λόγους που εξηγούνται στη συνέχεια. Μια παραλλαγή του ενδιάμεσου
+κώδικα μπορεί να δείξει τη διαφορά.
 
-\item Indexer.c: This benchmark uses a compare-and-swap(CAS) primitive instruction to check whether a specific entry in
-a matrix is 0 and set it to a new value. 
+\item Indexer.c: Αυτό το benchmark χρησιμοποιεί την compare-and-swap(CAS) primitive instruction για να ελέγξει να ένα entry στον
+    πίνακα είναι 0 και στη συνέχεια θέτει μια καινούρια τιμή σε αυτό.
 
-\item Indexermod.c: In this benchmark all the threads traverse and try to write the matrix at the same order and as a
-result many conflicts emerge.
-
+\item Indexermod.c: Σε αυτό το benchmark όλα τα threads διασχίζουν και προσπαθούν να γράψουν έναν πίνακα με αποτέλεσμα να προκύπτουν
+    πολλές συγκρούσεις μεταξύ των threads.
 
 \end{itemize}
 
 \section{RCU}
 
-Read-Copy-Update (RCU) is a synchronization mechanism, which was invented by McKenney and Slingwine \cite{McKenney98},
-based on mutual exclusion. It was added to the Linux kernel in October of 2002. RCU achieves scalability improvements by
-allowing reads to occur concurrently with updates. In contrast with conventional locking primitives that ensure mutual
-exclusion among concurrent threads regardless of whether they be readers or updaters, or with reader-writer locks that
-allow concurrent reads but not in the presence of updates, RCU supports concurrency between a single updater and
-multiple readers. 
+To Read-Copy-Update (RCU) είναι ένα μηχανισμός συγχρονισμού που εφευρέθηκε από τους McKenney and Slingwine \cite{McKenney98},
+και βασίζεται στην αμοιβαία απόκληση πόρων. Προστέθηκε τον πυρήνα του Linux τον Οκτώβριο του 2002 και επέτρεψε σημαντίκη 
+βελτίωση στην ταυτόχρονη ανάγνωση και ενημέρωση. Σε αντίθεση με τα συνήθη locking primitives που διασφαλίζουν αμοιβαίο αποκλεισμό
+μεταξύ threads ανεξάρτητα με το αν είναι αναγνώστες ή εγγραφείς ή με τη χρήση reader-writer locks που επιτρέπουν ταυτόχρονες
+αναγνώσεις ή μία εγγραφή, το RCU επιτρέπει ταυτόχρονες αναγνώσεις και μία εγγραφή.
 
-DPOR was used as an approach to systematically test the code of the main flavor of RCU used in the Linux kernel (Tree
-RCU) for concurrency errors, under sequential consistency. The modeling allows Nidhugg, a stateless model checking tool,
-to reproduce, within seconds, safety and liveness bugs that have been reported for RCU \cite{Spin}.
+Η τεχνική του DPOR χρησιμοποιήθηκε σαν μια προσέγγιση για ελεγχθεί συστηματικά ο κώδικα του RCU που χρησιμποιείται στο Linux kernel (Tree
+RCU) κάτω από το memory model του sequential consistency. Η μοντελοποίηση επιτρέπει στο Nidhugg
+να αναπαράγει σε μερικά δευτερόλεπτα σφάλαμτα που έχουν αναφερθεί κατα καιρούς σχετικά με το RCU \cite{Spin}.
 
-RCU provides an ideal testcase to evaluate the various DPOR and Bounded DPOR algorithms since it is:
+Το RCU είναι ένα ιδανικό testcase για την αξιολόγησης διαφόρων υλοποιήσεων του DPOR και Bounded DPOR καθώς:
 \begin{itemize}
-\item It is a real world software and not just a synthetic test.
-\item The number of traces (different schedulings) is large enough to demonstrate the differences in the performance.
-\item Previous work \cite{Spin} enables us to evaluate the correctness of each algorithm's implementation.
+\item Είναι ένα πρόγραμμα που χρησιμοποιείται πραγματικά και όχι ένα συνθετικό τεστ synthetic test.
+\item Ο αριθμός των διαφορετικών δρομολογήσεων είναι αρκετά μεγάλος για να δούμε διαφορές στην επίδοση.
+\item Προηγούμενη δουλειά  \cite{Spin} μας επιτρέπει να αξιολογήσουμε την ορθότητα των υλοποιήσεων μας.
 \end{itemize}
 
 
-\section{Evaluation of Unbounded Algorithms}
-As it was established in the chapter \ref{unbounded} the implementation of the persistent sets is crucial since they are
-utilized in every bounding technique. In this section we demonstrate performance differences between Source-DPOR and
-Nidhugg-DPOR in both synthetic tests and RCU.
+\section{Αξιολόγηση των Μη Φραγμένων Αλγορίθμων}
+Όπως έγινε σαφές στο κεφάλαιο \ref{unbounded} η υλοποίηση των persistent sets είναι πολύ σημαντική καθώς χρησιμοποιείται
+σε κάθε bounding technique. Σε αυτή την ενότητα θα δείξουμε τις διαφοϱες στην επίδοση μεταξύ των Source-DPOR και
+Nidhugg-DPOR τόσο στα συνθετικά tests όσο και στο RCU.
 
-\subsection{Evaluation of Persistent sets on Synthetic tests}
-The results are presented with two different ways. The writer-N-readers testcase result is given with a graph, in Figure
-\ref{writer-N-readers}, in order to demonstrate the escalation of the state space as well as the greater impact the
-source-DPOR has. The rest of the results are given in Table \ref{Source-DPOR vs Nidhugg-DPOR for synthetic tests} so they can be
-easily compared. We deliberately do not show the duration of the execution since for most testcases the number of traces
-explored is really small. The execution of the synthetic test cases delineated that Source-DPOR indeed performs better
-than Nidhugg-DPOR. As it was expected Source-DPOR explores less traces than the Nidhugg-DPOR. It is important to notice
-that this difference is caused by the sleep set blocked traces that are produced by the DPOR algorithm that are omitted
-by the source DPOR. The reduction in the number of traces explored is not the same of all the testcases. For example in
-some testcases there is a significant decrease of the explored traces while in others the reduction is not so great. It
-varies due to the
+\subsection{Αξιολόγηση των Persistent Sets στα Συνθετικά Τεστ}
+Τα αποτελέσματα παρουσιάζονται με δύο διαφορετικούς τρόπους. Τα αποτελέσματα για το writer-N-readers testcase δίνονται σε μορφή γραφήματος, 
+στο Figure \ref{writer-N-readers}, προκειμένου να απεικονίσουμε την κλιμάκωση του χώρου καταστάσεων καθώς
+και την σημαντική επίδραση που έχει ο source-DPOR. Τα υπόλοιπα αποτελέσματα δίνονται στο Table \ref{Source-DPOR vs Nidhugg-DPOR for synthetic tests} 
+ώστε να μπορέσουμε εύκολα να τα συγκρίνουμε. Ηθελημένα δεν σημειώνουμε τη διάρκεια εκτέλεση καθώς στις περισσότερες περιπτώσεις ο αριθμός
+των traces είναι πολύ μικρός όπως και ο χρόνος.
+Όπως ήταν αναμενόνμενο τα συνθετικά testcase έδειξαν ότι ο Source-DPOR πράγματι έχει καλύτερη επίδοση από τον
+Nidhugg-DPOR. Όπως ήταν αναμενόμενο ο Source-DPOR εξερευνά λιγότερα traces από τον Nidhugg-DPOR. Είναι σημαντικό να
+σημειώσουμ ότι η διαφορά οφείλεται στον αριθμός των sleep set blocked traces τα οποία προκύτπουν από τον DPOR αλγόριθμο 
+και τα οποία δεν συναντάμε στον source DPOR. Αυτή η μείωση δεν είναι σταθερή σε όλες τις περιπτώσεις.
 
 \graph{img/wNr.png}{writer-N-readers}
 
 \smalltabular{"tables/synthetic_unbounded.tex"}{Source-DPOR vs Nidhugg-DPOR for synthetic tests}
 
 \subsection{Evaluation of Persistent sets on RCU}
-We noticed that there is no difference between Source sets and persistent sets thus no results are presented since they
-coincide with \cite{Spin}. The reason why the results of Nidhugg-DPOR and Source-DPOR are the same may be due to the operations
-that take place which not allow for the optimization of the Source-DPOR to be effective. Another reason is the LLVM IR
-which is used by Nidhugg and will be explained in the next section.
+Παρατηρήσμα ότι δεν υπάρχει διαφορά μεταξύ Source sets και persistent sets και επομένως δεν παρουσιάζουμε αποτέλεσματα
+καθώς αυτά θα συμφωνούν με αυτα του \cite{Spin}. Ο λόγος που τα αποτελέσατα του Nidhugg-DPOR και Source-DPOR είναι ίδια οφείτεαι 
+στις λειτουργίες που εκτελούνται και που δεν επιτρέπουν την βελτιστοποίηση του Source-DPOR.
 
-\section{Comparison with Concuerror results}
-The are many cases where Concuerror's Source-DPOR explores less traces than Classic-DPOR while Nidhugg's Source-DPOR
-does not explore less traces than Nidhugg-DPOR. Moreover. Nidhugg-DPOR implementation seems to explore less number of
-traces than Concuerror's Classic-DPOR \cite{AbdullaAronisJohnssonSagonasDPOR2014} which, in many cases, equals with the
-numbers of traces explored by Source-DPOR. Here we present the reasons that justify this behavior. 
+\section{Σύγκριση με τα αποτελέσματα του Concuerror}
+Ο Concuerror είναι ένα εργαλείο που αναπτύχθηκε από την ίδια ερευνητική ομάδα και έχει στόχο να εντοπίζει σφάλματα
+σε προγράμματα Erlang. Επομένως η σύγκριση της επίδοσής του μπορεί να μας δώσει μια ένδειξη για την ορθότητα των
+υλοποιήσεών μας.
+Υπάρχουν περιπτώσεις here Concuerror's Source-DPOR εξερευνά λιγότερα traces από τον Classic-DPOR ενώ στο Nidhugg αυτό δεν ισχύει.
+Επιπλέον, η υλοποίηση του Nidhugg-DPOR φαίνεται να εξερευνά λιγότερα traces από αυτά που εξερευνόνται από τον
+Classic-DPOR του Concuerror \cite{AbdullaAronisJohnssonSagonasDPOR2014}. Προσπαθήσαμε να ερμηνεύσουμε αυτή τη συμπεριφορά και συμπεράναμε
+ότι οι λόγοι που οι τιμές διαφέρουν είναι οι εξής:
 
 \begin{itemize}
-  \item The implementation of the persistent set calculation: In Concuerror this calclation is more relaxed than the in
-  Nidhugg as a result Nidhugg calculates sometimes smaller persistent sets. In Figure \ref{Lastzero Concuerror} the
-  example of lastzero testcase in Concuerror is given when a larger persistent set is calculated. In fact, the process
-  $q$ should never have been added to the persistent set since it does not conflict with any other process.
+  \item Η υλοποίηση των persistent set: Στον Concuerror ο υπολογισμός των persistent sets είναι πιο χαλαρός από του
+  Nidhugg με αποτέλεσμα το τελευταίο να υπολογίζει μικρότερα persistent sets. Στο Figure \ref{Lastzero Concuerror} 
+  δίνεται το παράδειγμα του Last-zero testcase του Concuerror ως παράδειγμα υπολογισμού μεγαλύτερου persistent set. Στην πραγματικότητα
+  το $q$ δε θα έπρεπε ποτέ να προστεθεί στο persistent set καθώς δεν έχει conflict με άλλες διεργασίες.
 
-  \item The number of traces explored is closely related by scheduling of the events: Let a program consist of a process
-  which writes on variable $x$ and two process that read variable $x$. In Figure \ref{Scheduling Effect
-  reader-writer-reader} the exploration is demonstrated when one reader is scheduled first. We notice that exactly 4
-  traces are explored. On the other hand, provided that the writer was scheduled first \ref{Scheduling Effect
-  writer-reader-reader} 5 traces with one sleep set blocked traces would have been explored.
+  \item Ο αριθμός των traces που εξερευνότναι σχετίζεται άμεσα με την δρομολόγηση των γεγονότων: Έστω ένα πρόγραμμα που αποτελείται από
+      δύο διεργασίες που διαβάζουν μια μεταβλητή $x$ και μία που γράφει σε αυτή τη μεταβλητή $x$. Στο Figure \ref{Scheduling Effect
+  reader-writer-reader} παρουσιάζεται η εξερεύνηση όταν ο ένας αναγνώστης δρομολογείται πρώτος. Παρατηρούμε ότι εξερευνόνται ακριβώς
+  4 traces. Στην περίπτωση που δρομολογούντας πρώτα ο εγγραφέας \ref{Scheduling Effect
+  writer-reader-reader} θα εξερευνότναν 5 traces με το ένα trace να γίνεται sleep set blocked.
 
 \end{itemize}
 

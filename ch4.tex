@@ -76,8 +76,7 @@ explored is really small. The execution of the synthetic test cases delineated t
 than Nidhugg-DPOR. As it was expected Source-DPOR explores less traces than the Nidhugg-DPOR. It is important to notice
 that this difference is caused by the sleep set blocked traces that are produced by the DPOR algorithm that are omitted
 by the source DPOR. The reduction in the number of traces explored is not the same of all the testcases. For example in
-some testcases there is a significant decrease of the explored traces while in others the reduction is not so great. It
-varies due to the
+some testcases there is a significant decrease of the explored traces while in others the reduction is not so great.
 
 \graph{img/wNr.png}{writer-N-readers}
 
@@ -86,10 +85,11 @@ varies due to the
 \subsection{Evaluation of Persistent sets on RCU}
 We noticed that there is no difference between Source sets and persistent sets thus no results are presented since they
 coincide with \cite{Spin}. The reason why the results of Nidhugg-DPOR and Source-DPOR are the same may be due to the operations
-that take place which not allow for the optimization of the Source-DPOR to be effective. Another reason is the LLVM IR
-which is used by Nidhugg and will be explained in the next section.
+that take place which not allow for the optimization of the Source-DPOR to be effective.
 
 \section{Comparison with Concuerror results}
+Concuerror is a model checking tool for concurrent Erlang programs. Since it was created by the same team, the performance
+of Concuerror can provide us with some sanity tests regarding the correctness of our implementation.
 The are many cases where Concuerror's Source-DPOR explores less traces than Classic-DPOR while Nidhugg's Source-DPOR
 does not explore less traces than Nidhugg-DPOR. Moreover. Nidhugg-DPOR implementation seems to explore less number of
 traces than Concuerror's Classic-DPOR \cite{AbdullaAronisJohnssonSagonasDPOR2014} which, in many cases, equals with the

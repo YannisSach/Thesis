@@ -1,49 +1,46 @@
-\chapter{Further Discussion on Bounding Problem}
+\chapter{Επιπλέον Συζήτηση του Bounding Problem}
 \label{Chapter 5}
 
-In this chapter we discuss alternative ideas of approaching the preemption bounding problem of the DPOR. 
-We suggest a new approach which is shown to be equivalent to the addition of conservative branches but does not require the addition of conservative
-branches.
+Σε αυτό το κεφάλαιο συζητόνται εναλλακτικές προσεγγίσεις του preemption bounding problem για τον DPOR.
+Προτείνεται μια καινούρια προσέγγιση η οποία δείχνουμε ότι είναι ισοδύναμη με την προσθήκη συντηρητικών διακλαδώσεων η οποία όμως δεν χρησιμοποιεί 
+συντηρητικές διακλαδώσεις.
 
-\section{Techniques without the Addition of Conservative Branches}
+\section{Τεχνικές χωρίς την Προσθήκη Συντηρητικών Διακλαδώσεων}
 
-In previous chapters we discussed the challenges one have to deal with when designing a Bounded DPOR algorithm. We saw that there there is 
-no apparent significant improvement can be made with the use of conservative branches and that other optimizations used for the unbouded versions of DPOR
-cannot have analogous results. 
+Σε προηγούμενο κεφάλαιο συζητήσαμε τις προκλήσεις που προκύπτουν από τη σχεδίαση ενός Bounded DPOR αλγορίθμου. Είδαμε ότι δεν μπορούν να γίνουν
+σημαντικές βελτιώσεις όταν προσθέτουμε συντηρητικές διακλαδώσεις και ότι πολλές βελτιστοποιήσεις που δουλεύουν για τις μη φραγμένες εκδοχές των
+αλγορίθμων δεν δουλεύουν για τις φραγμένες εκδοχές τους.
 
-\subsection{Motivation}
-The only algorithm that does not add any conservative branch is the Naive-BPOR. For a sufficient bound an erroneous
-trace would have still be found using this technique. The drawback of this algorithm is its unsoundness. In this
-algorithm a function which calculates the number of preemptive switches in the current thread is used. However many of
-the preemptive switches that are counted would be avoided.
+\subsection{Κίνητρο}
+Ο μόνος αλγόριθμος που δεν προσθέτει συντηρητικές διακλαδώσεις είναι ο Naive-BPOR. Για ένα επαρκές bound ένα trace που περιείχε 
+σφάλμα θα εξετάζοταν από τον αλγόριθμο. Το ελλάτωμα αυτού του αλγορίθμου είναι ότι δεν είναι sound.
+Σε αυτό τον αλγόριθμο μια συνάρτηση υπολογίζει τον αριμό των preemptive switches. Όμως πολλές switches που υπολογίζονται μπορούν να 
+αποφευχθούν.
 
-An example is given in Figure \ref{An example of avoidable preemption-switch} further explaining this idea. Let
-a program consisting of two processes $p$ and $q$. Process $p$ writes a shared variable $x$ and process $q$ reads
-the shared variable $y$ (which is not modified at any point by any other process), and the shared variable $x$. There
-are only two possible schedulings i.e. one that the writing of $x$ precedes the reading and one that these two commands
-are reversed. However, in order to make the reversion a preemptive switch must be introduced. Suppose that the first
-execution sequence is $q.q.p$, the other will be $q.p.q$ since the first step of $q$ has no race with step of $p$.
+Ένα παράδειγμα δίνεται στο Figure \ref{An example of avoidable preemption-switch} που εξηγεί καλύτερα την ιδέα. Έστω 
+ένα πρόγραμμα που αποτελείτα από τις διεργασίες $p$ και $q$. Η διεργασία $p$ γράφει μια μοιραζόμενη μεταβλητή $x$ και η διεργασία $q$ διαβάζει
+μια μεταβλητή $y$ (η οποία δεν τροποιείται από κάποια άλλη διεργαία), και γράφει την μεταβλητή $x$. Υπάρχουν δύο δυνατά 
+interleavings όπως φαίνεται και στην εικόνα. Αν υποθέσουμε ότι κάνουμε εξερεύνηση με bound $0$ τότε και μια συντηρητική διακλάδωσηη πρέπει να 
+προστεθεί.
 
 \trace{motivation.pdf}{An example of avoidable preemption-switch}
 
-In Figure \ref{An example of avoidable preemption-switch} the preemptive switch that takes places would have been easily
-avoided there is an obvious inversion of the two blocks $q:read(y)$ and $p$. But what allows such an inversion?
+Στο Figure \ref{An example of avoidable preemption-switch} το preemptive switch που λαμβάνει χώρα θα μπορούσε εύκολα να αποφευχθεί αντιστρέφοντας
+απλώς την πρώτη εντολή του $q$ με την πρώτη την $p$. Αλλά τί επιτρέπει αυτή την αλλαγή;
 
-The answer lies to the events of block (in this particular case the block consists of one step only). The first block
-reads a variable which is not used by any other block. It is fathomable that this block can be switched with the next
-block since there is no a happens before relationship with the two blocks.
+Η απάντηση βρίσκεται στα γεγονότα που αποτελείται το block. Στην περίπτωσή μας το block αποτελείται από 
+ένα μόνο βήμα. Το πρώτο block διαβάζει μια μεταβλητή που δε χρησιμοποιείτα από άλλο block. Επομένως τα δύο block δεν έχουν happens-before
+σχέση.
 
-This observation leads to the next question: Which of the preemption switches are compulsory? (Or equivalently, which
-traces cannot be produced without a preemption switch?) Moreover, is it possible for a given trace to calculate the
-minimum number of preemptive switches among all the equivalent traces?
+Η παρατήρηση αυτή οδηγεί στο επόμεον ερώτημα: Ποία preemption switches είναι υποχρεωτικά; Ή ισοδύναμα ποια traces δεν μπορούν να παραχθούν
+χωρίς preemptive switch; Επιπλέον, είναι δυνατό για ένα trace να υπολογίσουμε τον ελάχιστο αριθμό από preemptive switches που θα απαιτούσε ένα
+ισοδύναμο trace;
 
-\subsection{An Algorithm without Conservative Branches}
-An algorithm that would preform such a bounded search would be different from the Naive-BPOR only concerning the
-function that calculates the bound count of the traces. This function $f$ would have to be constantly ascending i.e. it
-would not be possible to calculate a lower bound later for the same traces. Given a suffix $E$, $f(E) \leq f(E.E')$ for
-any $E'$.
+\subsection{Ένας Αλγόριθμος χωρίς Συντηρητκές Διακλαδώσεις}
+Ένας αλγόριθμος που θα έκανε bounded search θα ήταν διαφορετικός από τον Naive-BPOR μόνο σε ότι αφορά τη συνάρτηση που υπολογίζει το
+preemption count της δρομολόγησης. Αυτή η συνάρτηση $f$ θα ήταν αύξουσα δηλαδή θα ίσχυε για ένα πρόθεμα $E$, $f(E) \leq f(E.E')$ για κάθε $E'$.
 
-The general form of the algorithm is given in Algorithm \ref{NBBPOR}.
+Η γενική μορφή του αλγορίθμου δίνεται στον Αλγόριθμο \ref{NBBPOR}.
 
 \begin{algorithm}[H]
     \SetAlgoLined
@@ -61,41 +58,36 @@ The general form of the algorithm is given in Algorithm \ref{NBBPOR}.
     }
 \end{algorithm}
 
-Comparing Algorithm \ref{NBBPOR} with Algorithm \ref{GeneralDPOR} we notice that instead of calculating the $B_v(S.t)$ i.e., the
-bound count of the current trace value, we calculate the $min(B_v[S.t])$ i.e., minimum of all $B_v$ values of the traces
-that are equivalent with $S.t$.
+Συγκρίνοντας τον Αλγόρθμο \ref{NBBPOR} με τον \ref{GeneralDPOR} παρατηρούε ότι αντί να υπολογίζουμε το $B_v(S.t)$ δηλαδή το preemption
+count ενός trace υπολογίζουμε το $min(B_v[S.t])$ δηλαδή το ελάχιστο $B_v$ για όλα τα ισοδύναμα traces.
 
-\subsection{Calculating Minimum Bound Count}
-The only thing left is the construction of this function $f$. For a given trace $E$ which consists of blocks many
-happens-before relations hold. Each equivalent trace should also compensate with these relations. It is also possible
-for different instructions in one block different happens-before relations hold true. For this section only, we will
-consider that a happens-before relation is a relation that holds between blocks. This is done for two main reasons:
+\subsection{Υπολογισμός του Ελάχιστου Preemption Count}
+To μόνο που μας μένει είναι η κατασκεύ της συνάρτησης $f$. Για ένα trace $E$ που αποτελείται από blocks πολλές σχέσεις 
+happens-before ισχύουν. Κάθε ισοδύναμο trace πρέπει να συμφωνεί με αυτές τις σχέσεις. Επίσης σχέσεις happens-before ισχύουν
+για τις εντολές εντός ενός block. Γι αυτή την ενότητα μόνο θα μας απασχολήσουν οι σχέσεις μεταξύ blocks.
+Οι λόγοι που έγινε αυτή η επιλογή είναι οι εξής:
 
 \begin{itemize}
-    \item The algorithm described later is simplified.
-    \item We are not interested in further breaking each block and as a result we can regard is block as an entity.
+    \item Οι αλγόριθμοι που παρουσιάζονται στη συνέχεια είναι πολύ πιο απλοί.
+    \item Δεν μας ενδιαφέρει να σπάσουμε περαιτέρω κάθε block και επομένως μπορούμε να δούμε τοblock σαν μια ενότητα.
 \end{itemize}
 
-These happens-before relations form a graph. This graph consists of nodes which are the blocks and edges which are these
-relations. Obviously blocks of the same thread have a happens-before relation. We can also move from one block to
-another as long as these blocks happen concurrently. We add weights to each edge. The edges that connect to blocks of
-the same thread weigh 0. Edges that start from a block that is blocked or the most recently added block of each thread
-weigh 0 since blocked blocks do not increase the bound count and we do not know if the last block of each thread is
-indeed the last one. All the other edges which represent preemption points have weight 1.
+Αυτές οι σχέσεις happens-before σχηματίζουνε ένα γράφο. Αυτός ο γράφος αποτελείται από κόμβους που αντιστοιχούν σε blocks και 
+ακμές που αντιστοιχούν στις σχέσεις μεταξύ τους. Προφανώς block που ανήκουν στο ίδιο thread έχουν happens-before σχέση.
+Επίσης μπορούμε να κινηθούμε από το ένα block στο άλλο από τη στιγμή που αυτά είναι ταυτόχρονα.
+Προσθέτουμε βάρη σε κάθε ακμή. Ακμές που συνδέουν blocks του ίδιου thread έχουν βάρος $0$. Οι ακμές που ξεκινάν από block
+που είναι μπλοκαρισμένα έχουν επίσης βάρος $0$. Οι υπόλοιπες ακμές έχουν βάρος ένα.
 
-In order to find the minimum bound count we have to traverse this all the blocks of this graph without breaking at any
-point the happens-before relations. Hence, the minimum bound count corresponds to the minimum hamiltonian path that
-compensates with all happens-before relations of the trace that is explored.
+Προκειμένου να βρούμε το ελάχιστο preemption count διασχίζουμε όλα τα block του γράφου χωρίς να παραβιάζουμε τις happens-before σχέσεις.
+Επομένως το minimum bound count αντιστοιχεί στο ελάχιστο hamiltonian μονοπάτι το οποίο δεν παραβίαζει τις happens-before σχέσεις.
 
-Since the calculation of the minimum hamiltonian path is demanding we have to create a graph that limits as much as
-possible traverses that break the happens-before relations. All traversals that cover the whole graph passing from each
-node only once are equivalent traces. 
+Επειδή ο υπολογισμός του ελάχιστου hamiltonian μονοπατιού είναι απαιτητικός κατασκευάζουμε ένα γράφο που περιορίζει όσο αυτό είναι
+δυνατό πιθανές διασχίσεις που παραβιάζουν τις σχέσεις happens-before.
 
-\noindent An algorithm on how to add a block to a given graph is given at Algorithm \ref{Adding a new block to the
-dependencies graph}. The algorithm works using induction. Initially the graph consists of the first block. When a block
-of the trace is completed then we add it to the dependency graph. We connect the new block with each concurrent block
-with double edges with the new block. Moreover we connect the most recent block of each thread that happens before the
-new block with a directed edge ending to the new block. 
+\noindent Ένας αλγόριθμος που προσθέτει τα blocks στο γράφο είναι δίνεται στον Αλγόριθμο \ref{Adding a new block to the
+dependencies graph}. Ο αλγόριθμος λειτουργεί επαγωγικά. Αρχικά ο γράφος αποτελείται από το πρώτο block. Όταν block
+του trace ολοκληρώνεται το προσθέτουμε στο γράφο. Προσθέτουμε κάθε block που συμβαίνει ταυτόχρονα με ένα άλλο block με διπλή ακμή
+Επιπλέον συνδέουμ το πιο πρόσφατο block κάθε thread που συμβαίνει πριν από το καινούριο block με ακμες που καταλήγουν στο καινούριο block.
 
 \SetKw{Return}{return \;}
 \SetKw{Break}{break \;}

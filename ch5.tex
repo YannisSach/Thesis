@@ -40,7 +40,7 @@ minimum number of preemptive switches among all the equivalent traces?
 \subsection{An Algorithm without Conservative Branches}
 An algorithm that would preform such a bounded search would be different from the Naive-BPOR only concerning the
 function that calculates the bound count of the traces. This function $f$ would have to be constantly ascending i.e. it
-would not be possible to calculate a lower bound later for the same traces. Given a suffix $E$, $f(E) \leq f(E.E')$ for
+would not be possible to calculate a lower bound later for the same traces. Given a prefix $E$, $f(E) \leq f(E.E')$ for
 any $E'$.
 
 The general form of the algorithm is given in Algorithm \ref{NBBPOR}.

@@ -128,37 +128,32 @@ dependencies graph}. Ο αλγόριθμος λειτουργεί επαγωγι
 
 \trace{compulsoryswitch.pdf}{Graph example}
 
-In Figure \ref{Graph example} a simple example of such a graph is demonstrated. For this trace we notice that $w(y)$ of
-$q$ thread is concurrent with $r(x)$ while it happens before $w(y)$ of the $p$ thread. Each transition costs 1
-preemption switch that is why the weight is 1. Moreover transitions between the same thread cost 0. The most important
-fact, however, is that if for any reason we try to violate the happen before relation (e.g. starting from $r(x)$ we jump
-to $w(x)$) there is no way to traverse all the nodes. 
+Στο Figure \ref{Graph example} ένα απλό παράδειγμα ενός τέτοιου γράφου παρουσιάζεται. Για το trace παρατηρούμε ότι το $w(y)$ του thread 
+$q$ είναι ταυτόχρονο με το $r(x)$ ενώ συμβαίνει πριν το $w(y)$ του $p$ thread. Κάθε μετάβαση κοστίζει 1 preemption switch και γι αυτό
+το λόγο έχει βάρος 1.
+Επιπλέον, μεταβάσεις μεταξύ των ίδιων thread κοστίζουν 0. Είναι σημαντικό να σημειώσουμε ότι αν παραβιάσουμε τις happens-before σχέσεις
+δεν υπάρχει διάσχιση που να μπορεί να διασχίσει όλους τους κόμβους. Για παράδειγμα ξεκινώντας από το $r(x)$ και μεταβένοντας στο
+$w(x)$ δεν υπάρχει τρόπος να διασχίσουμε όλους του κόμβους.
 
-We can see that there is a hamiltonian path with weight 1 for the given trace. In fact, this is the minimum hamiltonian
-path of the graph. We can easily realize that there is no equivalent trace with the initial one that has bound count
-less than 1. 
+Μπορούμε να δούμε ότι το hamiltonian path με βάρος 1 για ένα trace. Αυτό είναι και το ελάχιστο hamiltonian μονοπάτι.
 
-We can infer that the calculation of this bound count is reduced to the weight of the minimum hamiltonian path of this
-graph. This problem it is known to be NP-complete. As a result any algorithm that would calculate this weight would not
-be significantly better than a DFS-exploration. 
+Έτσι έχουμε καταφέρει να ανάξουμε το πρόβλημα του minimum preemption coount στο πρόβλημα του minimum hamiltonian path.
+Το πρόβλημα αυτό είναι γνωστό  NP-hard. Έτσι δεν μπρούμε να αναμένουμε ο αλγόριθμος που υπολογίζει το βάρος να είναι θεαματικά πιο γρήγορος
+από μια εξερεύνηση DFS. 
 
-This is an extremely interesting indication of the difficulty of the DPOR bounding problem since the addition of the
-conservative sets imply this DFS exploration at the state space. As a result this algorithm would not be better than the
-already proposed BPOR algorithm.
+Αυτό είναι πολύ ενδιαφέρον αποτελέσμα καθώς απεικονίζε τη δυσκολία του DPOR bounding problem καθώς η προσθήκη των συντηρητικών διακλαδώσεων
+υπονοεί αυτή την DFS αναζήτηση.
 
-Now that the difficulty of this approach is clear a new question arises. Is it possible to approximate the total weight of the minimum hamiltonian path?
-Such an algorithm would cover a greater state space than the Naive-BPOR without the explosion caused by the conservative branches.
+Τώρα που έχουμε διαπιστώσει τη δυσκολία του προβλήματος ένα καινυριο ερώτημα δημιουργείται. Μπορούμε να προσεγγίσουμε το βάρος του ελάχιστου μονοπατιού;
+Ένας τέτοιας αλγόριθμος δεν θα ήταν sound αλλά θα ήταν μια βελτίωση στον Naive-BPOR χωρίς να έχουμε την έκρηξη του χώρου καταστάσεων.
 
-\subsection{Approximating Bound Count}
-There are two approaches examined in order to approximate the value of the bound count. The idea of both algorithms is
-based on this observation: A preemption switch is compulsory when for two blocks of the same process A a block of
-another process B must intervene in order for the happens-before relations to hold true. As a result, the execution of
-the first A block should stop so the execution of the B block takes place followed by the execution of the A block
-again. Hence it should hold $e_1(A) \rightarrow e(B) \rightarrow e_2(A)$. In case of $e_1(A) \not \rightarrow e(B)$ or
-$e(B) \not \rightarrow e_2(A)$ we could invert the blocks without affecting the happens-before relations and, thus
-construct an equivalent trace with lower bound count.
+\subsection{Προσεγγίζοντας το Bound Count}
+Δύο μέθοδη δοκιμάστηκαν για να προσεγγίσουμε την τιμή του preemption count. Η ιδέα και για τους δύο αλγορίθμους βασίζεται στην εξής παρατήρηση:
+Ένα preemption switch είναι υποχρεωτικό αν δύο block της ίδιας διεργασίας A διακόπτονται από ένα block της διεργασίας B.
+Δηλαδή αν ισχύει $e_1(A) \rightarrow e(B) \rightarrow e_2(A)$. Στην περίπτωση που ίσχυε $e_1(A) \not \rightarrow e(B)$ ή
+$e(B) \not \rightarrow e_2(A)$ θα μπορούσαμε να αντιστρέψουμε τα blocks χωρίς να παραβιάζουμε τις happens-before σχέσεις.
 
-The algorithm is presented here:\\
+Ο Αλγόριθμος παρουσιάζεται εδώ:\\
 
 \SetKwProg{Fn}{Function}{}{}
 \begin{algorithm}[H]
@@ -180,13 +175,12 @@ The algorithm is presented here:\\
     }
 \end{algorithm}
 
-In Algorithm \ref{First Approximation Algorithm} we find the most recent block with the same pid as with the last block. We, then try to find if there is an event that happens before the first
-and after the last event. If exists such an event we increase the counter.
-Notice that for establishing the happens-before relation vector clocks can be used.
-Moreover, it is obvious that more happens-before relations can be counted.
+Στον Αλγόριθμο \ref{First Approximation Algorithm} εντοπίζουμε το πιο πρόσφατο block με το ίδιο pid με το τελευτάιο block. Στη συνέχεια προσπαθούμε να βρούμε αν υπάρχει κάποιο
+γεγονός που συμβαίνει μετά το πρώτο γεγονός και πριν το τελευταίο.
+Αν αυτό υπάρχει τότε αυξάνουμε τον μετρητή.
+Προκειμένου να διαπιστώσουμε τις happens-before σχέσεις τα vector clocks μπορούν να χρησιμοποιηθούν.
 
-
-Th second algorithm explores more state space than it is required.\\
+Ο δεύτερος αλγόριθμος εξερευνεί μεγαλύτερο κομμάτι του state space.\\
 
 \begin{algorithm}[H]
     \caption{Second Approximation Algorithm}
@@ -207,30 +201,23 @@ Th second algorithm explores more state space than it is required.\\
     }
 \end{algorithm}
 
-This algorithm starts the search for an event that intervenes the two events of the same id from the immediately previous block 
-with the same id. 
-
-\subsection{Evaluation of Approximating Algorithms}
-The previous discussed approaches were tested and produced some interesting results. The both estimation algorithms seem
-to be ``more sound'' than the BPOR and may explore traces that exceed the bound. This stems from the fact that they tend
-to underestimate the bound count since there are more complex relations between blocks that result traces with higher
-bound count than the one estimated. We notice that in writer-N-readers example the number of traces explored is stable
-for every bound. In fact, each trace of this test has an equivalent trace with zero bound count since in each thread
-only a command related to a shared variable is executed.
+\subsection{Αξιολόγηση των Αλγορίθμων Προσέγγισης}
+Οι προηγούμενες προσεγγίσεις που συζητήθηκαν παρουσάζουν κάποια ενδιαφέροντα αποτελέσματα. Και οι δύο αλγόριθμοι φαίνεται να είναι πιο 
+``sound'' και από τον BPOR και εξερευνούν traces που ξεπερνούν το bound. Αυτό προκύπτει από το γεγονός ότι τείνουν να
+υποεκτιμούν το preemption count καθώς πιο πολύπλοκες σχέσεις δεν αποκαλύπτονται.
+Παρατηρούμε ότι στο writer-N-readers ο αριθμός των traces είναι σταθερός για κάθε bound. Αυτό οφείλεται στο όιτ κάθε thread αποτελείται από μόνο 
+μια εντολή.
 
 \graph{img/wNrLB.png}{writer-N-readers bounded by the first estimation algorithm}
 \smalltabular{tables/lazy1_bounded.tex}{Traces for the first estimation algorithm for various bound limits}
 
-\subsection{Implementation of Lazy-BPOR}
+\subsection{Υλοποίηση του Lazy-BPOR}
 
-Some of the testcases such as lastzero or writer-N-readers made clear that an implementation of a bound count function
-which does not simply counts the preemptive switches in traces can prevent the state space explosion caused by the
-conservative branches added. The next step is to implement the Lazy-BPOR, an algorithm that calculates the number of
-compulsory preemptive switches (preemptive switches that cannot be avoided in any equivalent trace with the one
-examined). The main difference from the Naive-BPOR is that the Lazy-BPOR maintains throughout the execution of the DPOR
-a graph of the blocks that are contained in the traces. When a new block is created, it is added by the algorithm
-previously described. When it comes to the calculation of the bound count, the minimum hamiltonian path is calculated.
-The weight of this path corresponds to the bound count taken into consideration.
+Τα προηγούμενα testcases δείξαν ότι μπορύμε να αποφύγουμε το state space explosion καθώς δεν προσθέτουμε συντηρητικές διακλαδώσεις.
+Το επόμενο βήμα είναι η υλοποίηση του Lazy-BPOR, ενός αλγορίθμου που υπολογίζει με ακρίβεια τα compulsory switches.
+Η διαφορά του από τον Naive-BPOR είναι οτι διατηρεί ένα γράφο καθ᾽ όλη τη διάρκεια εκτέλεσης του DPOR
+Η προσθήκη των κόμβων γίνεται όπως έχει ήδη περιγραφεί.
+Το preemption count γίνεται με τον υπολογσιμό του minimum hamiltonian path.
 
 \begin{algorithm}
     \caption{Lazy-BPOR}
@@ -264,13 +251,11 @@ The weight of this path corresponds to the bound count taken into consideration.
 
 
 
-\subsection{Lazy-BPOR - RCU Evaluation}
+\subsection{Lazy-BPOR - Αξιολόγηση στο RCU}
 
-The results are demonstrated below. Since we have to compare Lazy-BPOR with BPOR the bugged versions of the DPOR must be used. The bugged version
-of DPOR is that where the last running thread is prioritized.
+Τα αποτελέσματα παρουσιάζονται στη συνέχεια. Συγκρίνουμ τον Lazy-BPOR με την buggy εκδοχή του BPOR. 
 
-At Figures \ref{Comparison between DPOR and Lazy-BPOR} and \ref{Comparison between BPOR and Lazy-BPOR} we present the results for the various
-testcases of RCU test suite.
+Στα Figures \ref{Comparison between DPOR and Lazy-BPOR} και \ref{Comparison between BPOR and Lazy-BPOR} παρουσιάζουμε τα αποτελέσματα για τα διάφορα testcases του RCU.
 
 
 \landscapetabular{"tables/lazy_comp.tex"}{Comparison between DPOR and Lazy-BPOR}
@@ -278,21 +263,18 @@ testcases of RCU test suite.
 \landscapetabular{"tables/lazy_buged_comp.tex"}{Comparison between DPOR and Lazy-BPOR without the bug}
 
 
-We compare the algorithm with BPOR. We notice that Lazy-BPOR examines less traces but requires longer time since the cost of the lazy bound count is significantly
-increased. This is due to the calculation of the minimum hamiltonian path.
+Συγκρίνοντας τα αποτελέσματα παρατηρούμε ότι ο Lazy-BPOR εξετάζει λιγότερα traces αλλά απαιτεί περισσότερο χρόνο καθώς ο υπολογισμός του preemption count απαιτεί
+αρκετό χρόνο.
 
 \landscapetabular{"tables/hline_pandas_lazy_preep.tex"}{Comparison between BPOR and Lazy-BPOR}
 
-\section{Conclusion}
-Even though the Lazy-BPOR is not proved to be a more efficient way than all the other sound BPOR algorithms examined in this thesis it
-provides some interesting results.
+\section{Συμπεράσματα}
+Παρόλο που ο Lazy-BPOR δεν είναι πιο αποδοτικός από τους υπόλοιπους αλγορίθμους που παρουσιάστηκαν σε αυτή τη διπλωματική παρουσιάζει μερικά ενδιαφέρονται αποτελέσματα.
 
 \begin{itemize}
-    \item It is possible to explore a preemption-bounded state space without the addition of conservative branches.
-    \item It provides an upper bound for the number of traces explored in BPOR no matter the bound. In fact the number of traces
-    explored by Lazy-BPOR at worst case equal to the number of traces explored by the unbounded DPOR. This is true since no conservative
-    branches are added.
-    \item The most important is that provides a reduction of the preemption-bounded search to a well known graph problem where many heuristics can
-    be applied in order to expedite the calculation of the minimum hamiltonian path.
+    \item Μπορούμε να εξερευνήσουμε το preemption-bounded state space χωρίς την προσθήκη conservative branches.
+    \item Καθώς δεν προσθέτει συντηρητικές διακλαδώσεις δίνει ένα άνω φράγμα στον αριθμό των traces πολύ μικρότερο από αυτό του BPOR (τον αριθμό των traces της unbounded εκδοχής)
+    \item Το πιο ενδιαφέρον είναι ότι ανάγει την preemption-bounded search σε ένα γνωστό γραφοθεωρητικό πρόβλημα το οποίο μπορεί να επιδεχθεί ευρηστικές για την 
+        επιτάχυνση του υπολογισμού του hamiltonian path.
 \end{itemize}
 
